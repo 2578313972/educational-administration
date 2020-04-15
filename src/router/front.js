@@ -5,19 +5,19 @@ import FrontFore from '../views/front/front copy 4'
 
 const front = [
   {
-    path: 'FrontOne',
+    path: '/FrontOne',
     name: 'FrontOne',
     component: FrontOne
   }, {
-    path: 'FrontTow',
+    path: '/FrontTow',
     name: 'FrontTow',
     component: FrontTow
   }, {
-    path: 'FrontThree',
+    path: '/FrontThree',
     name: 'FrontThree',
     component: FrontThree
   }, {
-    path: 'FrontFore',
+    path: '/FrontFore',
     name: 'FrontFore',
     component: FrontFore
   }
