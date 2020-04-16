@@ -1,15 +1,15 @@
 <template>
     <div id="">
-        front 2
+        BArrange
     </div>
 </template>
 
 <script>
 export default {
-
+    
 }
 </script>
 
-<style lang="less" scoped >
+<style lang="less">
 
 </style>

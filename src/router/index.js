@@ -1,28 +1,23 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import front from './front'
-import queen from './queen'
-import Home from '../views/home.vue'
-import Login from '../views/login.vue'
-
-
 Vue.use(VueRouter)
 
+import Front from './front';
+import Back from './back';
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: () => import('../views/Home.vue'),
     children:[
-      ...front,
-      ...queen
+      ...Front,
+      ...Back
     ]
-  },
-  {
-    path: '/Login',
-    name: 'Login',
-    component: Login,
+  },{
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/Login.vue')
   }
 ]
 
