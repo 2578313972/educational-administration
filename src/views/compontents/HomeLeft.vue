@@ -59,27 +59,16 @@ export default {
 
 <style lang="less" scoped>
     #HomeLeft{
-
         .asideImg{width: 50px;height: 50px;margin: auto 5px;}
         .font{color: #24A33A;font-weight: 600;font-size: 18px;}
         .el-menu{border-right:0px;}
         .el-menu-item.is-active{background-color: rgb(67,74,80) !important;}
-
         .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;}
         .tl-item{
             padding: 0px !important;
-            // padding-left:3px !important;
-                // /deep/.el-tooltip{//样式穿透0-=
-                //     padding: 0px !important;
-                //     padding-left:3px !important;
-                // }
         }
         .el-menu-vertical-demo:not(.el-menu--collapse) {
             width: 200px;
         }
     }
-
-
-
-
 </style>
