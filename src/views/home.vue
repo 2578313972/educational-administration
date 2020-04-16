@@ -2,16 +2,16 @@
   <div class="home">
     <el-container>
       <el-aside :width="isCollapse?'64px':'200px'" style="transition:.2s" >
-        <HomeLeft 
+        <HomeLeft
         :active="active"
         :isCollapse="isCollapse"
-        :selectData="selectData" 
+        :selectData="selectData"
         @select="select"
       />
       </el-aside>
       <el-main>
-        <HomeRight 
-        :editableTabs="editableTabs" 
+        <HomeRight
+        :editableTabs="editableTabs"
         :value="value"
         :isCollapse='isCollapse'
         @clickTab="clickTab"
@@ -29,8 +29,8 @@ import HomeRight from './compontents/HomeRight'
 export default {
   data(){
     return{
-      active:'',
-      isCollapse:false,
+      active:'', // 选择目标
+      isCollapse:false, // 缩展
       selectData:[
         {name:"基础数据",data:[
           {url:"/FClass",name:"班级管理"},
@@ -45,7 +45,7 @@ export default {
           {url:"/BTest",name:"测试成绩"}
         ]}
       ],
-      editableTabs: [
+      editableTabs: [ // Tab页数据
         {title: '首页', name: '1',url:'/'}
       ],
       tabIndex: 1,
@@ -53,28 +53,27 @@ export default {
     }
   },
   methods:{
-    change(){
-      console.log(123123)
+    change(){ // 缩展
       this.isCollapse = !this.isCollapse
     },
-    select(url,e){
+    select(url,e){ // 点击添加Tab数据
       this.selectData[e[0]].data.forEach((element,index) => {
         if(element.url===url){
           let data = this.selectData[e[0]].data[index]
           for (const key in this.editableTabs) {
             if (this.editableTabs[key].title === data.name) return this.editableTabsValue = this.editableTabs[key].name
           }
-          this.editableTabs.push({title: data.name, name: ++this.tabIndex+"",url:data.url,bool:true})
+          this.editableTabs.push({title: data.name, name: ++this.tabIndex+"",url:data.url})
           this.value = this.tabIndex.toString()
         }
       });
     },
-    clickTab(e,index){
+    clickTab(e,index){ // 点击Tab数据
       if(this.$route.path!==this.editableTabs[e].url) this.$router.push(this.editableTabs[e].url)
       this.active = this.editableTabs[e].url
       this.value = index
     },
-    removeTab(name){
+    removeTab(name){ // 删除Tab数据
       let tabs = this.editableTabs;
       let activeName = this.value;
       console.log(activeName)
@@ -100,5 +99,5 @@ export default {
 </script>
 
 <style lang="less">
-  .el-main{padding:0;}
+  .el-main{padding:0px;}
 </style>

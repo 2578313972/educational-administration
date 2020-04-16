@@ -1,8 +1,8 @@
 <template>
     <div id="HomeLeft">
-        <div style="line-height:70px;background:#FFEB3A;display:flex;">
+        <div style="line-height:70px;height:70px;background:#FFEB3A;display:flex;">
             <div class="asideImg">
-                <img class="img" src="../assets/logo.png" />
+                <img class="img" src="../../assets/logo.png" />
             </div>
             <div v-show="!isCollapse" class="font">
                 自学无忧教育
@@ -54,9 +54,11 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
     #HomeLeft{
+
         .asideImg{width: 50px;height: 50px;margin: auto 5px;}
+        .font{color: #24A33A;font-weight: 600;font-size: 18px;}
         .el-menu{border-right:0px;}
         .el-menu-item.is-active{background-color: rgb(67,74,80) !important;}
     }

@@ -10,11 +10,11 @@
 
         <el-tabs v-model="editableTabsValue" type="card" @tab-click="clickTab" @tab-remove="removeTab">
             <el-tab-pane
-                v-for="(item) in editableTabs"
+                v-for="item in editableTabs"
                 :key="item.name"
                 :label="item.title"
                 :name="item.name"
-                :closable="item.bool"
+                :closable="item.title==='首页'?false:true"
             >
                 <router-view />
             </el-tab-pane>
@@ -50,7 +50,7 @@ export default {
             this.$emit('removeTab',targetName)
         }
     }
-    
+
 }
 </script>
 
@@ -68,6 +68,7 @@ export default {
             z-index: 2;
             color: white;
             background-color: #008181;
+            cursor: pointer;
         }
         .account{
             width: 120px;
