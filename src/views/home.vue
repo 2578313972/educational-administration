@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <el-container>
-      <el-aside :width="isCollapse?'64px':'200px'" style="transition:.2s" >
+      <el-aside width="auto" >
         <HomeLeft
         :active="active"
         :isCollapse="isCollapse"
@@ -31,7 +31,7 @@ export default {
     return{
       active:'', // 选择目标
       isCollapse:false, // 缩展
-      selectData:[
+      selectData:[ // 菜单栏选择数据
         {name:"基础数据",data:[
           {url:"/FClass",name:"班级管理"},
           {url:"/FStudent",name:"学生管理"},
@@ -49,7 +49,7 @@ export default {
         {title: '首页', name: '1',url:'/'}
       ],
       tabIndex: 1,
-      value:"1"
+      value:"1" // 默认显示（Tab标签）
     }
   },
   methods:{
@@ -61,7 +61,7 @@ export default {
         if(element.url===url){
           let data = this.selectData[e[0]].data[index]
           for (const key in this.editableTabs) {
-            if (this.editableTabs[key].title === data.name) return this.editableTabsValue = this.editableTabs[key].name
+            if (this.editableTabs[key].title === data.name) return this.value = this.editableTabs[key].name
           }
           this.editableTabs.push({title: data.name, name: ++this.tabIndex+"",url:data.url})
           this.value = this.tabIndex.toString()
@@ -82,6 +82,7 @@ export default {
               if (tab.name === name) {
                   let nextTab = tabs[index + 1] || tabs[index - 1];
                   if (nextTab) {
+                      this.active = nextTab.url
                       this.value = nextTab.name;
                       this.$router.push(nextTab.url)
                   }

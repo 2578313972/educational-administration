@@ -1,21 +1,24 @@
 <template>
     <div id="HomeLeft">
-        <div style="line-height:70px;height:70px;background:#FFEB3A;display:flex;">
-            <div class="asideImg">
-                <img class="img" src="../../assets/logo.png" />
-            </div>
-            <div v-show="!isCollapse" class="font">
-                自学无忧教育
-            </div>
-        </div>
+        <el-menu
+        background-color="#FFEB3A"
+        class="el-menu-vertical-demo top-el-menu"
+        :collapse="isCollapse"
+        >
+            <el-menu-item class="tl-item">
+                <img class="img asideImg" src="../../assets/logo.png" />
+                <span style="color:#24A33A;">自学无忧教育</span>
+            </el-menu-item>
+        </el-menu>
+
         <el-menu
         :style="{height:height-70+'px'}"
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b"
-
-        @select="select"
+        class="el-menu-vertical-demo"
         router
+        @select="select"
         :default-active="active"
         :collapse="isCollapse">
             <el-submenu :index="index.toString()" v-for="(item, index) in selectData" :key="item.name">
@@ -61,5 +64,22 @@ export default {
         .font{color: #24A33A;font-weight: 600;font-size: 18px;}
         .el-menu{border-right:0px;}
         .el-menu-item.is-active{background-color: rgb(67,74,80) !important;}
+
+        .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;}
+        .tl-item{
+            padding: 0px !important;
+            // padding-left:3px !important;
+                // /deep/.el-tooltip{//样式穿透0-=
+                //     padding: 0px !important;
+                //     padding-left:3px !important;
+                // }
+        }
+        .el-menu-vertical-demo:not(.el-menu--collapse) {
+            width: 200px;
+        }
     }
+
+
+
+
 </style>
