@@ -74,9 +74,15 @@
     },
     methods: {
       submitForm(formName) {
+this.axios.get('https://baidu.com').then(function(res){
+                console.log(res)
+            }).catch(function (error) {
+                console.log(error);
+            });
+        let that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let ajax = new XMLHttpRequest()
+            
           } else return false
         });
       }
