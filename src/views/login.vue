@@ -36,6 +36,7 @@
 </template>
 
 <script>
+  import Http from '@/axios/api.js'
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -43,7 +44,7 @@
           callback(new Error('请输入账号！'));
         } else {
           let a = /^\w{4,16}$/
-          if(!a.test(value)) callback(new Error('账号长度 4-16'));
+          if(!a.test(value)) callback(new Error('账号长度 4~16'));
           setTimeout(callback,500)
         }
       };
@@ -52,7 +53,7 @@
           callback(new Error('请输入密码！'));
         } else{
           let a = /^\w{4,16}$/
-          if(!a.test(value)) callback(new Error('密码长度 4-16'));
+          if(!a.test(value)) callback(new Error('密码长度 4~16'));
           setTimeout(callback,500)
         }
       };
@@ -60,7 +61,7 @@
         ruleForm: {
           userName: '',
           userPassword: '',
-          type:[]
+          type:true
         },
         rules: {
           userName: [
@@ -74,15 +75,27 @@
     },
     methods: {
       submitForm(formName) {
-this.axios.get('https://baidu.com').then(function(res){
-                console.log(res)
-            }).catch(function (error) {
-                console.log(error);
-            });
         let that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            
+            that.axios.get('http://192.168.1.188:12/api/OAuth/authenticate',{
+              params:{
+                  userMobile:this.ruleForm.userName,
+                  userPassword:this.ruleForm.userPassword
+              }
+            })
+            .then(function(res){
+              console.log(res)
+                that.$message({message: '登录成功正在进行跳转……',type: 'success'});
+                setTimeout(()=>{
+                  that.Cookie.setCookie('token',that.Base64.encode(res.data.access_token)) // 将token值加密并将加密token存在cookie中
+                  sessionStorage.setItem("userData",res.data.profile)
+                  that.$router.push("/")
+                },1000)
+            })
+            .catch(function (error) {
+                that.$message.error('账号或密码错误！');
+            });
           } else return false
         });
       }
@@ -163,6 +176,37 @@ this.axios.get('https://baidu.com').then(function(res){
         }
 
 
+      }
+    }
+  }
+  @media(max-width: 600px){
+    #Login{
+      background: url();
+      overflow: hidden;
+      .content{
+        width: 100%;
+        height: 100vh;
+        margin: auto;
+        border-radius: 0px;
+        box-shadow:0px 0px 0px 0px #4B91E4;
+        display: block;
+        .content_left,.content_right{
+          width: 100%;
+          height: 50%;
+          box-sizing: border-box;
+          padding: 30px 20px;
+        }
+        .content_left{
+          padding: 30px 20px 0px;
+          text-align: center;
+        }
+        .content_mid{
+          width: 100%;
+          height: 2px;
+        }
+        .content_right{
+          padding-top: 20px;
+        }
       }
     }
   }

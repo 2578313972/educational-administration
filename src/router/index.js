@@ -9,7 +9,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/home.vue'),
+    component: () => import('../views/Home.vue'),
     children:[
       ...Front,
       ...Back
@@ -17,7 +17,7 @@ const routes = [
   },{
     path: '/login',
     name: 'login',
-    component: () => import('../views/login.vue')
+    component: () => import('../views/Login.vue')
   }
 ]
 
@@ -26,5 +26,16 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+import Base64 from '@/plug-in/Base64.js'
+import Cookie from '@/plug-in/Cookie.js'
+//全局导航守卫
+// router.beforeEach((to, from, next) => {
+//   if(!Cookie.getCookie("token")&&to.fullPath!=="/login"){
+//     return next('/login')
+//   }
+//   next()
+// })
+
 
 export default router
