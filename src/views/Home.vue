@@ -53,7 +53,7 @@ export default {
     }
   },
   methods:{
-    change(){ // 缩展
+    change(){ // 缩展45
       this.isCollapse = !this.isCollapse
     },
     select(url,e){ // 点击添加Tab数据
