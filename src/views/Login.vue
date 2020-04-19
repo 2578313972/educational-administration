@@ -90,7 +90,7 @@
                 setTimeout(()=>{
                   that.Cookie.setCookie('token',that.Base64.encode(res.data.access_token)) // 将token值加密并将加密token存在cookie中
                   sessionStorage.setItem("userData",res.data.profile)
-                  that.$router.push("/")
+                  this.$router.push("/FClass")
                 },1000)
             })
             .catch(function (error) {

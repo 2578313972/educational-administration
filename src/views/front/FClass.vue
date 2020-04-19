@@ -8,47 +8,47 @@
 
         <el-container>
             <el-header style="height: 50px;">
-                <span @click="ruleForm.className = '',ruleForm.course = '',ruleForm.teacher = '',selectWin=true,centerDialogVisible=true"><i class="el-icon-circle-plus-outline"></i>新增班级</span>
+                <span @click="ruleForm.className = '',ruleForm.major = '',ruleForm.teacher = '',selectWin=true,centerDialogVisible=true"><i class="el-icon-circle-plus-outline"></i>新增班级</span>
             </el-header>
             <el-main>
                 <el-table :data="tableData" style="width: 100%" >
-                    <el-table-column label="#" width="100" >
+                    <el-table-column label="#"  min-width="40px" >
                         <template slot-scope="scope">
                             <span>{{ scope.row.id }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="班级名称" width="220" >
+                    <el-table-column label="班级名称" min-width="100px" >
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.calssName }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="授课老师" width="220" >
+                    <el-table-column label="授课老师" min-width="80px" >
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.classTeacher }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="专业" width="220" >
+                    <el-table-column label="专业" min-width="50px" >
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.major }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="班级人数" width="220" >
+                    <el-table-column label="班级人数" min-width="80px" >
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.classNumber }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="开班日期" width="220">
+                    <el-table-column label="开班日期" min-width="100px">
                         <template slot-scope="scope">
                             <span>{{ scope.row.date}}</span>
                         </template>
                     </el-table-column>
                     
-                    <el-table-column label="操作">
+                    <el-table-column label="操作"  min-width="150px">
                         <template slot-scope="scope">
                             <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -66,7 +66,7 @@
                     <el-input v-model="ruleForm.className"></el-input>
                 </el-form-item>
                 <el-form-item label="专业课程">
-                    <el-select v-model="ruleForm.course" placeholder="请选择">
+                    <el-select v-model="ruleForm.major" placeholder="请选择">
                     <el-option label="Java" value="Java"></el-option>
                     <el-option label="Typescript" value="Typescript"></el-option>
                     <el-option label="javascript" value="javascript"></el-option>
@@ -93,62 +93,74 @@
 export default {
     data() {
         return {
-            tableData: [{
-                id:0,
-                calssName:'17',
-                classTeacher:'老曹',
-                major:'js',
-                classNumber:0,
-                date: '2016-05-02',
-            },{
-                id:0,
-                calssName:'17',
-                classTeacher:'jkl',
-                major:'ts',
-                classNumber:0,
-                date: '2016-05-02',
-            }],
+            tableData: [],
             selectWin:true,
             centerDialogVisible:false, // 控制新增弹框
             ruleForm: {
-                className: '',
-                course: '',
+                className: '', // 
+                major: '',
                 teacher:''
             },
             selectIndex:0,
             selectData:{}
         }
     },
+    created(){
+        this.axios.get('/mock/FClass').then(res => {
+            this.tableData = res.data
+        })
+    },
     methods: {
         handleEdit(index, row) { // 编辑
             this.selectWin = false
             this.centerDialogVisible = true
-            this.ruleForm.className = row.classTeacher
-            this.ruleForm.course = row.major
+            this.ruleForm.className = row.calssName
+            this.ruleForm.major = row.major
             this.ruleForm.teacher = row.classTeacher
-            console.log(index, row);
             this.selectIndex = index
             this.selectData = row
         },
         handleDelete(index, row) { // 删除
-            this.tableData.splice(index,1)
-            console.log(index, row);
+            console.log(index,row)
+            if(this.tableData[index].classNumber) return this.$message({
+                message: '该班级中还有学生，不能删除该班级。',
+                type: 'warning'
+            });
+                
+            
+            this.$confirm('此操作将永久删除该班级, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.tableData.splice(index,1)
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
         },
         modification(){ // 修改
-            console.log(this.selectIndex)
-            console.log(this.selectData)
             this.tableData[this.selectIndex].calssName = this.ruleForm.className
-            this.tableData[this.selectIndex].major = this.ruleForm.course
+            this.tableData[this.selectIndex].major = this.ruleForm.major
             this.tableData[this.selectIndex].classTeacher = this.ruleForm.teacher
             this.centerDialogVisible = false
         },
         addData(){ // 添加数据
-            if(this.ruleForm.className&&this.ruleForm.course&&this.ruleForm.teacher){
+            this.axios.get('/mock/addFClass').then(res => { // url即在mock.js中定义的
+                console.log(res) // 打印一下响应数据
+            })
+            if(this.ruleForm.className&&this.ruleForm.major&&this.ruleForm.teacher){
                     this.tableData.unshift({
                         id:0,
                         calssName:this.ruleForm.className,
                         classTeacher:this.ruleForm.teacher,
-                        major:this.ruleForm.course,
+                        major:this.ruleForm.major,
                         classNumber:0,
                         date:new Date().toLocaleDateString()
                     }
@@ -186,6 +198,7 @@ export default {
                     height: 100%;
                 }
             }
+            .el-main{padding: 0;}
             .el-table--fit{
                 width: 100%;
                 margin-top: 15px;

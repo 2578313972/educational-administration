@@ -9,14 +9,16 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
 // 导入axios
-import axios from '@/axios/api.js'
+import axios from '@/axios/api.js' // 改变了原始的axios路径  添加了  拦截器
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
 
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 // import Http from '@/axios/api.js'
-// Vue.use(Http)
+
+require('./mock/index')
+
 Vue.config.productionTip = false
 
 Vue.prototype.Base64 = Base64

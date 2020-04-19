@@ -37,12 +37,27 @@
       </el-aside>
       <el-main>
         <div id="HomeRight">
-          <div class="arrows" @click="change"><span :class="isCollapse?'el-icon-caret-right':'el-icon-caret-left'"></span></div>
+          <div class="arrows" @click="isCollapse = !isCollapse"><span :class="isCollapse?'el-icon-caret-right':'el-icon-caret-left'"></span></div>
           <div class="account">
             <div class="account_1">
-              <i class="el-icon-s-custom"></i>退出
+
+              
+              <el-row class="block-col-2">
+                <el-col :span="12">
+                  <el-dropdown trigger="click">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-s-custom"></i>退出
+                      <div class="account_2"><i class="el-icon-s-custom"></i></div>
+                    </span>
+
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item icon="el-icon-plus">退出52525252</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </el-col>
+              </el-row>
             </div>
-            <div class="account_2"><i class="el-icon-s-custom"></i></div>
+            <!-- <div class="account_2"><i class="el-icon-s-custom"></i></div> -->
           </div>
 
           <el-tabs v-model="editableTabsValue" type="card" @tab-click="clickTab" @tab-remove="removeTab">
@@ -67,7 +82,7 @@ export default {
   data(){
     return{
       height:0, // 定义左边菜单栏高度
-      active:'', // 选择目标
+      active:'', // 左侧菜单栏选中目标
       isCollapse:false, // 缩展
       selectData:[ // 菜单栏选择数据
         {name:"基础数据",data:[
@@ -91,12 +106,21 @@ export default {
     }
   },
   created() {
-      this.height = window.innerHeight
+      this.height = window.innerHeight; // 获取屏幕高度给左菜单栏
+
+      this.active = this.$route.fullPath; // 改变左菜单栏目标
+      for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
+        for (let j in this.selectData[i].data) {
+          if(this.selectData[i].data[j].url === this.$route.fullPath){
+            this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
+            this.editableTabsValue = this.tabIndex+""
+
+          }
+        }
+      }
+
   },
   methods:{
-    change(){ // 缩展45
-      this.isCollapse = !this.isCollapse
-    },
     select(url,e){ // 点击添加Tab数据
       this.selectData[e[0]].data.forEach((element,index) => {
         if(element.url===url){
@@ -143,7 +167,7 @@ export default {
         .el-menu{border-right:0px;}
         .el-menu-item.is-active{background-color: rgb(67,74,80) !important;}
         .el-menu-vertical-demo.top-el-menu{height: 70px;}
-        .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;line-height: 70px;}
+        .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;line-height: 70px;font-weight: 600;font-size: 19px;}
         .tl-item{
             padding: 0px !important;
         }
@@ -169,26 +193,42 @@ export default {
         .account{
             width: 120px;
             line-height: 70px;
+            box-sizing: border-box;
+            cursor: pointer;
             position: absolute;
+            z-index: 2;
             font-size: 30px;
             right: 0px;
             display: flex;
             justify-content: center;
             top: 0px;
             .account_1{
-                i{margin-right: 5px;}
-                color: #5D636A;
-                margin-top: 6px;
-            }
-            .account_2{
-                width: 40px;
-                line-height: 40px;
-                font-size: 25px;
-                margin: auto 10px;
-                text-align: center;
-                border-radius: 50%;
-                color: white;
-                background-color: #C2C6CE;
+              color: #5D636A;
+              .el-col.el-col-12{
+                padding-top: 5px;
+                width:120px;
+                line-height: 65px;
+                .el-dropdown{
+                  width:100%;
+                  font-size: 16px;
+                  font-weight: 500;
+                  i{margin-right: 5px;font-size: 18px;}
+                  .account_2{
+                    i{margin-right: 0px;font-size: 28px;}
+                    display: inline-block;
+                    width: 45px;
+                    height:45px;
+                    line-height: 40px;
+                    font-size: 28px;
+                    margin: auto 0px;
+                    text-align: center;
+                    border-radius: 50%;
+                    color: white;
+                    background-color: #C2C6CE;
+                  }
+                }
+                
+              }
             }
         }
         .el-tabs.el-tabs--card.el-tabs--top{
