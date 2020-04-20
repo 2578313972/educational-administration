@@ -3,12 +3,17 @@ import router from '../router'
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 
-let http = axios.create({timeout:3000})
+let http = axios.create(
+    {
+        // timeout:3000,
+        baseURL:"http://192.168.1.188:12"
+    }
+)
 
 http.interceptors.request.use(function (config) {
-    console.log(config)
+    // console.log(config)
     if(Cookie.getCookie("token")){
-        config.headers.Authorization = Base64._utf8_decode(Cookie.getCookie("token"));
+        config.headers.Authorization = Base64.decode(Cookie.getCookie("token"));
     }
     return config;
 }, function (error) {
@@ -20,7 +25,7 @@ http.interceptors.response.use(function (response) {
     // console.log(response)
     return response
 }, function (error) {
-    // console.log(error)
+    // console.log(error.response)
     if (error.response) {
         switch (error.response.status) {
             case 401:

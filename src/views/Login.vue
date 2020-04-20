@@ -8,35 +8,35 @@
         </div>
         <div class="content_mid"></div>
         <div class="content_right">
-                    <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
-                      <el-form-item class="Ficon" prop="userName">
-                        <el-input class="Ficon_inp"  type="text" v-model="ruleForm.userName" autocomplete="off"></el-input>
-                        <i class="el-icon-user-solid icon icon_one"></i>
-                      </el-form-item>
-                      <el-form-item class="Ficon" prop="userPassword">
-                        <el-input class="Ficon_inp" type="password" v-model="ruleForm.userPassword" autocomplete="off"></el-input>
-                        <i class="el-icon-lock icon icon_two"></i>
-                      </el-form-item>
+          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
+            <el-form-item class="Ficon" prop="userName">
+              <el-input class="Ficon_inp"  type="text" v-model="ruleForm.userName" autocomplete="off"></el-input>
+              <i class="el-icon-user-solid icon icon_one"></i>
+            </el-form-item>
+            <el-form-item class="Ficon" prop="userPassword">
+              <el-input class="Ficon_inp" type="password" v-model="ruleForm.userPassword" autocomplete="off"></el-input>
+              <i class="el-icon-lock icon icon_two"></i>
+            </el-form-item>
 
 
-                      <el-form-item>
-                        <el-checkbox-group v-model="ruleForm.type">
-                          <el-checkbox label="记住密码" name="type"></el-checkbox>
-                        </el-checkbox-group>
-                      </el-form-item>
+            <el-form-item>
+              <el-checkbox-group v-model="ruleForm.type">
+                <el-checkbox label="记住密码" name="type"></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
 
 
-                      <el-form-item>
-                        <el-button class="submi" type="primary" @click="submitForm('ruleForm')">登录</el-button>
-                      </el-form-item>
-                    </el-form>
+            <el-form-item>
+              <el-button class="submi" type="primary" @click="submitForm('ruleForm')">登录</el-button>
+            </el-form-item>
+          </el-form>
         </div>
       </div>
   </div>
 </template>
 
 <script>
-  import Http from '@/axios/api.js'
+  import * as Http from '@/axios/axios.js'
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -73,24 +73,40 @@
         }
       };
     },
+    created() {
+      if(sessionStorage.getItem('userName')){
+        this.ruleForm.userName = this.Base64.decode(sessionStorage.getItem('userName'))
+        this.ruleForm.userPassword = this.Base64.decode(sessionStorage.getItem('userPassword'))
+      }
+    },
     methods: {
       submitForm(formName) {
         let that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            that.axios.get('http://192.168.1.188:12/api/OAuth/authenticate',{
-              params:{
+            // that.axios.get('http://192.168.1.188:12/api/OAuth/authenticate',{
+            //   params:{
+            //       userMobile:this.ruleForm.userName,
+            //       userPassword:this.ruleForm.userPassword
+            //   }
+            // })
+            Http.enter({
                   userMobile:this.ruleForm.userName,
                   userPassword:this.ruleForm.userPassword
-              }
             })
             .then(function(res){
-              console.log(res)
                 that.$message({message: '登录成功正在进行跳转……',type: 'success'});
                 setTimeout(()=>{
-                  that.Cookie.setCookie('token',that.Base64.encode(res.data.access_token)) // 将token值加密并将加密token存在cookie中
-                  sessionStorage.setItem("userData",res.data.profile)
-                  this.$router.push("/FClass")
+                  if(that.ruleForm.type){
+                    sessionStorage.setItem("userName",that.Base64.encode(that.ruleForm.userName))
+                    sessionStorage.setItem("userPassword",that.Base64.encode(that.ruleForm.userPassword))
+                  }else{
+                    sessionStorage.removeItem("userName")
+                    sessionStorage.removeItem("userPassword")
+                  }
+                  that.Cookie.setCookie('token',that.Base64.encode(res.data.token_type+" "+res.data.access_token)) // 将token值加密并将加密token存在cookie中
+                  sessionStorage.setItem("userData",JSON.stringify(res.data.profile))
+                  that.$router.push("/FClass")
                 },1000)
             })
             .catch(function (error) {

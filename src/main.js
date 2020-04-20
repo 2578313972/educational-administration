@@ -17,7 +17,6 @@ import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 // import Http from '@/axios/api.js'
 
-require('./mock/index')
 
 Vue.config.productionTip = false
 

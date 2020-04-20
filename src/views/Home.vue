@@ -1,7 +1,7 @@
 <template>
   <div id="Home">
     <el-container>
-      <el-aside width="auto" >
+      <el-aside width="auto" height="100vh" style="background:rgb(84, 92, 100)" >
         <div id="HomeLeft">
           <el-menu
           background-color="#FFEB3A"
@@ -39,25 +39,22 @@
         <div id="HomeRight">
           <div class="arrows" @click="isCollapse = !isCollapse"><span :class="isCollapse?'el-icon-caret-right':'el-icon-caret-left'"></span></div>
           <div class="account">
-            <div class="account_1">
-
-              
               <el-row class="block-col-2">
                 <el-col :span="12">
                   <el-dropdown trigger="click">
                     <span class="el-dropdown-link">
                       <i class="el-icon-s-custom"></i>退出
-                      <div class="account_2"><i class="el-icon-s-custom"></i></div>
+                      <div class="account_1">
+                        <i v-if="!userData" class="el-icon-s-custom"></i>
+                        <img v-if="userData" class="img" :src="userData.userHeader" />
+                      </div>
                     </span>
-
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item icon="el-icon-plus">退出52525252</el-dropdown-item>
+                      <el-dropdown-item icon="el-icon-plus"><span @click="backLogin">退出登录</span></el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </el-col>
               </el-row>
-            </div>
-            <!-- <div class="account_2"><i class="el-icon-s-custom"></i></div> -->
           </div>
 
           <el-tabs v-model="editableTabsValue" type="card" @tab-click="clickTab" @tab-remove="removeTab">
@@ -68,7 +65,14 @@
               :name="item.name"
               :closable="item.title==='首页'?false:true"
             >
-              <router-view />
+              <div class="main" :style="{height:height-70+'px'}">
+                <el-breadcrumb separator-class="el-icon-arrow-right">
+                    <el-breadcrumb-item :to="{ path: '/' }"><span @click="goIndex">首页</span></el-breadcrumb-item>
+                    <el-breadcrumb-item v-if="Crumb_first">{{Crumb_first}}</el-breadcrumb-item>
+                    <el-breadcrumb-item v-if="Crumb_second">{{Crumb_second}}</el-breadcrumb-item>
+                </el-breadcrumb>
+                <router-view />
+              </div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -81,44 +85,79 @@
 export default {
   data(){
     return{
+      userData:{}, // 用户数据
       height:0, // 定义左边菜单栏高度
       active:'', // 左侧菜单栏选中目标
       isCollapse:false, // 缩展
-      selectData:[ // 菜单栏选择数据
-        {name:"基础数据",data:[
-          {url:"/FClass",name:"班级管理"},
-          {url:"/FStudent",name:"学生管理"},
-          {url:"/FTeacher",name:"老师管理"},
-          {url:"/FPassword",name:"修改密码"}
-        ]},{name:"在线测试",data:[
-          {url:"/BTeacher",name:"老师出卷"},
-          {url:"/BPaper",name:"试卷管理"},
-          {url:"/BArrange",name:"安排测试"},
-          {url:"/BReadover",name:"批阅试卷"},
-          {url:"/BTest",name:"测试成绩"}
-        ]}
-      ],
-      editableTabs: [ // Tab页数据
-        {title: '首页', name: '1',url:'/'}
-      ],
-      tabIndex: 1,
-      editableTabsValue:"1" // 默认显示（Tab标签）
+      selectData:[], // 菜单栏选择数据
+      editableTabs: [], // Tab页数据
+      tabIndex: 1, // 不断变化的name值
+      editableTabsValue:"1", // 默认显示（Tab标签）
+      Crumb_first:'', // 面包屑数据1
+      Crumb_second:'' // 面包屑数据2
     }
   },
   created() {
-      this.height = window.innerHeight; // 获取屏幕高度给左菜单栏
-
-      this.active = this.$route.fullPath; // 改变左菜单栏目标
+    this.selectData = [
+      {name:"基础数据",data:[
+        {url:"/FClass",name:"班级管理"},
+        {url:"/FStudent",name:"学生管理"},
+        {url:"/FTeacher",name:"老师管理"},
+        {url:"/FPassword",name:"修改密码"}
+      ]},{name:"在线测试",data:[
+        {url:"/BTeacher",name:"老师出卷"},
+        {url:"/BPaper",name:"试卷管理"},
+        {url:"/BArrange",name:"安排测试"},
+        {url:"/BReadover",name:"批阅试卷"},
+        {url:"/BTest",name:"测试成绩"}
+      ]}
+    ]
+    this.editableTabs = [
+      {title: '首页', name: '1',url:'/'}
+    ]
+    this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
+    this.userData = JSON.parse(sessionStorage.getItem('userData')) // 获取登录用户数据
+    this.active = this.$route.fullPath; // 改变左菜单栏目标
+  },
+  beforeMount() {
+    for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
+      for (let j in this.selectData[i].data) {
+        if(this.selectData[i].data[j].url === this.$route.fullPath){
+          /**
+           * 获取菜单栏和tab name值
+           */
+          this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
+          this.editableTabsValue = this.tabIndex+""
+          /**
+           *获取面包屑数据
+           */
+          this.Crumb_first = this.selectData[i].name
+          this.Crumb_second = this.selectData[i].data[j].name
+        }
+      }
+    }
+  },
+  watch: {
+    $route(to,from){
+      if(to.fullPath==="/"){
+        this.Crumb_first = ''
+        this.Crumb_second = ''
+      }
       for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
         for (let j in this.selectData[i].data) {
-          if(this.selectData[i].data[j].url === this.$route.fullPath){
-            this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
-            this.editableTabsValue = this.tabIndex+""
-
+          if(this.selectData[i].data[j].url === to.fullPath){
+            /**
+             *监听获取面包屑数据
+            */
+            this.Crumb_first = this.selectData[i].name
+            this.Crumb_second = this.selectData[i].data[j].name
           }
         }
       }
-
+    }
+  },
+  mounted() {
+    this.isCollapse = true
   },
   methods:{
     select(url,e){ // 点击添加Tab数据
@@ -153,6 +192,14 @@ export default {
           });
       }
       this.editableTabs = tabs.filter(tab => tab.name !== name);
+    },
+    goIndex(){ // 回首页
+      this.editableTabsValue = "1"
+      this.active = ''
+    },
+    backLogin(){ // 退出登录
+      this.Cookie.removeCookie("token")
+      this.$router.push("/login")
     }
   }
 }
@@ -192,42 +239,46 @@ export default {
         }
         .account{
             width: 120px;
-            line-height: 70px;
-            box-sizing: border-box;
+            height: 70px;
+            background-color: white;
             cursor: pointer;
             position: absolute;
-            z-index: 2;
+            z-index: 3;
             font-size: 30px;
             right: 0px;
-            display: flex;
-            justify-content: center;
             top: 0px;
-            .account_1{
-              color: #5D636A;
+            overflow: hidden;
+            .block-col-2.el-row{
+              height: 100%;
               .el-col.el-col-12{
-                padding-top: 5px;
-                width:120px;
-                line-height: 65px;
+                width:100%;
+                height:100%;
                 .el-dropdown{
                   width:100%;
-                  font-size: 16px;
-                  font-weight: 500;
-                  i{margin-right: 5px;font-size: 18px;}
-                  .account_2{
-                    i{margin-right: 0px;font-size: 28px;}
-                    display: inline-block;
-                    width: 45px;
-                    height:45px;
-                    line-height: 40px;
-                    font-size: 28px;
-                    margin: auto 0px;
-                    text-align: center;
-                    border-radius: 50%;
-                    color: white;
-                    background-color: #C2C6CE;
+                  height: 100%;
+                  .el-dropdown-link.el-dropdown-selfdefine{
+                    width:100%;
+                    height:100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    transform: translateY(-1px);
+                    font-size: 15px;
+                    border-bottom: 1px solid #E4E7ED;
+                    i{font-size: 16px;}
+                    .account_1{
+                      width:45px;
+                      height: 45px;
+                      margin-left: 2px;
+                      background-color:#999;
+                      line-height: 3.8;
+                      border-radius: 50%;
+                      overflow: hidden;
+                      text-align: center;
+                      i{font-size: 28px;color:white;}
+                    }
                   }
                 }
-                
               }
             }
         }
@@ -236,11 +287,18 @@ export default {
         }
         /deep/ .el-tabs__header.is-top{
             width: 100%;
-            min-width: 300px;
+            min-width: 370px;
             box-sizing: border-box;
             padding-left: 50px;
             padding-right: 120px;
+            margin:0;
         }
+    }
+    .main{
+      padding: 25px 25px 10px 25px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      .el-breadcrumb{margin-bottom: 25px;}
     }
   }
 </style>
