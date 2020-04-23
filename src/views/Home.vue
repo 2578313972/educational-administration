@@ -214,7 +214,9 @@ export default {
     },
     backLogin(){ // 退出登录
       this.Cookie.removeCookie("token")
-      this.$router.push("/login")
+console.log(this.$route.fullPath);
+
+      this.$router.push({path:"/login",query: {redirect: this.$route.fullPath}})
     }
   },
 }

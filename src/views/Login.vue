@@ -9,7 +9,7 @@
         <div class="content_mid"></div>
         <div class="content_right">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
-            <el-form-item class="Ficon" prop="userName">
+            <el-form-item class="Ficon" inline-message=false prop="userName">
               <el-input class="Ficon_inp"  type="text" v-model="ruleForm.userName" autocomplete="off"></el-input>
               <i class="el-icon-user-solid icon icon_one"></i>
             </el-form-item>
@@ -32,6 +32,7 @@
 </template>
 
 <script>
+  import Api from '@/http/Login'
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -69,9 +70,8 @@
       };
     },
     created() {
-      console.log(this.$router)
-      console.log(this.$route)
-      // console.log(window.history)
+      console.log(this.$route.query.redirect);
+      console.log(this.$router);
 
       if(this.Cookie.getCookie("userInfo")){
         /**
@@ -87,7 +87,7 @@
         let that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.api.authenticate({
+            Api.authenticate({
               userMobile:this.ruleForm.userName,
               userPassword:this.ruleForm.userPassword
             }).then(res=>{
@@ -96,14 +96,18 @@
                   if(that.ruleForm.type){
                     that.Cookie.setCookie("userInfo",that.Base64.encode(JSON.stringify(res.config.params))) // 加密保存用户信息的账号密码
                   }else{
-                    sessionStorage.removeItem("userInfo")
+                    that.Cookie.removeCookie("userInfo")
                   }
                   // 将token值加密并将加密token存在cookie中
                   that.Cookie.setCookie('token',that.Base64.encode(res.data.token_type+" "+res.data.access_token),{maxAge:60*20,domain:"localhost",path:"/"})
                   // 储存用户信息
+
                   sessionStorage.setItem("userData",JSON.stringify(res.data.profile))
-                  that.$router.replace("/FClass") // 不记住历史路由
-                  // history.go(-1)
+                  if(this.$route.query.redirect){
+                    this.$router.replace(this.$route.query.redirect) // 不记住历史路由
+                  }else{
+                    that.$router.replace("/")
+                  }
                 },1000)
             })
             .catch(function (error) {

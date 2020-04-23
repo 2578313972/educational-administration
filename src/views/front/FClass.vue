@@ -1,15 +1,14 @@
 <template>
   <div id="FClass">
-    <el-container>
-      <el-header style="height: 50px;">
-        <span
-          @click="ruleForm.className = '',ruleForm.courseName = '',ruleForm.userName = '',selectWin=true,centerDialogVisible=true"
-        >
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <!-- <span>卡片名称</span> -->
+        <el-button @click="ruleForm.className = '',ruleForm.courseName = '',ruleForm.userName = '',selectWin=true,centerDialogVisible=true" style="padding: 3px 0;font-size:15px;"  type="text">
           <i class="el-icon-circle-plus-outline"></i>新增班级
-        </span>
-      </el-header>
-      <el-main>
-        <el-table :data="tableData" height="calc(100vh - 200px)" style="width: 100%">
+        </el-button>
+      </div>
+      <div class="text item">
+        <el-table :data="tableData" height="calc(100vh - 250px)" style="width: 100%">
           <el-table-column label="#" type="index" width="50"></el-table-column>
 
           <el-table-column label="班级名称" min-width="100px">
@@ -49,20 +48,20 @@
             </template>
           </el-table-column>
         </el-table>
-      </el-main>
-    </el-container>
+      </div>
+    </el-card>
 
-    <el-dialog :title="selectWin?'新增班级信息':'修改班级信息'" :visible.sync="centerDialogVisible" width="35%" center>
-      <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="班级名称">
+    <el-dialog @close="close('ruleForm')" :title="selectWin?'新增班级信息':'修改班级信息'" :visible.sync="centerDialogVisible" width="35%" center>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"  class="demo-ruleForm">
+        <el-form-item label="班级名称" prop="className">
           <el-input v-model="ruleForm.className"></el-input>
         </el-form-item>
-        <el-form-item label="专业课程">
+        <el-form-item label="专业课程" prop="courseName">
           <el-select v-model="ruleForm.courseName" placeholder="请选择">
             <el-option v-for="item in courses" :key="item.courseId" :label="item.courseName" :value="item.courseId" ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="授课老师">
+        <el-form-item label="授课老师" prop="userName">
           <el-select v-model="ruleForm.userName" placeholder="请选择">
             <el-option v-for="item in teachers" :key="item.userId" :label="item.userName" :value="item.userId" ></el-option>
           </el-select>
@@ -72,7 +71,7 @@
         <el-button @click="centerDialogVisible = false">取 消</el-button>
         <el-button
           type="primary"
-          @click="selectWin?addData():modification()"
+          @click="selectWin?addData('ruleForm'):modification('ruleForm')"
         >{{selectWin?'添 加':'修 改'}}</el-button>
       </span>
     </el-dialog>
@@ -80,6 +79,7 @@
 </template>
 
 <script>
+import Api from '@/http/FClass'
 export default {
   data() {
     return {
@@ -94,6 +94,14 @@ export default {
         courseName: "", // 专业
         userName: "" // 授课老师
       },
+      rules:{
+        /**
+         * 弹框验证
+         */
+        className:[{ required: true, message: '请输入班级名称', trigger: 'blur' }],
+        courseName:[{ required: true, message: '请选择专业名称', trigger: 'blur' }],
+        userName:[{ required: true, message: '请选择授课老师', trigger: 'blur' }]
+      },
       selectData: {}, // 修改时需要用到的所有数据
       selectIndex: 0, // 修改时需要时用的下标
       teachers: [], // 所有老师
@@ -101,26 +109,27 @@ export default {
     };
   },
   created() {
-    // history.go(-1)
     // this.axios.get('/mock/FClass').then(res => {
     //     this.tableData = res.data
     // })
-    this.axios.all([this.GetAllClass(), this.GetTeachers(), this.GetAllCourse()])
-    .then(this.axios.spread((GetAllClass, GetTeachers, GetAllCourse)=>{
-        this.tableData = GetAllClass.data
-        this.teachers = GetTeachers.data
-        this.courses = GetAllCourse.data
-    }));
+
+    Api.All().then(res=>{
+      console.log(res)
+      this.tableData = res[0]
+      this.teachers = res[1]
+      this.courses = res[2]
+    })
+
   },
   methods: {
     GetAllClass(){ // 获取所有班级数据api
-      return this.api.GetAllClass()
+      return Api.GetAllClass()
     },
     GetTeachers(){ // 获取所有老师信息api
-      return this.api.GetTeachers()
+      return Api.GetTeachers()
     },
     GetAllCourse(){ // 获取所有专业信息api
-      return this.api.GetAllCourse()
+      return Api.GetAllCourse()
     },
     handleEdit(index, row) { // 编辑
       this.selectWin = false; // 改为编辑框
@@ -137,94 +146,118 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-          this.tableData.splice(index, 1);
-          this.api.RemoveClass({
+          Api.RemoveClass({
               classId: row.classId
+          }).then(res=>{
+            console.log(res)
+            if(res.data.code === 1){
+              this.tableData.splice(index, 1);
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+            }else{
+              console.log(row)
+              this.$message({
+                type: "info",
+                message: "删除失败！"
+              });
+            }
           })
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
-        })
-        .catch(() => {
+        }).catch(() => {
           this.$message({
             type: "info",
             message: "已取消删除"
           });
         });
     },
-    modification() {// 修改
+    modification(formName) {// 修改
       /**
        * 后台修改
        */
-      this.api.ModifyClass({
-        classId: this.selectData.classId, //要修改的班级主键
-        className: this.ruleForm.className, //要修改的班级名称
-        classCourseId: this.ruleForm.courseName, //课程编号
-        classTeacherId: this.ruleForm.userName //老师编号
-      }).then(res => {
-        /**
-         * 虚拟修改
-         */
-        let teachName = ""; // 授课老师  （临时变量）
-        let courses = ""; // 专业  （临时变量）
-        this.teachers.forEach(item => {
-            if (item.userId === this.ruleForm.userName)
-            return (teachName = item.userName);
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let classId = this.selectData.classId
+          let className = this.ruleForm.className
+          let teacherId = this.ruleForm.userName
+          let courseId = this.ruleForm.courseName
+          console.log(this.selectData,"11111111111")
+          console.log(this.ruleForm,"22222222222")
+        Api.ModifyClass({
+          classId, //要修改的班级主键
+          className: className, //要修改的班级名称
+          classCourseId: courseId, //课程编号
+          classTeacherId: teacherId //老师编号
+        }).then(res => {
+          console.log(res,"3333333333333")
+          /**
+           * 虚拟修改
+           */
+
+          let teachName = this.arrFindTeacher(this.teachers,teacherId).userName // 授课老师
+          let courses = this.arrFindCourses(this.courses,courseId).courseName; // 专业  （临时变量）
+
+          let item = this.tableData[this.selectIndex]
+          item.className = className;
+          item.courseName = courses;
+          item.userName = teachName;
+          item.classTeacherId = this.ruleForm.userName
+          item.classCourseId = this.ruleForm.courseName
+          this.$message({
+              message: "修改成功",
+              type: "success"
+          });
         });
-        this.courses.forEach(item => {
-            if (item.courseId === this.ruleForm.courseName)
-            return (courses = item.courseName);
-        });
-        let item = this.tableData[this.selectIndex]
-        item.className = this.ruleForm.className;
-        item.courseName = courses;
-        item.userName = teachName;
-        item.classTeacherId = this.ruleForm.userName
-        item.classCourseId = this.ruleForm.courseName
-        this.$message({
-            message: "修改成功",
-            type: "success"
-        });
-      });
-      this.centerDialogVisible = false;
+        this.centerDialogVisible = false;
+        }
+      })
     },
-    addData() { // 添加
+    addData(formName) { // 添加
       /**
        * 添加数据
        */
-      if (
-        this.ruleForm.className &&
-        this.ruleForm.courseName &&
-        this.ruleForm.userName
-      ) {
-        this.api.AddClass({
-            className: this.ruleForm.className, //班级名称
-            classTeacherId: this.ruleForm.userName, //老师编号
-            classCourseId: this.ruleForm.courseName //课程编号
-        }).then(res => {
-            let teachName = this.arrFindTeacher(this.teachers,this.ruleForm.userName).userName;
-            let courses = this.arrFindCourses(this.courses,this.ruleForm.courseName).courseName;
-            this.tableData.unshift({
-              classCourseId: res.data.data.classCourseId,
-              className: res.data.data.className,
-              userName: teachName,
-              courseName: courses,
-              classStudents: res.data.data.classStudents,
-              classCreateTime: res.data.data.classCreateTime.substring(0, 10),
-              classTeacherId: res.data.data.classTeacherId
-            });
-        });
-        this.centerDialogVisible = false;
-      } else {
-        this.$message.error("输入框不得为空");
-      }
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let className = this.ruleForm.className
+          let teacherId = this.ruleForm.userName
+          let courseId = this.ruleForm.courseName
+          console.log(this.ruleForm)
+          Api.AddClass({
+              className: this.ruleForm.className, //班级名称
+              classTeacherId: this.ruleForm.userName, //老师编号
+              classCourseId: this.ruleForm.courseName //课程编号
+          }).then(res => {
+            console.log(res)
+              let teachName = this.arrFindTeacher(this.teachers,teacherId).userName;
+              let courses = this.arrFindCourses(this.courses,courseId).courseName;
+              this.tableData.unshift({
+                classCourseId: res.data.data.classCourseId,
+                className: className,
+                userName: teachName,
+                classId: res.data.data.classId,
+                courseName: courses,
+                classStudents: res.data.data.classStudents,
+                classCreateTime: res.data.data.classCreateTime.substring(0, 10),
+                classTeacherId: res.data.data.classTeacherId
+              });
+          });
+          this.centerDialogVisible = false;
+        }
+      })
+    },
+    close(formName){ // 关闭弹出窗口回调
+      this.$refs[formName].resetFields();
     },
     arrFindTeacher(arr,val){ // 查找老师名称
       return arr.find(item=>item.userId===val)
     },
-    arrFindC8ourses(arr,val){ // 查找专业名称
+    arrFindCourses(arr,val){ // 查找专业名称
       return arr.find(item=>item.courseId===val)
+    }
+  },
+  filters:{
+    time(){
+
     }
   }
 };
@@ -233,38 +266,17 @@ export default {
 <style lang="less" scoped>
 #FClass {
   box-sizing: border-box;
-  .el-container.is-vertical {
-    padding: 0px 20px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    .el-header {
-      line-height: 50px;
-      color: #469fff;
-      font-size: 17px;
-      font-weight: 600;
-      border-bottom: 1px solid #ebeef5;
-      i {
-        margin-right: 5px;
-      }
-      span {
-        cursor: pointer;
-        display: inline-block;
-        height: 100%;
-      }
-    }
-    .el-main {
-      padding: 0;
-    }
-    .el-table--fit {
-      width: 100%;
-      margin-top: 15px;
-      overflow: hidden;
-    }
-  }
-  .el-select {
-    width: 100%;
+  .el-card.box-card.is-always-shadow{
+    width:100%;
   }
   .el-dialog.el-dialog--center{
       min-width: 250px;
+      .el-select{
+        width:100%;
+      }
+  }
+  .el-table::before{
+    height: 0;
   }
 }
 </style>
