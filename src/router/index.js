@@ -27,9 +27,8 @@ const router = new VueRouter({
   routes
 })
 
-import Base64 from '@/plug-in/Base64.js'
-import Cookie from '@/plug-in/Cookie.js'
-//全局导航守卫
+// import Cookie from '@/plug-in/Cookie.js'
+// 全局导航守卫
 // router.beforeEach((to, from, next) => {
 //   if(!Cookie.getCookie("token")&&to.fullPath!=="/login"){
 //     return next('/login')

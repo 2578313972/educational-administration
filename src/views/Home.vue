@@ -1,7 +1,7 @@
 <template>
   <div id="Home">
     <el-container>
-      <el-aside width="auto" height="100vh" style="background:rgb(84, 92, 100)" >
+      <el-aside width="auto" style="background:rgb(84, 92, 100)" >
         <div id="HomeLeft">
           <el-menu
           background-color="#FFEB3A"
@@ -14,7 +14,7 @@
             </el-menu-item>
           </el-menu>
           <el-menu
-          :style="{height:height-70+'px'}"
+          style="height:calc(100vh - 60px)"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"
@@ -65,15 +65,15 @@
               :name="item.name"
               :closable="item.title==='首页'?false:true"
             >
-              <div class="main" :style="{height:height-70+'px'}">
-                <el-breadcrumb separator-class="el-icon-arrow-right">
-                    <el-breadcrumb-item :to="{ path: '/' }"><span @click="goIndex">首页</span></el-breadcrumb-item>
-                    <el-breadcrumb-item v-if="Crumb_first">{{Crumb_first}}</el-breadcrumb-item>
-                    <el-breadcrumb-item v-if="Crumb_second">{{Crumb_second}}</el-breadcrumb-item>
-                </el-breadcrumb>
-                <router-view />
-              </div>
             </el-tab-pane>
+            <div class="main">
+              <el-breadcrumb separator-class="el-icon-arrow-right">
+                  <el-breadcrumb-item :to="{ path: '/' }"><span @click="goIndex">首页</span></el-breadcrumb-item>
+                  <el-breadcrumb-item v-if="Crumb_first">{{Crumb_first}}</el-breadcrumb-item>
+                  <el-breadcrumb-item v-if="Crumb_second">{{Crumb_second}}</el-breadcrumb-item>
+              </el-breadcrumb>
+              <router-view />
+            </div>
           </el-tabs>
         </div>
       </el-main>
@@ -94,7 +94,8 @@ export default {
       tabIndex: 1, // 不断变化的name值
       editableTabsValue:"1", // 默认显示（Tab标签）
       Crumb_first:'', // 面包屑数据1
-      Crumb_second:'' // 面包屑数据2
+      Crumb_second:'', // 面包屑数据2
+      historyActive:[] // 历史路由
     }
   },
   created() {
@@ -127,6 +128,7 @@ export default {
            * 获取菜单栏和tab name值
            */
           this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
+          this.historyActive.unshift(this.tabIndex+"")
           this.editableTabsValue = this.tabIndex+""
           /**
            *获取面包屑数据
@@ -154,6 +156,8 @@ export default {
           }
         }
       }
+      this.historyActive.unshift(this.editableTabsValue)
+      this.historyActive = [...new Set(this.historyActive)]
     }
   },
   mounted() {
@@ -165,7 +169,10 @@ export default {
         if(element.url===url){
           let data = this.selectData[e[0]].data[index]
           for (const key in this.editableTabs) {
-            if (this.editableTabs[key].title === data.name) return this.editableTabsValue = this.editableTabs[key].name
+            if (this.editableTabs[key].title === element.name){
+               this.editableTabsValue = this.editableTabs[key].name
+               return
+            }
           }
           this.editableTabs.push({title: data.name, name: ++this.tabIndex+"",url:data.url})
           this.editableTabsValue = this.tabIndex.toString()
@@ -180,18 +187,26 @@ export default {
       let tabs = this.editableTabs;
       let activeName = this.editableTabsValue;
       if (activeName === name) {
+        let historyActiveName = this.historyActive[1]
+          if(!historyActiveName){
+            this.active = '/'
+            this.editableTabsValue = '1';
+            this.$router.push('/')
+            this.editableTabs = tabs.filter(tab => tab.name !== name);
+            this.historyActive = this.historyActive.filter(tab => tab !== name);
+            return
+          }
           tabs.forEach((tab, index) => {
-              if (tab.name === name) {
-                  let nextTab = tabs[index + 1] || tabs[index - 1];
-                  if (nextTab) {
-                      this.active = nextTab.url
-                      this.editableTabsValue = nextTab.name;
-                      this.$router.push(nextTab.url)
-                  }
-              }
+            if(tab.name === historyActiveName){
+              let nextTab = tabs[index]
+              this.active = nextTab.url
+              this.editableTabsValue = nextTab.name;
+              this.$router.push(nextTab.url)
+            }
           });
       }
       this.editableTabs = tabs.filter(tab => tab.name !== name);
+      this.historyActive = this.historyActive.filter(tab => tab !== name);
     },
     goIndex(){ // 回首页
       this.editableTabsValue = "1"
@@ -201,7 +216,7 @@ export default {
       this.Cookie.removeCookie("token")
       this.$router.push("/login")
     }
-  }
+  },
 }
 </script>
 
@@ -213,8 +228,8 @@ export default {
         .font{color: #24A33A;font-weight: 600;font-size: 18px;}
         .el-menu{border-right:0px;}
         .el-menu-item.is-active{background-color: rgb(67,74,80) !important;}
-        .el-menu-vertical-demo.top-el-menu{height: 70px;}
-        .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;line-height: 70px;font-weight: 600;font-size: 19px;}
+        .el-menu-vertical-demo.top-el-menu{height: 60px;}
+        .el-menu-vertical-demo.top-el-menu .el-menu-item.tl-item{background-color: rgb(255, 235, 58) !important;line-height: 60px;font-weight: 600;font-size: 19px;}
         .tl-item{
             padding: 0px !important;
         }
@@ -226,7 +241,7 @@ export default {
         position: relative;
         .arrows{
             width: 40px;
-            line-height: 70px;
+            line-height: 60px;
             position: absolute;
             text-align: center;
             font-size: 30px;
@@ -239,7 +254,7 @@ export default {
         }
         .account{
             width: 120px;
-            height: 70px;
+            height: 60px;
             background-color: white;
             cursor: pointer;
             position: absolute;
@@ -283,7 +298,7 @@ export default {
             }
         }
         .el-tabs.el-tabs--card.el-tabs--top{
-            padding-top: 29px;
+            padding-top: 19px;
         }
         /deep/ .el-tabs__header.is-top{
             width: 100%;
@@ -295,6 +310,7 @@ export default {
         }
     }
     .main{
+      height: calc(100vh - 60px);
       padding: 25px 25px 10px 25px;
       box-sizing: border-box;
       overflow-x: hidden;

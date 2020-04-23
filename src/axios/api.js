@@ -5,33 +5,56 @@ import Cookie from '@/plug-in/Cookie.js'
 
 let http = axios.create(
     {
-        // timeout:3000,
         baseURL:"http://192.168.1.188:12"
     }
 )
 
-http.interceptors.request.use(function (config) {
-    // console.log(config)
+http.interceptors.request.use( config => {
     if(Cookie.getCookie("token")){
-        config.headers.Authorization = Base64.decode(Cookie.getCookie("token"));
+        try{
+            config.headers.Authorization = Base64.decode(Cookie.getCookie("token"));
+        }catch(err){
+            console.log(err)
+        }
     }
     return config;
-}, function (error) {
-    // console.log(error)
+}, error => {
     return Promise.reject(error);
 });
 
-http.interceptors.response.use(function (response) {
-    // console.log(response)
+http.interceptors.response.use( response => {
     return response
-}, function (error) {
-    // console.log(error.response)
+}, async error => {
     if (error.response) {
         switch (error.response.status) {
             case 401:
-                if(router.app._route.fullPath !== '/login') router.replace('/login')
+                if(!Cookie.getCookie("userInfo"))return router.replace("/login")
+                try{
+                    await login()
+                    return http(error.config)
+                }catch(err){
+                    Cookie.removeCookie("userInfo")
+                    return router.replace({
+                        path:"/login"
+                    })
+                }
         }
     }
-    return Promise.reject(error.response.data);
+    return Promise.reject(error)
 });
+
+async function login(){
+    let userInof = JSON.parse(Base64.decode(Cookie.getCookie("userInfo")))
+    let res = await axios.get('http://192.168.1.188:12/api/OAuth/authenticate',{
+        params:{
+            userMobile:userInof.userMobile,
+            userPassword:userInof.userPassword
+        }
+    })
+    Cookie.setCookie('token',Base64.encode(res.data.token_type+" "+res.data.access_token),{maxAge:60*20,domain:"localhost",path:"/"})
+}
+
+
+
+
 export default http

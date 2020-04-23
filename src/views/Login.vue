@@ -17,15 +17,11 @@
               <el-input class="Ficon_inp" type="password" v-model="ruleForm.userPassword" autocomplete="off"></el-input>
               <i class="el-icon-lock icon icon_two"></i>
             </el-form-item>
-
-
             <el-form-item>
               <el-checkbox-group v-model="ruleForm.type">
                 <el-checkbox label="记住密码" name="type"></el-checkbox>
               </el-checkbox-group>
             </el-form-item>
-
-
             <el-form-item>
               <el-button class="submi" type="primary" @click="submitForm('ruleForm')">登录</el-button>
             </el-form-item>
@@ -36,7 +32,6 @@
 </template>
 
 <script>
-  import * as Http from '@/axios/axios.js'
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -59,9 +54,9 @@
       };
       return {
         ruleForm: {
-          userName: '',
-          userPassword: '',
-          type:true
+          userName: '', // 用户名
+          userPassword: '', // 密码
+          type:true　// 是否记住密码（默认记住）
         },
         rules: {
           userName: [
@@ -74,9 +69,17 @@
       };
     },
     created() {
-      if(sessionStorage.getItem('userName')){
-        this.ruleForm.userName = this.Base64.decode(sessionStorage.getItem('userName'))
-        this.ruleForm.userPassword = this.Base64.decode(sessionStorage.getItem('userPassword'))
+      console.log(this.$router)
+      console.log(this.$route)
+      // console.log(window.history)
+
+      if(this.Cookie.getCookie("userInfo")){
+        /**
+         * 检查是否记住过密码
+         */
+        let userInof = JSON.parse(this.Base64.decode(this.Cookie.getCookie("userInfo")))
+        this.ruleForm.userName = userInof.userMobile
+        this.ruleForm.userPassword = userInof.userPassword
       }
     },
     methods: {
@@ -84,29 +87,23 @@
         let that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            // that.axios.get('http://192.168.1.188:12/api/OAuth/authenticate',{
-            //   params:{
-            //       userMobile:this.ruleForm.userName,
-            //       userPassword:this.ruleForm.userPassword
-            //   }
-            // })
-            Http.enter({
-                  userMobile:this.ruleForm.userName,
-                  userPassword:this.ruleForm.userPassword
-            })
-            .then(function(res){
+            this.api.authenticate({
+              userMobile:this.ruleForm.userName,
+              userPassword:this.ruleForm.userPassword
+            }).then(res=>{
                 that.$message({message: '登录成功正在进行跳转……',type: 'success'});
                 setTimeout(()=>{
                   if(that.ruleForm.type){
-                    sessionStorage.setItem("userName",that.Base64.encode(that.ruleForm.userName))
-                    sessionStorage.setItem("userPassword",that.Base64.encode(that.ruleForm.userPassword))
+                    that.Cookie.setCookie("userInfo",that.Base64.encode(JSON.stringify(res.config.params))) // 加密保存用户信息的账号密码
                   }else{
-                    sessionStorage.removeItem("userName")
-                    sessionStorage.removeItem("userPassword")
+                    sessionStorage.removeItem("userInfo")
                   }
-                  that.Cookie.setCookie('token',that.Base64.encode(res.data.token_type+" "+res.data.access_token)) // 将token值加密并将加密token存在cookie中
+                  // 将token值加密并将加密token存在cookie中
+                  that.Cookie.setCookie('token',that.Base64.encode(res.data.token_type+" "+res.data.access_token),{maxAge:60*20,domain:"localhost",path:"/"})
+                  // 储存用户信息
                   sessionStorage.setItem("userData",JSON.stringify(res.data.profile))
-                  that.$router.push("/FClass")
+                  that.$router.replace("/FClass") // 不记住历史路由
+                  // history.go(-1)
                 },1000)
             })
             .catch(function (error) {
@@ -141,7 +138,6 @@
         width: 49%;
         height: 100%;
         box-sizing: border-box;
-        // background-color: chartreuse;
         padding: 30px 20px;
       }
       .content_left{
