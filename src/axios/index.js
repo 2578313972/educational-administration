@@ -3,9 +3,9 @@ import router from '../router'
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 
-function Http() {
+function Http(aaa) {
     let http = axios.create({
-        baseURL: 'http://192.168.1.188:12'
+        baseURL: aaa || 'http://192.168.1.188:12'
     })
 
     this.get = (url, queryObj) => {
@@ -85,7 +85,11 @@ function Http() {
         /**
          * 重新获取token
          */
-        Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token), { maxAge: 60 * 20, domain: "localhost", path: "/" })
+        if(res.status === 200){
+            Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token), { maxAge: 60 * 20, domain: "localhost", path: "/" })
+        }else{
+            throw new Error()
+        }
     }
 }
 

@@ -2,7 +2,6 @@
   <div id="FClass">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <!-- <span>卡片名称</span> -->
         <el-button @click="ruleForm.className = '',ruleForm.courseName = '',ruleForm.userName = '',selectWin=true,centerDialogVisible=true" style="padding: 3px 0;font-size:15px;"  type="text">
           <i class="el-icon-circle-plus-outline"></i>新增班级
         </el-button>
@@ -181,15 +180,12 @@ export default {
           let className = this.ruleForm.className
           let teacherId = this.ruleForm.userName
           let courseId = this.ruleForm.courseName
-          console.log(this.selectData,"11111111111")
-          console.log(this.ruleForm,"22222222222")
         Api.ModifyClass({
           classId, //要修改的班级主键
           className: className, //要修改的班级名称
           classCourseId: courseId, //课程编号
           classTeacherId: teacherId //老师编号
         }).then(res => {
-          console.log(res,"3333333333333")
           /**
            * 虚拟修改
            */
@@ -221,13 +217,11 @@ export default {
           let className = this.ruleForm.className
           let teacherId = this.ruleForm.userName
           let courseId = this.ruleForm.courseName
-          console.log(this.ruleForm)
           Api.AddClass({
               className: this.ruleForm.className, //班级名称
               classTeacherId: this.ruleForm.userName, //老师编号
               classCourseId: this.ruleForm.courseName //课程编号
           }).then(res => {
-            console.log(res)
               let teachName = this.arrFindTeacher(this.teachers,teacherId).userName;
               let courses = this.arrFindCourses(this.courses,courseId).courseName;
               this.tableData.unshift({

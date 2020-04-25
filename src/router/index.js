@@ -27,14 +27,15 @@ const router = new VueRouter({
   routes
 })
 
-// import Cookie from '@/plug-in/Cookie.js'
+import Cookie from '@/plug-in/Cookie.js'
+
 // 全局导航守卫
-// router.beforeEach((to, from, next) => {
-//   if(!Cookie.getCookie("token")&&to.fullPath!=="/login"){
-//     return next('/login')
-//   }
-//   next()
-// })
+router.beforeEach((to, from, next) => {
+  if(!Cookie.getCookie("token")&&to.fullPath!=="/login"){
+    return next('/login')
+  }
+  next()
+})
 
 
 export default router

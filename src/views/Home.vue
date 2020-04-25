@@ -104,6 +104,7 @@ export default {
         {url:"/FClass",name:"班级管理"},
         {url:"/FStudent",name:"学生管理"},
         {url:"/FTeacher",name:"老师管理"},
+        {url:"/FRole",name:"用户管理"},
         {url:"/FPassword",name:"修改密码"}
       ]},{name:"在线测试",data:[
         {url:"/BTeacher",name:"老师出卷"},

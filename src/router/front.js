@@ -15,5 +15,9 @@ export default [
         path: '/FTeacher',
         name: 'FTeacher',
         component: () => import('../views/front/FTeacher.vue')
+    },{
+        path: '/FRole',
+        name: 'FRole',
+        component: () => import('../views/front/FRole.vue')
     }
 ]
