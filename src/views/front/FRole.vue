@@ -11,20 +11,20 @@
           <i class="el-icon-circle-plus-outline"></i>新增用户
         </el-button>
 
-        <el-checkbox v-model="checked">备选项</el-checkbox>
+        <el-checkbox v-model="checked">允许拖拽</el-checkbox>
 
       </div>
       <div class="text item">
         <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%"  row-key="date">
-          <el-table-column label="#" type="index"></el-table-column>
+          <el-table-column class-name="table" label="#" type="index"></el-table-column>
 
-          <el-table-column label="角色名称">
+          <el-table-column class-name="table" label="角色名称">
             <template slot-scope="scope">
               <span>{{ scope.row.userTypeTypeName }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作">
+          <el-table-column class-name="table" label="操作">
             <template slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
@@ -74,12 +74,11 @@
 
 <script>
 import Api from "@/http/FRole";
-import Sortable from 'sortablejs'
+import Sortable from 'sortablejs';
 export default {
   data() {
     return {
-      checked:true,
-
+      checked:false, // 是否允许拖拽
       tableData: [], // 显示的用户数据
       allData:[],
       selectWin: true, // 控制添加和修改
@@ -101,19 +100,13 @@ export default {
   created() {
     Api.GetUserRoles().then(res=>{
       this.tableData = res.data
-      this.allData = res.data
-      console.log(res.data)
-
+      this.allData = JSON.parse(JSON.stringify(res.data))
     })
-
   },
-  mounted() {
-    document.body.ondrop = function (event) {
-             event.preventDefault();
-             event.stopPropagation();
-    };
-    this.rowDrop()
-
+  watch: {
+    checked(newVal,oldVla){
+      this.rowDrop(newVal)
+    }
   },
   methods: {
     handleEdit(index, row) {
@@ -161,10 +154,7 @@ export default {
       });
     },
     addData(formName) {
-      // 添加学生
-      /**
-       * 添加数据
-       */
+      /**添加数据*/
       this.$refs[formName].validate(valid => {
         if (valid) {
           let userRoleName = this.ruleForm.userTypeTypeName
@@ -187,29 +177,48 @@ export default {
 
 
     //行拖拽
-    rowDrop() {
+    rowDrop(bool) {
+      if(!bool) return
       const tbody = document.querySelector('.el-table__body-wrapper tbody')
       const that = this
       Sortable.create(tbody, {
+        handle:bool?".table":"",
         onEnd({ newIndex, oldIndex }) {
-          console.log(newIndex, oldIndex)
-          let item = that.allData[newIndex]
-          let oldData = that.allData[oldIndex]
-          that.allData[newIndex] = oldData
-          that.allData[oldIndex] = item
+          let allData = JSON.parse(JSON.stringify(that.tableData))
 
-          // that.allData.splice(newIndex,1,oldData)
-          // that.allData.splice(oldIndex,1,newData)
-          // console.log(newData)
-          // console.log(oldData)
-          console.log(that.allData)
+          let newData = allData[newIndex] // 新数据
+          let oldData = allData[oldIndex] // 旧数据
+          console.log(1,allData.map(item=>item.userTypeTypeName))
+          console.log(2,oldIndex,oldData.userTypeTypeName,"-----",newIndex,newData.userTypeTypeName);
+
+          if(oldIndex<newIndex){ // 当从上往下拉时
+            allData.splice(newIndex,1,newData,oldData)
+            that.tableData.slice(0,)
+            allData.splice(oldIndex,1)
+          }else if(oldIndex>newIndex){ // 当从下往上拉时
+            allData.splice(oldIndex,1)
+            allData.splice(newIndex,1,oldData,newData)
+          }
+
+          console.log(3,allData.map(item=>item.userTypeTypeName))
+
+          let userTypes = [] // 创建一个数组用于接收改变顺序后的值
+          for (let i in allData) { // 循环添加
+            userTypes.push({userTypeId:allData[i].userTypeId,userTypeSortNo:++i})
+          }
+          Api.OrderUserRoleNo(userTypes).then(res=>{ /**调用Api接口*/
+            that.tableData = JSON.parse(JSON.stringify(allData))
+
+            console.log(4,res.data.message);
+            console.log(5,allData.map(item=>item.userTypeTypeName))
+            console.log(6,that.tableData.map(item=>item.userTypeTypeName),"!!!!!!!!!!!!!!!")
+
+
+          })
+          // that.tableData = allData
         }
       })
-    },
-
-
-
-
+    }
   }
 };
 </script>

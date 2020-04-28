@@ -85,7 +85,7 @@
 export default {
   data(){
     return{
-      userData:{}, // 用户数据
+      userData:null, // 用户数据
       height:0, // 定义左边菜单栏高度
       active:'', // 左侧菜单栏选中目标
       isCollapse:false, // 缩展
@@ -103,8 +103,8 @@ export default {
       {name:"基础数据",data:[
         {url:"/FClass",name:"班级管理"},
         {url:"/FStudent",name:"学生管理"},
-        {url:"/FTeacher",name:"老师管理"},
-        {url:"/FRole",name:"用户管理"},
+        {url:"/FTeacher",name:"用户管理"},
+        {url:"/FRole",name:"用户角色"},
         {url:"/FPassword",name:"修改密码"}
       ]},{name:"在线测试",data:[
         {url:"/BTeacher",name:"老师出卷"},

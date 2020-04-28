@@ -5,10 +5,11 @@
                 <el-button @click="ruleForm.userTypeTypeName='',ruleForm.userName='',ruleForm.userMobile='',ruleForm.userSex='男',ruleForm.userPassword='',selectWin=true,centerDialogVisible=true" style="padding: 3px 0;font-size:15px;"  type="text">
                     <i class="el-icon-circle-plus-outline"></i>新增用户
                 </el-button>
-                <el-radio-group v-model="radio">
+                <!-- <el-radio-group v-model="radio">
                     <el-radio label="全部">全部</el-radio>
                     <el-radio v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName">{{item.userTypeTypeName}}</el-radio>
-                </el-radio-group>
+                </el-radio-group> -->
+                <Select-User v-model="radio" />
             </div>
             <div class="text item">
                 <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
@@ -95,6 +96,7 @@
 
 <script>
 import Api from '@/http/FTeacher'
+import SelectUser from '@/components/selectionBox/SelectUser'
 export default {
   data() {
      var checkAge = (rule, value, callback) => {
@@ -158,15 +160,16 @@ export default {
       Api.GetTeachers().then(res=>{
           this.tableData = res.data
           this.allData = res.data
-          console.log(res)
+          // console.log(this.allData)
       })
   },
   watch:{
-    radio(newVal,oldVal){
+    radio(newVal){
         if(newVal==="全部") return this.tableData = this.allData
         this.tableData = this.allData.filter(item=> item.userTypeTypeName===this.radio)
     }
   },
+  components:{SelectUser},
   methods: {
     handleEdit(index, row) { // 编辑
       this.selectWin = false; // 改为编辑框
@@ -225,36 +228,19 @@ export default {
                 userUserTypeId, //角色
                 userPassword //密码
             }).then(res=>{
-                let allIndex = this.arrIndex(this.allData,this.selectData)
-                //   console.log(this.allData[allIndex].userName)
-
-
-
-                // if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
-                  //  this.tableData.splice(this.selectIndex,1)
-                  //  console.log('TypeId')
-                // }else{
-                  // console.log('Nowary')
-                  // console.log(this.arrFind(this.allData,'userUserTypeId',this.ruleForm.userTypeTypeName).userTypeTypeName)
-                  // console.log(this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName);
-
-                  let item = this.tableData[this.selectIndex];
-                  item.userUid = userUid;
-                  item.userName = userName;
-                  item.userMobile = userMobile;
-                  item.userSex = userSex;
-                  item.userUserTypeId = userUserTypeId;
-                  item.userPassword = userPassword;
-                  item.userTypeTypeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName;
-                  console.log(this.allData[allIndex].userName,)
-
-                  if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
-                    this.tableData.splice(this.selectIndex,1)
-                  }
-
-
-
-
+                let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
+                if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
+                  /* 判断是否移除 */
+                  this.tableData.splice(this.selectIndex,1)
+                }
+                let allIndex = this.arrIndex(this.allData,this.selectData.userUid);
+                let allItem = this.allData[allIndex];
+                allItem.userName = userName;
+                allItem.userMobile = userMobile;
+                allItem.userSex = userSex;
+                allItem.userUserTypeId = userUserTypeId;
+                allItem.userPassword = userPassword;
+                allItem.userTypeTypeName = typeName;
                 this.$message({message: '修改成功',type: 'success'});
             });
             this.centerDialogVisible = false;
@@ -289,7 +275,6 @@ export default {
                             userSex: res.data.data.userSex,
                             userUid: res.data.data.userUid,
                             userUserTypeId: res.data.data.userUserTypeId,
-                            disableDelete: false,
                             userTypeTypeName: this.arrFind(this.allUser,"userTypeId",userUserTypeId).userTypeTypeName
                         }
                         let typeName = this.arrFind(this.allData,'userUserTypeId',res.data.data.userUserTypeId).userTypeTypeName
@@ -313,7 +298,7 @@ export default {
     },
     arrIndex(arr,el){ // 通过数组查找相同目标的下标
       for (let i in arr) {
-        if(arr[i] === el){
+        if(arr[i].userUid === el){
           return i
         }
       }

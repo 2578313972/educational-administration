@@ -3,15 +3,13 @@ import router from '../router'
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 
-function Http(aaa) {
+function Http(baseurl) {
     let http = axios.create({
-        baseURL: aaa || 'http://192.168.1.188:12'
+        baseURL: baseurl || 'http://192.168.1.188:12'
     })
 
     this.get = (url, queryObj) => {
-        /**
-         * 如果没有传对象 则赋值一个空对象
-         */
+        /**如果没有传对象 则赋值一个空对象*/
         return http.get(url, {
             params: {
                 ...(queryObj || {})
@@ -20,9 +18,7 @@ function Http(aaa) {
     }
 
     this.post = (url, data, queryObj) => {
-        /**
-         * 如果没有传对象 则赋值一个空对象
-         */
+        /**如果没有传对象 则赋值一个空对象*/
         return http.post(url, data || {}, {
             params: {
                 ...(queryObj || {})
@@ -31,9 +27,7 @@ function Http(aaa) {
     }
 
     this.all = (...data) => {
-        /**
-         * 合并请求
-         */
+        /**合并请求*/
         return axios.all(data).then(axios.spread((...res) => {
             return res.map((item) => item.data)
         }))
@@ -60,9 +54,7 @@ function Http(aaa) {
                 case 401:
                     if (!Cookie.getCookie("userInfo")) return router.replace({path:"/login"})
                     try {
-                        /**
-                         * 解密报错时 直接去登录页面
-                         */
+                        /**解密报错时 直接去登录页面*/
                         await login()
                         return http(error.config)
                     } catch (err) {

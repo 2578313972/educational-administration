@@ -1,6 +1,4 @@
 import axios from '@/axios'
-
-function Login() {
-    this.authenticate = params => axios.get("/api/OAuth/authenticate",params)
+export default{
+    authenticate : (params) => axios.get("/api/OAuth/authenticate",params) // 登录
 }
-export default new Login()

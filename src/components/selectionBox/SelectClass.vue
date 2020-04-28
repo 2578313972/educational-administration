@@ -1,0 +1,39 @@
+<template>
+    <div id="SelectClass">
+        <el-select v-model="value.classId" placeholder="班级选择">
+            <el-option v-for="item in allClass" :key="item.classId" :label="item.className" :value="item.classId"></el-option>
+        </el-select>
+    </div>
+</template>
+
+<script>
+import Api from '@/http/FStudent'
+export default {
+    data() {
+        return {
+            allClass:[], // 选择框所有数据
+        }
+    },
+    props:['value'],
+    created() {
+        Api.GetAllClass().then(res => {
+            this.allClass = res.data.map(item=>({classId:item.classId,className:item.className}))
+        })
+    },
+    watch: {
+        value:{
+            handler:function(newVal,oldVal){
+                this.$emit("input",newVal)
+            },
+            deep:true
+        }
+    },
+}
+</script>
+
+<style lang="less" scoped>
+    #SelectClass{
+        box-sizing: border-box;
+        .el-select{width:100%;}
+    }
+</style>

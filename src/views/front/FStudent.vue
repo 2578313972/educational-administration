@@ -2,20 +2,17 @@
     <div id="FStudent">
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <!-- <span>卡片名称</span> -->
-                <el-form :inline="true" :rules="formInlineRules" :model="formInline" class="demo-form-inline">
+                <el-form :inline="true" :model="formInline" class="demo-form-inline">
                   <el-form-item>
-                    <el-select v-model="formInline.classId" placeholder="班级选择">
-                      <el-option v-for="item in allClass" :key="item.classId" :label="item.className" :value="item.classId"></el-option>
-                    </el-select>
+                    <Select-Class v-model="formInline" />
                   </el-form-item>
                 </el-form>
-                <el-button @click="selectWin=true,centerDialogVisible=true" style="padding: 3px 0;font-size:15px;"  type="text">
+                <el-button @click="addItem" style="padding: 3px 0;font-size:15px;"  type="text">
                 <i class="el-icon-circle-plus-outline"></i>新增学生
                 </el-button>
             </div>
             <div class="text item">
-                <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
+                <el-table v-loading="loading" :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
                 <el-table-column label="#" type="index" width="50"></el-table-column>
 
                 <el-table-column label="班级名称" min-width="70px">
@@ -66,10 +63,8 @@
 
         <el-dialog @close="close('ruleForm')" :title="selectWin?'新增班级信息':'修改班级信息'" :visible.sync="centerDialogVisible" width="35%" center>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"  class="demo-ruleForm">
-                <el-form-item label="班级" prop="className">
-                  <el-select v-model="ruleForm.className" placeholder="请选择">
-                      <el-option v-for="item in allClass" :key="item.classId" :label="item.className" :value="item.classId"></el-option>
-                  </el-select>
+                <el-form-item label="班级">
+                    <Select-Class v-model="selectFrame" />
                 </el-form-item>
 
                 <el-form-item label="学生名称" prop="stuName">
@@ -85,8 +80,8 @@
                 </el-form-item>
 
                 <el-form-item label="性别" prop="stuSex">
-                  <el-radio v-model="ruleForm.stuSex" label="1">男</el-radio>
-                  <el-radio v-model="ruleForm.stuSex" label="2">女</el-radio>
+                  <el-radio v-model="ruleForm.stuSex" label="男">男</el-radio>
+                  <el-radio v-model="ruleForm.stuSex" label="女">女</el-radio>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="stuPassword">
@@ -108,6 +103,8 @@
 <script>
 import Api from '@/http/FStudent'
 import TimeOut from '@/plug-in/TimeOut'
+
+import SelectClass from '@/components/selectionBox/SelectClass'
 export default {
   data() {
      var checkAge = (rule, value, callback) => {
@@ -123,35 +120,23 @@ export default {
         }, 500);
       };
     return {
-      formInline: {
-        classId: '' // 被选中的班级名称
-      },
-      allClass:[],
-      formInlineRules:{
-         classId: [
-            { message: '请输入班级名称', trigger: 'change' }
-          ],
-      },
-
+      loading:false, // 加载效果
+      formInline: {classId:""}, // 子组件选择班级
+      selectFrame: {classId:""}, // 子组件选择班级（弹框）
+      classId:'',
       tableData: [], // 显示的班级数据
       selectWin: true, // 控制添加和修改
       centerDialogVisible: false, // 控制新增弹框
-      ruleForm: {
-        /**
-         * 弹出框数据
-         */
-        className: "", // 班级名称
+      ruleForm: { /**弹出框数据*/
+        className:{classId:""}, // 班级名称
         stuName: "", // 学生姓名
         stuBirthDay:"", // 生日
         stuMobile:"",//手机号
         stuSex:"",//性别
         stuPassword:"", // 密码
       },
-      rules:{
-        /**
-         * 弹框验证
-         */
-        className:[{ required: true, message: '请选择班级名称', trigger: 'blur' }],  // 班级名称验证
+      rules:{ /**验证规则 */
+        /**弹框验证*/
         stuName:[{ required: true, message: '请输入学生姓名', trigger: 'blur' }],  // 学生姓名验证
         stuBirthDay:[{ required: true, message: '请选择生日时间', trigger: 'blur' }],  // 生日验证
         stuMobile:[{ validator:checkAge,trigger: 'blur' }], //手机号验证
@@ -162,35 +147,37 @@ export default {
       selectIndex: 0, // 修改时需要时用的下标
     };
   },
-  created() {
-    Api.GetAllClass().then(res => {
-      this.allClass = res.data
-      console.log(this.allClass)
-    })
-  },
-  watch:{
+  watch: {
     formInline:{
-      handler:function(){
-        Api.GetClassStudent({classId:this.formInline.classId}).then(res=>{
-          this.tableData = res.data
-          this.classId = this.formInline.classId
-        })
+      /**监听选择班级下拉框 */
+      handler:function(newVla,oldVal){
+        this.loading = true
+        this.upClassData(newVla.classId)
       },
       deep:true
     }
   },
+  components:{SelectClass},
   methods: {
+    addItem(){ // 点击新增
+      this.ruleForm.className= this.classId
+      this.ruleForm.stuName= ''
+      this.ruleForm.stuBirthDay=''
+      this.ruleForm.stuMobile= ''
+      this.ruleForm.stuSex= '男'
+      this.ruleForm.stuPassword=''
+      this.selectWin=true
+      this.centerDialogVisible=true
+    },
     handleEdit(index, row) { // 编辑
       console.log(index,row);
       this.selectWin = false; // 改为编辑框
       this.centerDialogVisible = true; // 显示弹框
-
       this.ruleForm.className = row.className
       this.ruleForm.stuName = row.stuName
       this.ruleForm.stuBirthDay = row.stuBirthDay
       this.ruleForm.stuMobile = row.stuMobile
       this.ruleForm.stuSex = row.stuSex
-      this.ruleForm.stuSex=="男"?this.ruleForm.stuSex='1':this.ruleForm.stuSex='2'
       this.ruleForm.stuPassword = row.stuPassword
 
       this.selectData = row; // 将要编辑的所有数据传给 selectData 在修改时引用
@@ -220,12 +207,11 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           let stuName = this.ruleForm.stuName // 学生姓名
-          let stuClassId = this.arrFindClass(this.allClass,this.ruleForm.className).classId // 班级编号
+          let stuClassId = this.selectFrame.classId // 班级编号
           let stuBirthDay = this.ruleForm.stuBirthDay // 生日
           let stuMobile = this.ruleForm.stuMobile // 手机号
           let stuPassword = this.ruleForm.stuPassword // 密码
           let stuSex = this.ruleForm.stuSex // 性别
-          stuSex==1?stuSex="男":stuSex="女"
           Api.ModifyStudent({
             stuUid:this.selectData.stuUid,// 要修改学生的唯一标识符
             stuName,//要修改的名称
@@ -235,13 +221,12 @@ export default {
             stuPassword,//要修改的密码
             stuSex,//要修改的性别
           }).then(res=>{
-            console.log(res)
+            console.log(res);
             switch (res.data.code) {
               case 0:
                 this.$message({message: '数据没有变化',type: 'warning'});
                 break;
               case 1:
-                this.$message({message: '修改成功',type: 'success'});
                 let item = this.tableData[this.selectIndex]
                 item.stuName = stuName
                 item.stuBirthDay = stuBirthDay
@@ -250,9 +235,11 @@ export default {
                 item.stuPassword = stuPassword
                 item.stuSex = stuSex
                 item.stuAge = res.data.data
+                // console.log(stuClassId,'---------',this.ruleForm.className)
+                if(stuClassId!==this.classId) this.tableData.splice(this.selectIndex,1)
+                this.$message({message: '修改成功',type: 'success'});
                 break;
             }
-
           })
           this.centerDialogVisible = false;
         }
@@ -270,13 +257,7 @@ export default {
           let stuMobile = this.ruleForm.stuMobile // 手机号
           let stuPassword = this.ruleForm.stuPassword // 密码
           let stuSex = this.ruleForm.stuSex // 性别
-          stuSex==1?stuSex="男":stuSex="女"
-          console.log(stuName)
-          console.log(stuClassId)
-          console.log(stuBirthDay)
-          console.log(stuMobile)
-          console.log(stuPassword)
-          console.log(stuSex)
+          console.log(this.ruleForm)
           Api.AddStudent({
             stuName,  //学生姓名
             stuClassId,  //班级编号
@@ -287,10 +268,9 @@ export default {
           }).then(res => {
             console.log(res)
             if(res.data.code==1){
-              console.log(this.tableData)
-              if(this.formInline.classId===res.data.data.classId){
+              if(this.classId==res.data.data.classId){
                 this.tableData.push({
-                  classId:2899,
+                  classId:res.data.data.classId,
                   className:res.data.data.className,
                   stuAge:res.data.data.stuAge,
                   stuBirthDay:res.data.data.stuBirthDay,
@@ -302,6 +282,8 @@ export default {
                 })
               }
               this.$message({message: '添加成功',type: 'success'});
+            }else{
+              this.$message({message: res.data.message,type: 'warning'});
             }
 
           });
@@ -313,8 +295,16 @@ export default {
       this.$refs[formName].resetFields();
     },
     arrFindClass(arr,val){ // 查找班级编号
-      return arr.find(item=>item.className===val)
+      return arr.find(item=>item.classId===val)
     },
+    upClassData(ID){ // 改变下拉框重新获取新的数据
+      Api.GetClassStudent({classId:ID}).then(res=>{
+        this.tableData = res.data
+        this.classId = ID
+        this.selectFrame.classId = ID
+        this.loading = false
+      })
+    }
   },
   filters:{ // 过滤器
     time(val){

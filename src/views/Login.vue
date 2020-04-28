@@ -113,7 +113,7 @@
             .catch(function (error) {
                 that.$message.error('账号或密码错误！');
             });
-          } else return false
+          } else return false ;
         });
       }
     }
