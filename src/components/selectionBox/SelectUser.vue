@@ -1,9 +1,8 @@
 <template>
     <div id="SelectUser">
-        <el-radio-group v-model="radio">
-            <el-radio label="全部">全部</el-radio>
-            <el-radio v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName">{{item.userTypeTypeName}}</el-radio>
-        </el-radio-group>
+        <el-select v-model="value.TypeId" placeholder="请选择">
+            <el-option v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName" :value="item.userTypeId"></el-option>
+        </el-select>
     </div>
 </template>
 
@@ -12,31 +11,38 @@ import Api from '@/http/FTeacher'
 export default {
     data() {
         return {
-            radio:"",
             allUser:[]
         }
     },
     props:{
-        value:String
+        value:{
+            TypeName:String,
+            TypeId:String
+        }
     },
     created() {
         Api.GetUserRoles().then(res=>{
             this.allUser = res.data
-            this.radio = this.value
-            console.log(this.allUser);
-
         })
     },
     watch: {
-        radio(newVal){
-            // console.log(newVal)
-            // let a = this.allUser.find(item=>item.userTypeTypeName===newVal)
-            this.$emit("input",newVal)
+        value:{
+            handler:function(newVal,oldVal){
+                try{
+                    newVal.TypeName = this.allUser.find(item=>item.userTypeId===newVal.TypeId).userTypeTypeName
+                }catch{}
+                this.$emit("input",newVal)
+            },
+            deep:true
         }
     },
 }
 </script>
 
 <style lang="less" scoped>
-    #SelectUser{margin: auto 10px;}
+    #SelectUser{
+        margin: auto 10px;
+        box-sizing: border-box;
+        .el-select{width:100%;}
+    }
 </style>

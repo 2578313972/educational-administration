@@ -2,14 +2,10 @@
     <div id="FTeacher">
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <el-button @click="ruleForm.userTypeTypeName='',ruleForm.userName='',ruleForm.userMobile='',ruleForm.userSex='男',ruleForm.userPassword='',selectWin=true,centerDialogVisible=true" style="padding: 3px 0;font-size:15px;"  type="text">
+                <el-button @click="addItem" style="padding: 3px 0;font-size:15px;"  type="text">
                     <i class="el-icon-circle-plus-outline"></i>新增用户
                 </el-button>
-                <!-- <el-radio-group v-model="radio">
-                    <el-radio label="全部">全部</el-radio>
-                    <el-radio v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName">{{item.userTypeTypeName}}</el-radio>
-                </el-radio-group> -->
-                <Select-User v-model="radio" />
+                <Click-User v-model="radio" />
             </div>
             <div class="text item">
                 <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
@@ -77,9 +73,7 @@
                 </el-form-item>
 
                 <el-form-item label="角色" prop="userTypeTypeName">
-                  <el-select v-model="ruleForm.userTypeTypeName" placeholder="请选择">
-                      <el-option v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName" :value="item.userTypeId"></el-option>
-                  </el-select>
+                      <SelectUser v-model="comUserType" />
                 </el-form-item>
 
             </el-form>
@@ -96,6 +90,7 @@
 
 <script>
 import Api from '@/http/FTeacher'
+import ClickUser from '@/components/selectionBox/ClickUser'
 import SelectUser from '@/components/selectionBox/SelectUser'
 export default {
   data() {
@@ -104,8 +99,8 @@ export default {
           return callback(new Error('请输入手机号码'));
         }
         setTimeout(() => {
-          if(!(/^1\d{10}$/.test(value))){
-              callback(new Error('手机号码格式有误，请重填'));
+          if(!(/^1[3|5|7|8|9]\d{9}$/.test(value))){
+              callback(new Error('手机号码格式为13-15-17-18-19开头'));
           } else{
             callback();
           }
@@ -122,30 +117,24 @@ export default {
         }
       };
     return {
-        radio:"全部",
-        allUser:[], // 所有角色
+        radio:{radioName:"全部",radioId:""},
         allData:[], // 所有老师数据
-        tableData: [], // 显示的老师数据
+        // tableData: [], // 显示的老师数据
         selectWin: true, // 控制添加和修改
         centerDialogVisible: false, // 控制新增弹框
-        ruleForm: {
-            /**
-             * 弹出框数据
-             */
+        comUserType:{TypeName:'',TypeId:""},
+        ruleForm: {/**弹出框数据*/
             userTypeTypeName: "", // 角色
             userName: "", // 用户名称
             userMobile:"",//手机号
             userSex:"男",//性别
             userPassword:"", // 密码
         },
-        rules:{
-            /**
-             * 弹框验证
-             */
+        rules:{/**弹框验证*/
             userTypeTypeName:[{ required: true, message: '请选择班级名称', trigger: 'blur' }],  // 班级名称验证
             userName:[{ required: true, message: '请输入学生姓名', trigger: 'blur' }],  // 学生姓名验证
             stuBirthDay:[{ required: true, message: '请选择生日时间', trigger: 'blur' }],  // 生日验证
-            userMobile:[{ validator:checkAge,trigger: 'blur' }], //手机号验证
+            userMobile:[{ validator:checkAge,trigger: 'change' }], //手机号验证
             userSex:[{ required: true, message: '请选择性别', trigger: 'blur' }], //性别验证
             userPassword:[{ validator:password, trigger: 'blur' }]  // 密码验证
         },
@@ -154,28 +143,46 @@ export default {
     };
   },
   created() {
-      Api.GetUserRoles().then(res=>{
-          this.allUser = res.data
-      })
       Api.GetTeachers().then(res=>{
-          this.tableData = res.data
+          // this.tableData = res.data
           this.allData = res.data
-          // console.log(this.allData)
       })
   },
   watch:{
-    radio(newVal){
-        if(newVal==="全部") return this.tableData = this.allData
-        this.tableData = this.allData.filter(item=> item.userTypeTypeName===this.radio)
+    comUserType:{
+        handler:function(newVal,oldVal){
+          this.ruleForm.userTypeTypeName = newVal.TypeId
+        },
+        deep:true
     }
   },
-  components:{SelectUser},
+  computed: {
+    tableData(){
+        if(this.radio.radioName==="全部") return this.allData
+        this.comUserType.TypeId = this.radio.radioId
+        this.comUserType.TypeName = this.radio.radioName
+        return this.allData.filter(item=> item.userTypeTypeName===this.radio.radioName)
+    }
+  },
+  components:{ClickUser,SelectUser},
   methods: {
-    handleEdit(index, row) { // 编辑
+    addItem(){ // 点击添加
+      this.comUserType={TypeName:'',TypeId:""}
+      this.comUserType.TypeName = ""
+      this.ruleForm.userTypeTypeName=''
+      this.ruleForm.userName=''
+      this.ruleForm.userMobile=''
+      this.ruleForm.userSex='男'
+      this.ruleForm.userPassword=''
+      this.selectWin=true
+      this.centerDialogVisible=true
+    },
+    handleEdit(index, row) { // 点击编辑
       this.selectWin = false; // 改为编辑框
       this.centerDialogVisible = true; // 显示弹框
-      console.log(row)
+
       this.ruleForm.userTypeTypeName = row.userUserTypeId
+      this.comUserType.TypeId = row.userUserTypeId
       this.ruleForm.userName = row.userName
       this.ruleForm.userMobile = row.userMobile
       this.ruleForm.userSex = row.userSex
@@ -185,7 +192,6 @@ export default {
       this.selectIndex = index; // 将要编辑的下标传给 selectIndex 在修改时引用
     },
     handleDelete(index, row) { // 删除
-      console.log(row)
       this.$confirm("此操作将永久删除该班级, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -218,7 +224,7 @@ export default {
             let userName = this.ruleForm.userName
             let userMobile = this.ruleForm.userMobile
             let userSex = this.ruleForm.userSex
-            let userUserTypeId = this.ruleForm.userTypeTypeName
+            let userUserTypeId = this.comUserType.TypeId
             let userPassword = this.ruleForm.userPassword
             Api.ModifyTeacher({
                 userUid, //要修改的用户标识符
@@ -257,7 +263,7 @@ export default {
             let userMobile = this.ruleForm.userMobile
             let userSex = this.ruleForm.userSex
             let userPassword = this.ruleForm.userPassword
-            let userUserTypeId = this.ruleForm.userTypeTypeName
+            let userUserTypeId = this.comUserType.TypeId
             Api.AddTeacher({
                 userName, //用户名，不能为空
                 userMobile, //手机号，长度11位
@@ -275,15 +281,15 @@ export default {
                             userSex: res.data.data.userSex,
                             userUid: res.data.data.userUid,
                             userUserTypeId: res.data.data.userUserTypeId,
-                            userTypeTypeName: this.arrFind(this.allUser,"userTypeId",userUserTypeId).userTypeTypeName
+                            userTypeTypeName: this.comUserType.TypeName
                         }
                         let typeName = this.arrFind(this.allData,'userUserTypeId',res.data.data.userUserTypeId).userTypeTypeName
-                        if(this.radio===typeName) this.tableData.push(littleData)
+                        if(this.radio.radioName===typeName) this.tableData.push(littleData)
                         this.allData.push(littleData)// 虚拟添加到allData数组
                         this.$message({message: '添加成功',type: 'success'});
                         break;
                     default:
-                        this.$message({type: "info",message: "添加失败"});
+                        this.$message({type: "info",message: res.data.message});
                 }
             })
           this.centerDialogVisible = false;

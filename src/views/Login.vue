@@ -106,7 +106,7 @@
                   if(this.$route.query.redirect){
                     this.$router.replace(this.$route.query.redirect) // 不记住历史路由
                   }else{
-                    that.$router.replace("/")
+                    that.$router.replace("/BTeacher")
                   }
                 },1000)
             })
