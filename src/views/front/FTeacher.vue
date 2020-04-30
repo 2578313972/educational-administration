@@ -234,20 +234,25 @@ export default {
                 userUserTypeId, //角色
                 userPassword //密码
             }).then(res=>{
-                let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
-                if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
-                  /* 判断是否移除 */
-                  this.tableData.splice(this.selectIndex,1)
-                }
-                let allIndex = this.arrIndex(this.allData,this.selectData.userUid);
-                let allItem = this.allData[allIndex];
-                allItem.userName = userName;
-                allItem.userMobile = userMobile;
-                allItem.userSex = userSex;
-                allItem.userUserTypeId = userUserTypeId;
-                allItem.userPassword = userPassword;
-                allItem.userTypeTypeName = typeName;
-                this.$message({message: '修改成功',type: 'success'});
+              switch (res.data.code){
+                  case 1:
+                      let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
+                      if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
+                        /* 判断是否移除 */
+                        this.tableData.splice(this.selectIndex,1)
+                      }
+                      let allIndex = this.arrIndex(this.allData,this.selectData.userUid);
+                      let allItem = this.allData[allIndex];
+                      allItem.userName = userName;
+                      allItem.userMobile = userMobile;
+                      allItem.userSex = userSex;
+                      allItem.userUserTypeId = userUserTypeId;
+                      allItem.userPassword = userPassword;
+                      allItem.userTypeTypeName = typeName;
+                      this.$message({message: '修改成功',type: 'success'});
+                  break;
+              }
+
             });
             this.centerDialogVisible = false;
         }

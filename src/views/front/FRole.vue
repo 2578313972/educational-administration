@@ -15,7 +15,7 @@
 
       </div>
       <div class="text item">
-        <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%"  row-key="date">
+        <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%"  row-key="userTypeId">
           <el-table-column class-name="table" label="#" type="index"></el-table-column>
 
           <el-table-column class-name="table" label="角色名称">
@@ -86,6 +86,7 @@ export default {
       ruleForm: {
         userTypeTypeName: "", // 角色名称
       },
+      sortable:"",
       rules: { // 弹框验证
         userTypeTypeName: [
           { required: true, message: "输入角色名称", trigger: "blur" }
@@ -105,7 +106,12 @@ export default {
   },
   watch: {
     checked(newVal,oldVla){
-      this.rowDrop(newVal)
+      if(newVal){
+        this.rowDrop()
+      }else{
+        this.sortable.destroy()
+      }
+
     }
   },
   methods: {
@@ -177,43 +183,36 @@ export default {
 
 
     //行拖拽
-    rowDrop(bool) {
-      if(!bool) return
+    rowDrop() {
       const tbody = document.querySelector('.el-table__body-wrapper tbody')
       const that = this
-      Sortable.create(tbody, {
-        handle:bool?".table":"",
+      this.sortable = Sortable.create(tbody, {
+        animation:150,
         onEnd({ newIndex, oldIndex }) {
-          let allData = JSON.parse(JSON.stringify(that.tableData))
 
-          let newData = allData[newIndex] // 新数据
-          let oldData = allData[oldIndex] // 旧数据
-          console.log(1,allData.map(item=>item.userTypeTypeName))
-          console.log(2,oldIndex,oldData.userTypeTypeName,"-----",newIndex,newData.userTypeTypeName);
+          let data = that.tableData.splice(oldIndex,1)[0]
+          that.tableData.splice(newIndex,0,data)
+          //    let allData = JSON.parse(JSON.stringify(that.tableData))
+          //    let newData = that.allData[newIndex] // 新数据
+          //    let oldData = that.allData[oldIndex] // 旧数据
+          //    if(oldIndex<newIndex){ // 当从上往下拉时
+          //      that.allData.splice(newIndex,1,newData,oldData)
+          //      // that.tableData.slice(0,)
+          //      console.log(that.allData.splice(oldIndex,1))
+          //    }else if(oldIndex>newIndex){ // 当从下往上拉时
+          //      that.allData.splice(oldIndex,1)
+          //      that.allData.splice(newIndex,1,oldData,newData)
+          //    }
 
-          if(oldIndex<newIndex){ // 当从上往下拉时
-            allData.splice(newIndex,1,newData,oldData)
-            that.tableData.slice(0,)
-            allData.splice(oldIndex,1)
-          }else if(oldIndex>newIndex){ // 当从下往上拉时
-            allData.splice(oldIndex,1)
-            allData.splice(newIndex,1,oldData,newData)
-          }
-
-          console.log(3,allData.map(item=>item.userTypeTypeName))
+          // console.log(1,that.allData.map(item=>item.userTypeTypeName))
 
           let userTypes = [] // 创建一个数组用于接收改变顺序后的值
-          for (let i in allData) { // 循环添加
-            userTypes.push({userTypeId:allData[i].userTypeId,userTypeSortNo:++i})
+          for (let i in that.tableData) { // 循环添加
+            userTypes.push({userTypeId:that.tableData[i].userTypeId,userTypeSortNo:++i})
           }
           Api.OrderUserRoleNo(userTypes).then(res=>{ /**调用Api接口*/
-            that.tableData = JSON.parse(JSON.stringify(allData))
-
-            console.log(4,res.data.message);
-            console.log(5,allData.map(item=>item.userTypeTypeName))
-            console.log(6,that.tableData.map(item=>item.userTypeTypeName),"!!!!!!!!!!!!!!!")
-
-
+            // that.tableData = JSON.parse(JSON.stringify(that.allData))
+            console.log(res);
           })
           // that.tableData = allData
         }

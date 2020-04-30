@@ -1,6 +1,6 @@
 <template>
     <div id="BTeacher">
-        <el-card style="height: calc(100vh - 150px)" class="box-card">
+        <el-card class="box-card">
             <div slot="header" class="clearfix">
                 <el-steps :active="active" align-center finish-status="success">
                     <el-step title="试卷信息"></el-step>
@@ -24,7 +24,7 @@ import PaperComplete from '../../components/makePapers/PaperComplete'
 export default {
     data() {
         return {
-            active: 0, // 完成位置
+            active: 1, // 完成位置
         }
     },
     methods: {

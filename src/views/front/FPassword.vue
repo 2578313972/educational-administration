@@ -86,15 +86,18 @@ export default {
                 oldPassword:this.ruleForm.oldPassword,
                 newPassword:this.ruleForm.pass
             }).then(res=>{
-                console.log(res)
                 switch (res.data.code){
                   case 1:
-                    this.$message({message: '密码修改成功',type: 'success'});
+                    sessionStorage.removeItem('userData')
+                    this.Cookie.removeCookie('userInfo')
+                    this.$message({message: '密码修改成功,请重新登录',type: 'success'});
+                    setTimeout(()=>{
+                      this.$router.push('/login')
+                    },1000)
                     break;
                   default:
-                    this.$message.error('密码修改失败');
+                    this.$message.error(res.data.message);
                 }
-
             })
 
           } else {

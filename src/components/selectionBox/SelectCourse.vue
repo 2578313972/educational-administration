@@ -1,6 +1,6 @@
 <template>
     <div id="SelectCourse">
-        <el-select v-model="value.courseId" placeholder="请选择">
+        <el-select v-model="value.courseId" placeholder="请选择课程">
             <el-option v-for="item in allCourse" :key="item.userTypeId" :label="item.courseName" :value="item.courseId"></el-option>
         </el-select>
     </div>
@@ -22,15 +22,13 @@ export default {
         })
     },
     watch: {
-        'value':{
+        'value.courseId':{
             handler:function(newVal,oldVal){
-                console.log(newVal)
-                // if(!this.value.courseId)return
                 try{
-                    this.value.courseName = this.allCourse.find(item=>item.courseId===newVal.courseId).courseName
-                }catch{
-                    console.log("!!!")
-                }
+                    this.value.courseName = this.allCourse.find(item=>item.courseId===this.value.courseId).courseName
+                }catch{}
+                console.log(this.value)
+
                 this.$emit("input",this.value)
             },
             deep:true
