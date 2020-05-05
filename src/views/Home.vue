@@ -14,7 +14,6 @@
             </el-menu-item>
           </el-menu>
           <el-menu
-          style="height:calc(100vh - 60px)"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"

@@ -7,7 +7,7 @@
         </el-button>
       </div>
       <div class="text item">
-        <el-table :data="tableData" height="calc(100vh - 250px)" style="width: 100%">
+        <el-table :data="tableData" style="width: 100%">
           <el-table-column label="#" type="index" width="50"></el-table-column>
 
           <el-table-column label="班级名称" min-width="100px">
@@ -137,15 +137,13 @@ export default {
       this.centerDialogVisible=true
 
       this.ruleForm.className = ''
-      // this.ruleForm.courseName = ''
-      // this.ruleForm.userName = ''
       this.comTeacher = {
         userName:"",
-        userId:""
+        userId:"0"
       }
       this.comCourse = {
         courseName:"",
-        courseId:""
+        courseId:"0"
       }
 
     },

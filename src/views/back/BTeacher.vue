@@ -24,7 +24,7 @@ import PaperComplete from '../../components/makePapers/PaperComplete'
 export default {
     data() {
         return {
-            active: 1, // 完成位置
+            active: 0, // 步骤位置
         }
     },
     methods: {

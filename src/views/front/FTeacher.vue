@@ -8,7 +8,7 @@
                 <Click-User v-model="radio" />
             </div>
             <div class="text item">
-                <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
+                <el-table :data="tableData" style="width: 100%">
 
                     <el-table-column label="#" type="index" width="50"></el-table-column>
 
@@ -73,7 +73,7 @@
                 </el-form-item>
 
                 <el-form-item label="角色" prop="userTypeTypeName">
-                      <SelectUser v-model="comUserType" />
+                      <Select-User v-model="comUserType" />
                 </el-form-item>
 
             </el-form>
@@ -167,7 +167,7 @@ export default {
   components:{ClickUser,SelectUser},
   methods: {
     addItem(){ // 点击添加
-      this.comUserType={TypeName:'',TypeId:""}
+      this.comUserType={TypeName:'',TypeId:"0"}
       this.comUserType.TypeName = ""
       this.ruleForm.userTypeTypeName=''
       this.ruleForm.userName=''
@@ -208,10 +208,7 @@ export default {
             this.$message({message: '删除成功',type: 'success'});
           })
       }).catch(() => {
-        this.$message({
-          type: "info",
-          message: "已取消删除"
-        });
+        this.$message({type: "info",message: "已取消删除"});
       });
     },
     modification(formName) {// 修改
@@ -222,6 +219,8 @@ export default {
         if (valid) {
             let userUid = this.selectData.userUid
             let userName = this.ruleForm.userName
+            console.log(userName);
+
             let userMobile = this.ruleForm.userMobile
             let userSex = this.ruleForm.userSex
             let userUserTypeId = this.comUserType.TypeId
@@ -237,7 +236,7 @@ export default {
               switch (res.data.code){
                   case 1:
                       let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
-                      if( this.radio!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio){
+                      if( this.radio.radioName!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio.radioName){
                         /* 判断是否移除 */
                         this.tableData.splice(this.selectIndex,1)
                       }
@@ -251,8 +250,9 @@ export default {
                       allItem.userTypeTypeName = typeName;
                       this.$message({message: '修改成功',type: 'success'});
                   break;
+                  default:
+                    this.$message({type: "info",message: "修改失败"});
               }
-
             });
             this.centerDialogVisible = false;
         }

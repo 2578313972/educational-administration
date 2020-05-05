@@ -1,6 +1,7 @@
 <template>
     <div id="SelectClass">
         <el-select v-model="value.classId" placeholder="班级选择">
+            <el-option label="请选择班级" value="0"></el-option>
             <el-option v-for="item in allClass" :key="item.classId" :label="item.className" :value="item.classId"></el-option>
         </el-select>
     </div>

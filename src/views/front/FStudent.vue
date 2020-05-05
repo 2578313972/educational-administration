@@ -12,7 +12,7 @@
                 </el-button>
             </div>
             <div class="text item">
-                <el-table v-loading="loading" :data="tableData" height="calc(100vh - 300px)" style="width: 100%">
+                <el-table v-loading="loading" :data="tableData" style="width: 100%">
                 <el-table-column label="#" type="index" width="50"></el-table-column>
 
                 <el-table-column label="班级名称" min-width="70px">
@@ -121,7 +121,7 @@ export default {
       };
     return {
       loading:false, // 加载效果
-      formInline: {classId:""}, // 子组件选择班级
+      formInline: {classId:"0"}, // 子组件选择班级
       selectFrame: {classId:""}, // 子组件选择班级（弹框）
       classId:'',
       tableData: [], // 显示的班级数据
@@ -160,6 +160,7 @@ export default {
   components:{SelectClass},
   methods: {
     addItem(){ // 点击新增
+      this.formInline = {classId:this.classId}
       this.ruleForm.className= this.classId
       this.ruleForm.stuName= ''
       this.ruleForm.stuBirthDay=''
@@ -173,6 +174,8 @@ export default {
       console.log(index,row);
       this.selectWin = false; // 改为编辑框
       this.centerDialogVisible = true; // 显示弹框
+
+      this.formInline = {classId:this.classId}
       this.ruleForm.className = row.className
       this.ruleForm.stuName = row.stuName
       this.ruleForm.stuBirthDay = row.stuBirthDay

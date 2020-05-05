@@ -15,7 +15,7 @@
 
       </div>
       <div class="text item">
-        <el-table :data="tableData" height="calc(100vh - 300px)" style="width: 100%"  row-key="userTypeId">
+        <el-table :data="tableData" style="width: 100%"  row-key="userTypeId">
           <el-table-column class-name="table" label="#" type="index"></el-table-column>
 
           <el-table-column class-name="table" label="角色名称">

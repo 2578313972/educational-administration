@@ -1,6 +1,11 @@
+<!--
+*使用方法
+  <Select-Teacher v-model="这里传入一个对象" />
+-->
 <template>
     <div id="SelectTeacher">
         <el-select v-model="value.userId" placeholder="请选择">
+            <el-option label="请选择" value="0"></el-option>
             <el-option v-for="item in allTeacher" :key="item.userTypeId" :label="item.userName" :value="item.userId"></el-option>
         </el-select>
     </div>
@@ -28,11 +33,10 @@ export default {
     watch: {
         'value':{
             handler:function(newVal,oldVal){
-                console.log(newVal);
-
-                if(!this.value.userId)return
-                this.value.userName = this.allTeacher.find(item=>item.userId===this.value.userId).userName
-                this.$emit("input",this.value)
+                try{
+                    this.value.userName = this.allTeacher.find(item=>item.userId===this.value.userId).userName;
+                }catch{}
+                this.$emit("input",this.value);
             },
             deep:true
         }

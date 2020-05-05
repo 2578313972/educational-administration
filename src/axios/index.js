@@ -78,7 +78,7 @@ function Http(baseurl) {
          * 重新获取token
          */
         if(res.status === 200){
-            Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token), { maxAge: 60 * 20, domain: "localhost", path: "/" })
+            Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token))
         }else{
             throw new Error()
         }

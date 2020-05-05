@@ -5,7 +5,7 @@
                 <el-input v-model="fromPaperName.name"  placeholder="请试卷名称"></el-input>
             </el-form-item>
             <el-form-item label="课程名称" prop="selectCourse">
-                <Select-Course v-model="PaperCourse" />
+                <Select-Course v-model="paperCourse" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')" >下一步</el-button>
@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import SelectCourse from '../selectionBox/SelectCourse'
+import SelectCourse from '@/components/selectionBox/SelectCourse' // 组件
+import Api from '@/http/BMakePaper' // API接口
 export default {
     data() {
         var fromPaperFrom = (rule, value, callback) => {
@@ -23,7 +24,7 @@ export default {
             callback()
         };
         return {
-            PaperCourse:{courseId:"",courseName:""},
+            paperCourse:{courseId:"0",courseName:""}, // v-model的传入值
             fromPaperName:{
                 /** */
                 name:"",
@@ -36,18 +37,30 @@ export default {
         }
     },
     watch: {
-        'PaperCourse.courseId'(newV){
-            this.fromPaperName.selectCourse = this.PaperCourse.courseId
+        'paperCourse.courseId'(newV){ // 监听获取到的值
+            this.fromPaperName.selectCourse = this.paperCourse.courseId
         }
     },
     methods: {
-        next(){
-            this.$emit('next')
-        },
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.$emit("next")
+                    let uid = JSON.parse(sessionStorage.getItem('userData')).userUid // 老师编号
+                    Api.MakeTestPaper({
+                        uid,
+                        paper:{tpTitle:this.fromPaperName.name,tpCourseId:this.fromPaperName.selectCourse}
+                    }).then(res=>{
+                        switch (res.data.code){
+                            case 1:
+                                sessionStorage.setItem("testPaperId",res.data.data.testPaperId) // 保存试卷编号
+                                this.$message({message: '试卷添加成功',type: 'success'});
+                                this.$emit("next") // 在父组件调用方法
+                                break;
+                            default:
+                                this.$message({message: res.data.message ,type: 'warning'});
+                        }
+
+                    })
                 } else return false;
             });
         },

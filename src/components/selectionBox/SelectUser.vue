@@ -1,6 +1,7 @@
 <template>
     <div id="SelectUser">
         <el-select v-model="value.TypeId" placeholder="请选择">
+            <el-option label="请选择角色" value="0"></el-option>
             <el-option v-for="item in allUser" :key="item.userTypeId" :label="item.userTypeTypeName" :value="item.userTypeId"></el-option>
         </el-select>
     </div>
