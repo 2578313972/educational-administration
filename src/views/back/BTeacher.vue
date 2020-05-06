@@ -18,13 +18,13 @@
 </template>
 
 <script>
-import PaperMessage from '../../components/makePapers/PaperMessage'
-import PaperAddTitle from '../../components/makePapers/PaperAddTitle'
-import PaperComplete from '../../components/makePapers/PaperComplete'
+import PaperMessage from '@/components/makePapers/PaperMessage'
+import PaperAddTitle from '@/components/makePapers/PaperAddTitle'
+import PaperComplete from '@/components/makePapers/PaperComplete'
 export default {
     data() {
         return {
-            active: 0, // 步骤位置
+            active: 1, // 步骤位置
         }
     },
     methods: {

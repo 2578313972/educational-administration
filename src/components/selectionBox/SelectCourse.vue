@@ -1,6 +1,6 @@
 <template>
   <div id="SelectCourse">
-    <el-select v-model="value.courseId" placeholder="请选择课程">
+    <el-select v-model="value.courseId" ref="selectCourse" placeholder="请选择课程">
       <el-option label="请选择课程" value="0"></el-option>
       <el-option
         v-for="item in allCourse"
@@ -34,12 +34,16 @@ export default {
             item => item.courseId === this.value.courseId
           ).courseName;
         } catch {}
-        console.log(this.value);
         this.$emit("input", this.value);
       },
       deep: true
     }
-  }
+  },
+  methods: {
+    bindFocus(){
+      this.$refs.selectCourse.focus()
+    }
+  },
 };
 </script>
 

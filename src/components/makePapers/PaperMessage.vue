@@ -2,10 +2,10 @@
     <div id="PaperMessage">
         <el-form :model="fromPaperName" label-position="top" status-icon :rules="fromPaperRules" ref="ruleForm" class="demo-ruleForm">
             <el-form-item label="试卷名称" prop="name" >
-                <el-input v-model="fromPaperName.name"  placeholder="请试卷名称"></el-input>
+                <el-input v-model="fromPaperName.name" autofocus ref="name"  placeholder="请试卷名称"></el-input>
             </el-form-item>
-            <el-form-item label="课程名称" prop="selectCourse">
-                <Select-Course v-model="paperCourse" />
+            <el-form-item label="课程名称" >
+                <Select-Course  v-model="paperCourse" ref="selectCourse" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')" >下一步</el-button>
@@ -31,8 +31,7 @@ export default {
                 selectCourse:""
             },
             fromPaperRules:{
-                name: [{ validator: fromPaperFrom,required: true, trigger: 'blur' }],
-                selectCourse: [{ required: true, message: '课程不能为空'}]
+                name: [{ validator: fromPaperFrom,required: true, trigger: 'blur' }]
             },
         }
     },
@@ -43,26 +42,24 @@ export default {
     },
     methods: {
         submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    let uid = JSON.parse(sessionStorage.getItem('userData')).userUid // 老师编号
-                    Api.MakeTestPaper({
-                        uid,
-                        paper:{tpTitle:this.fromPaperName.name,tpCourseId:this.fromPaperName.selectCourse}
-                    }).then(res=>{
-                        switch (res.data.code){
-                            case 1:
-                                sessionStorage.setItem("testPaperId",res.data.data.testPaperId) // 保存试卷编号
-                                this.$message({message: '试卷添加成功',type: 'success'});
-                                this.$emit("next") // 在父组件调用方法
-                                break;
-                            default:
-                                this.$message({message: res.data.message ,type: 'warning'});
-                        }
+            if(!this.fromPaperName.name) return this.$refs['name'].focus()
+            if(this.paperCourse.courseId==="0") return this.$refs.selectCourse.$refs.selectCourse.focus()
+            let uid = JSON.parse(sessionStorage.getItem('userData')).userUid // 老师编号
+            Api.MakeTestPaper({
+                uid,
+                paper:{tpTitle:this.fromPaperName.name,tpCourseId:this.fromPaperName.selectCourse}
+            }).then(res=>{
+                switch (res.data.code){
+                    case 1:
+                        sessionStorage.setItem("testPaperId",res.data.data.testPaperId) // 保存试卷编号
+                        this.$message({message: '试卷添加成功',type: 'success'});
+                        this.$emit("next") // 在父组件调用方法
+                        break;
+                    default:
+                        this.$message({message: res.data.message ,type: 'warning'});
+                }
 
-                    })
-                } else return false;
-            });
+            })
         },
     },
     components:{SelectCourse}
@@ -74,6 +71,7 @@ export default {
         .el-form.el-form--label-top{
             /** */
             width: 50%;
+            max-width: 450px;
             margin: auto;
             .el-form-item__content{margin-top: 0px !important;}
             .el-select{width:100%;}

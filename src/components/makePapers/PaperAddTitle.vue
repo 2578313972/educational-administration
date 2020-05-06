@@ -2,20 +2,16 @@
     <div id="PaperAddTitle">
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-
                 <span style="margin-right:6px;">题目类型</span>
-                <el-radio-group v-model="radio">
-                    <el-radio :label="1">选择题</el-radio>
-                    <el-radio :label="2">填空题</el-radio>
-                    <el-radio :label="3">问答题</el-radio>
-                </el-radio-group>
+                <div id="click">
+                    <select-question-type v-model="radio" />
+                </div>
                 <el-button style="float: right; padding: 6px;" type="primary">操作按钮</el-button>
-
             </div>
             <div  class="text item">
-                <PaperChoiceQuestion v-show="radio===1" />
-                <PaperBlanksTest v-show="radio===2" />
-                <PaperEssayQuestion v-show="radio===3" />
+                <paper-choice-question v-show="radio.typeId===1" />
+                <paper-blanks-test v-show="radio.typeId===2" />
+                <paper-essay-question v-show="radio.typeId===3" />
             </div>
         </el-card>
 
@@ -49,17 +45,18 @@
 </template>
 
 <script>
-import PaperChoiceQuestion from '../../components/makePapers/subject/PaperChoiceQuestion'
-import PaperBlanksTest from '../../components/makePapers/subject/PaperBlanksTest'
-import PaperEssayQuestion from '../../components/makePapers/subject/PaperEssayQuestion'
+import SelectQuestionType from '@/components/selectionBox/SelectQuestionType' // 题目类型组件
+import PaperChoiceQuestion from '@/components/makePapers/subject/PaperChoiceQuestion' // 选择题组件
+import PaperBlanksTest from '@/components/makePapers/subject/PaperBlanksTest' // 填空题组件
+import PaperEssayQuestion from '@/components/makePapers/subject/PaperEssayQuestion' // 问答题组件
 
 export default {
     data() {
         return {
-            radio:1
+            radio:{typeId:"0",typeName:"",type:'click'}
         }
     },
-    components:{PaperChoiceQuestion,PaperBlanksTest,PaperEssayQuestion}
+    components:{ SelectQuestionType,PaperChoiceQuestion,PaperBlanksTest,PaperEssayQuestion }
 }
 </script>
 
@@ -67,6 +64,6 @@ export default {
     #PaperAddTitle{
         margin:0;
         .cardbox{margin-top: 25px;}
-
+        #click{display: inline-block;width:calc(100% - 150px) !important;}
     }
 </style>

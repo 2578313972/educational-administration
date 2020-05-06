@@ -44,8 +44,17 @@
                     <span class="el-dropdown-link">
                       <i class="el-icon-s-custom"></i>退出
                       <div class="account_1">
-                        <i v-if="!userData" class="el-icon-s-custom"></i>
-                        <img v-if="userData" class="img" :src="userData.userHeader" />
+
+                        <div class="demo-type">
+                          <el-avatar :size="60" :src="userData.userHeader" @error="errorHandler">
+                            <img class="img" src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
+                          </el-avatar>
+                        </div>
+
+
+
+
+
                       </div>
                     </span>
                     <el-dropdown-menu slot="dropdown">
@@ -214,9 +223,10 @@ export default {
     },
     backLogin(){ // 退出登录
       this.Cookie.removeCookie("token")
-console.log(this.$route.fullPath);
-
       this.$router.push({path:"/login",query: {redirect: this.$route.fullPath}})
+    },
+    errorHandler() {
+      return true
     }
   },
 }
@@ -287,13 +297,12 @@ console.log(this.$route.fullPath);
                       width:45px;
                       height: 45px;
                       margin-left: 2px;
-                      background-color:#999;
                       line-height: 3.8;
                       border-radius: 50%;
                       overflow: hidden;
                       text-align: center;
-                      i{font-size: 28px;color:white;}
                     }
+                    .demo-type,.el-avatar--circle{width: 100% !important;height: 100% !important;}
                   }
                 }
               }

@@ -5,7 +5,9 @@
                 <el-button @click="addItem" style="padding: 3px 0;font-size:15px;"  type="text">
                     <i class="el-icon-circle-plus-outline"></i>新增用户
                 </el-button>
-                <Click-User v-model="radio" />
+
+                <Select-User v-model="radio" />
+
             </div>
             <div class="text item">
                 <el-table :data="tableData" style="width: 100%">
@@ -90,7 +92,6 @@
 
 <script>
 import Api from '@/http/FTeacher'
-import ClickUser from '@/components/selectionBox/ClickUser'
 import SelectUser from '@/components/selectionBox/SelectUser'
 export default {
   data() {
@@ -117,12 +118,12 @@ export default {
         }
       };
     return {
-        radio:{radioName:"全部",radioId:""},
+        radio:{TypeName:"",TypeId:"全部",type:"click"},
         allData:[], // 所有老师数据
         // tableData: [], // 显示的老师数据
         selectWin: true, // 控制添加和修改
         centerDialogVisible: false, // 控制新增弹框
-        comUserType:{TypeName:'',TypeId:""},
+        comUserType:{TypeName:'',TypeId:"",type:'select'},
         ruleForm: {/**弹出框数据*/
             userTypeTypeName: "", // 角色
             userName: "", // 用户名称
@@ -144,7 +145,6 @@ export default {
   },
   created() {
       Api.GetTeachers().then(res=>{
-          // this.tableData = res.data
           this.allData = res.data
       })
   },
@@ -158,17 +158,15 @@ export default {
   },
   computed: {
     tableData(){
-        if(this.radio.radioName==="全部") return this.allData
-        this.comUserType.TypeId = this.radio.radioId
-        this.comUserType.TypeName = this.radio.radioName
-        return this.allData.filter(item=> item.userTypeTypeName===this.radio.radioName)
+        if(this.radio.TypeId==="全部") return this.allData;
+        this.comUserType.TypeId = this.radio.TypeId;
+        return this.allData.filter(item=> item.userUserTypeId===this.radio.TypeId);
     }
   },
-  components:{ClickUser,SelectUser},
+  components:{SelectUser},
   methods: {
     addItem(){ // 点击添加
       this.comUserType={TypeName:'',TypeId:"0"}
-      this.comUserType.TypeName = ""
       this.ruleForm.userTypeTypeName=''
       this.ruleForm.userName=''
       this.ruleForm.userMobile=''
@@ -219,8 +217,6 @@ export default {
         if (valid) {
             let userUid = this.selectData.userUid
             let userName = this.ruleForm.userName
-            console.log(userName);
-
             let userMobile = this.ruleForm.userMobile
             let userSex = this.ruleForm.userSex
             let userUserTypeId = this.comUserType.TypeId
@@ -236,7 +232,7 @@ export default {
               switch (res.data.code){
                   case 1:
                       let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
-                      if( this.radio.radioName!=="全部" && this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName !== this.radio.radioName){
+                      if( this.radio.TypeId!=="全部" && userUserTypeId !== this.radio.TypeId){
                         /* 判断是否移除 */
                         this.tableData.splice(this.selectIndex,1)
                       }
@@ -251,7 +247,7 @@ export default {
                       this.$message({message: '修改成功',type: 'success'});
                   break;
                   default:
-                    this.$message({type: "info",message: "修改失败"});
+                    this.$message({type: "warning",message: res.data.message});
               }
             });
             this.centerDialogVisible = false;
