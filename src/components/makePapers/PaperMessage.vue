@@ -53,7 +53,7 @@ export default {
                     case 1:
                         sessionStorage.setItem("testPaperId",res.data.data.testPaperId) // 保存试卷编号
                         this.$message({message: '试卷添加成功',type: 'success'});
-                        this.$emit("next") // 在父组件调用方法
+                        this.$emit("next",res.data.data.testPaperId) // 在父组件调用方法
                         break;
                     default:
                         this.$message({message: res.data.message ,type: 'warning'});

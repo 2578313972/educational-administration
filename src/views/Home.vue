@@ -115,7 +115,7 @@ export default {
         {url:"/FRole",name:"用户角色"},
         {url:"/FPassword",name:"修改密码"}
       ]},{name:"在线测试",data:[
-        {url:"/BTeacher",name:"老师出卷"},
+        {url:"/BMakePaper",name:"老师出卷"},
         {url:"/BPaper",name:"试卷管理"},
         {url:"/BArrange",name:"安排测试"},
         {url:"/BReadover",name:"批阅试卷"},

@@ -121,7 +121,7 @@ export default {
                 if (this.$route.query.redirect) {
                   this.$router.replace(this.$route.query.redirect); // 不记住历史路由
                 } else {
-                  that.$router.replace("/BTeacher");
+                  that.$router.replace("/");
                 }
               }, 1000);
             })

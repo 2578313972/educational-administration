@@ -1,12 +1,18 @@
+/**
+ * 使用方法
+ * save('时间（毫秒||默认1000）').then(()=>{}).catch(()=>{})
+ */
 let startTime = 0
-async function save(){
+function save(loneTime = 1000) {
     let newTime = new Date().getTime()
-    if (newTime - startTime > 1000) {
-        startTime = newTime
-        return await new Promise((res,rej)=>{
-
-        })
-    }
+    return new Promise((res, rej) => {
+        if (newTime - startTime > loneTime) {
+            startTime = newTime
+            res()
+        } else {
+            rej()
+        }
+    })
 }
 
 export default save

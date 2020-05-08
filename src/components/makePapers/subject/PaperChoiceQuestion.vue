@@ -1,9 +1,7 @@
 <template>
   <div id="PaperChoiceQuestion">
     <el-form label-width="80px" ref="paperForm" :model="paperForm">
-      <el-form-item
-        label="题干"
-      >
+      <el-form-item label="题干">
         <el-input
           type="textarea"
           ref="textarea"
@@ -43,25 +41,27 @@
 
 <script>
 import Api from "@/http/BMakePaper";
-// import save from '../../../plug-in/SaveTraffic'
 export default {
   data() {
     return {
       usa: ["A", "B", "C", "D", "E", "F", "G"],
       paperForm: {
-        data: [],
-        textarea: "",
-        num: 2
-      }
+        data: [], // 选项数据
+        textarea: "", //　题干
+        num: 2　// 分数
+      },
     };
   },
+  props:{
+    testPaperId:[String, Number]
+  },
   created() {
-    this.paperForm.data = [
-          { serial: "A", tar: false, value: "" },
-          { serial: "B", tar: false, value: "" },
-          { serial: "C", tar: false, value: "" },
-          { serial: "D", tar: false, value: "" }
-    ]
+    this.paperForm.data = [ // 初始值数据
+      { serial: "A", tar: false, value: "" },
+      { serial: "B", tar: false, value: "" },
+      { serial: "C", tar: false, value: "" },
+      { serial: "D", tar: false, value: "" }
+    ];
   },
   methods: {
     addValue() {
@@ -80,57 +80,76 @@ export default {
     },
     submitTitle() {
       /** 提交选择题 */
-      let bool = true;
-      let arrItem = this.paperForm.data;
-      if(!this.paperForm.textarea) {
-        this.$refs.textarea.focus()
-        this.$message({message: `题干不能为空。请输入题目`,type: "warning"});
-        return
-      }
-      for (let i in arrItem) {
-        if(!arrItem[i].value) {
-          // 查找未填写答案的输入框
-          this.$refs['value'+i][0].focus()
-          this.$message({message: `${this.usa[i]}选项未填写答案。请输入答案`,type: "warning"});
-          return
-        }
-        for (let j = +i + 1, len = arrItem.length; j < len; j++) {
-          // 检查答案是否重复
-          if (arrItem[i].value === arrItem[j].value){
-            this.$refs['value'+j][0].focus()
-            return this.$message({
-              message: `${this.usa[i]}选项与${this.usa[j]}选项出现重复答案,请重新填写`,
+      this.SaveTraffic(500) /** 需要多少的间隔时间 不填写默认为1000毫秒 */
+        .then(() => {
+          let bool = true;
+          let againObj = {}
+          let arrItem = this.paperForm.data;
+          if (!this.paperForm.textarea) {
+            this.$refs.textarea.focus();
+            this.$message({
+              message: `题干不能为空。请输入题目`,
               type: "warning"
             });
+            return;
           }
-        }
-        if (arrItem[i].tar === true) {
-          // 检查是否有正确答案，如果没有则返回提示
-          bool = false;
-          break;
-        }
-      }
-      if (bool) return this.$message({message: "没有选择答案,请选择",type: "warning"});
-      let chooseQuestion = arrItem.map(item=>{return {cqOption: item.value, cqIsRight: item.tar}}) // map映射导入数据
-      Api.AddQuestionToTestPaper({
-        tpqPaperId: sessionStorage.getItem("testPaperId"), //试卷主键编号
-        tpqScore: this.paperForm.num, //分值
-        tpqQuestion: {
-          questionTitle: this.paperForm.textarea, //题目的标题
-          questionTypeId: 1, //题目的类型 1=选择题 2=填空题 3=问答题
-          chooseQuestion
-        }
-      }).then(res => {
-        console.log(res);
-        switch (res.data.code) {
-          case 1:
-            this.resetForm(); // 调用重置表单函数
-            this.$message({ message: res.data.message, type: "success" });
-            break;
-          default:
-            this.$message({ message: res.data.message, type: "warning" });
-        }
-      });
+          for (let i = 0,len = arrItem.length;i<len;i++) {
+            if (!arrItem[i].value) {
+              // 查找未填写答案的输入框
+              this.$refs["value" + i][0].focus();
+              this.$message({
+                message: `${this.usa[i]}选项未填写答案。请输入答案`,
+                type: "warning"
+              });
+              return;
+            }
+            if(againObj[arrItem[i].value]){
+              let oldIndex = Object.keys(againObj).indexOf(arrItem[i].value)
+              this.$refs["value" + i][0].focus();
+              this.$message({message: `${this.usa[oldIndex]}选项与${this.usa[i]}选项出现重复答案,请重新填写`,type: "warning"});
+              return
+            }else{
+              againObj[arrItem[i].value] = arrItem[i].value
+            }
+            if (arrItem[i].tar === true) {
+              // 检查是否有正确答案，如果没有则返回提示
+              bool = false;
+            }
+          }
+          if (bool)
+            return this.$message({
+              message: "没有选择答案,请选择",
+              type: "warning"
+            });
+          let chooseQuestion = arrItem.map(item => {
+            return { cqOption: item.value, cqIsRight: item.tar };
+          }); // map映射导入数据
+          let tpqPaperId = this.testPaperId || sessionStorage.getItem("testPaperId")
+
+          Api.AddQuestionToTestPaper({
+            tpqPaperId, //试卷主键编号
+            tpqScore: this.paperForm.num, //分值
+            tpqQuestion: {
+              questionTitle: this.paperForm.textarea, //题目的标题
+              questionTypeId: 1, //题目的类型 1=选择题 2=填空题 3=问答题
+              chooseQuestion
+            }
+          }).then(res => {
+            switch (res.data.code) {
+              case 1:
+                this.$emit('choiceQuestion',res.data.data)
+                this.resetForm(); // 调用重置表单函数
+                this.$message({ message: res.data.message, type: "success" });
+                break;
+              default:
+                this.$message({ message: res.data.message, type: "warning" });
+            }
+          });
+        })
+        .catch(err => {
+          // this.$message({ message: '操作过于频繁', type: "warning" });
+          return;
+        });
     },
     resetForm() {
       /** 重置表单 */
@@ -155,8 +174,12 @@ export default {
   .btn {
     margin-top: 15px;
   }
+  /deep/ .el-input__inner{height:35px !important;}
+  /deep/ .el-input--small .el-input__inner{height:32px !important;}
+  .el-form-item{margin-bottom: 8px;}
+  .el-button.is-circle{padding:8px;}
   .el-input {
-    width: calc(100% - 60px);
+    width: calc(100% - 50px);
     margin-right: 12.5px;
   }
   .el-form-item__content .el-button.is-round {

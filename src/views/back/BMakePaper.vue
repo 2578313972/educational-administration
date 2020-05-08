@@ -9,8 +9,8 @@
                 </el-steps>
             </div>
             <div class="text item">
-                <Paper-Message @next="next" v-if="active===0" />
-                <Paper-AddTitle v-if="active===1"  />
+                <Paper-Message @next="choiceNext" v-if="active===0" />
+                <Paper-AddTitle :testPaperId="testPaperId" v-if="active===1"  />
                 <Paper-Complete v-if="active===3"  />
             </div>
         </el-card>
@@ -24,14 +24,26 @@ import PaperComplete from '@/components/makePapers/PaperComplete'
 export default {
     data() {
         return {
-            active: 1, // 步骤位置
+            active: 0, // 步骤位置
+            testPaperId:""
+        }
+    },
+    created() {
+        if(sessionStorage.getItem('testPaperId')){
+            this.active = 1
         }
     },
     methods: {
-        next() {
+        next(id) {
+
             /**跳转至下一步操作 */
             if(this.active==1)return this.active+=2
             if (this.active++ > 2) this.active = 0;
+        },
+        choiceNext(id){
+            console.log(id);
+            this.testPaperId = id
+            ++this.active
         }
     },
     components:{PaperMessage,PaperAddTitle,PaperComplete}

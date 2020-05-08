@@ -12,9 +12,9 @@ export default [
         name: 'BReadover',
         component: () => import('../views/back/BReadover.vue')
     },{
-        path: '/BTeacher',
-        name: 'BTeacher',
-        component: () => import('../views/back/BTeacher.vue')
+        path: '/BMakePaper',
+        name: 'BMakePaper',
+        component: () => import('../views/back/BMakePaper.vue')
     },{
         path: '/BTest',
         name: 'BTest',
