@@ -7,4 +7,5 @@ export default {
     ModifyScore: data => axios.post(`/api/TestPaper/ModifyScore`, data), // 修改分值
     RemoveQuestionFromTestPaper: data => axios.post(`/api/TestPaper/RemoveQuestionFromTestPaper`,{}, data), // 从试卷上删除题目
     ModifyQuestion: data => axios.post(`/api/TestPaper/ModifyQuestion`, data), // 修改题目
+    UploadImg: data => axios.post(`/api/Question/UploadImg`, data), // 通过富文本编辑器上传题目中的图片
 }

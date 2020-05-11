@@ -43,7 +43,7 @@ export default {
             this.allUser = res.data
             this.$nextTick(()=>{
                 this.allData = this.value
-                this.allData.typeId = this.allUser[0].typeId
+                this.allData.typeId = this.allUser[2].typeId
                 if(!this.allData.type) this.allData.type = 'select'
             })
         })

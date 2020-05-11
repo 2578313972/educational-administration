@@ -52,37 +52,33 @@ function Http(baseurl) {
         if (error.response) {
             switch (error.response.status) {
                 case 401:
-                    if (!Cookie.getCookie("userInfo")) return router.replace({path:"/login"})
+                    if (!Cookie.getCookie("userInfo")) return router.replace({ path: "/login" })
                     try {
-                        /**解密报错时 直接去登录页面*/
-                        await login()
-                        return http(error.config)
+                        /** 解密报错时 直接去登录页面 */
+                        let userInof = JSON.parse(Base64.decode(Cookie.getCookie("userInfo")))
+                        let res = await axios.get('http://192.168.1.188:12/api/OAuth/authenticate', {
+                            params: {
+                                userMobile: userInof.userMobile,
+                                userPassword: userInof.userPassword
+                            }
+                        })
+                        /** 重新获取token */
+                        console.log(res);
+                        if (res.data.token_type === "Bearer") {
+                            Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token))
+                            return http(error.config)
+                        } else {
+                            throw new Error()
+                        }
+
                     } catch (err) {
                         Cookie.removeCookie("userInfo")
-                        return router.replace({path:"/login"})
+                        return router.replace({ path: "/login" })
                     }
             }
         }
         return Promise.reject(error)
-    });
-
-    async function login() {
-        let userInof = JSON.parse(Base64.decode(Cookie.getCookie("userInfo")))
-        let res = await axios.get('http://192.168.1.188:12/api/OAuth/authenticate', {
-            params: {
-                userMobile: userInof.userMobile,
-                userPassword: userInof.userPassword
-            }
-        })
-        /**
-         * 重新获取token
-         */
-        if(res.status === 200){
-            Cookie.setCookie('token', Base64.encode(res.data.token_type + " " + res.data.access_token))
-        }else{
-            throw new Error()
-        }
-    }
+    })
 }
 
 export default new Http()

@@ -9,9 +9,16 @@
         <el-button style="float: right; padding: 6px;" type="primary">操作按钮</el-button>
       </div>
       <div class="text item">
-        <paper-choice-question :testPaperId="testPaperId" @choiceQuestion="choiceQuestion" v-show="radio.typeId===1" />
-        <paper-blanks-test v-show="radio.typeId===2" />
-        <paper-essay-question v-show="radio.typeId===3" />
+        <!-- 选择题 -->
+        <paper-choice-question
+          :testPaperId="testPaperId"
+          @choiceQuestion="choiceQuestion"
+          v-show="radio.typeId===1"
+        />
+        <!-- 填空题 -->
+        <paper-blanks-test :testPaperId="testPaperId" v-show="radio.typeId===2" />
+        <!-- 问答题 -->
+        <paper-essay-question @essayQuestion="essayQuestion" v-show="radio.typeId===3" />
       </div>
     </el-card>
 
@@ -23,14 +30,21 @@
         </span>
       </div>
       <div class="text item">
-        <Modify-Choice :allChoiceSubject="allChoiceSubject" @handleChange="handleChange" @deleteQuestion="deleteQuestion" />
+        <Modify-Choice
+          v-for="(item,index) in allChoiceSubject"
+          :item="item"
+          :index="index"
+          :key="item.tpqId"
+          @handleChange="handleChange"
+          @deleteQuestion="deleteQuestion"
+        />
       </div>
     </el-card>
 
     <el-card class="box-card cardbox">
       <div slot="header" class="clearfix">
         <span>
-          一、填空题（本题共{{blankNum}}道小题，共
+          二、填空题（本题共{{blankNum}}道小题，共
           <b>{{blankScore}}/{{zf}}</b>分）
         </span>
       </div>
@@ -40,11 +54,18 @@
     <el-card class="box-card cardbox">
       <div slot="header" class="clearfix">
         <span>
-          一、问答题（本题共{{essayNum}}道小题，共
+          三、问答题（本题共{{essayNum}}道小题，共
           <b>{{essayScore}}/{{zf}}</b>分）
         </span>
       </div>
-      <div class="text item"></div>
+      <div class="text item">
+        <ModifyEssay
+          v-for="(item,index) in allEssaySubject"
+          :item="item"
+          :index="index"
+          :key="item.tpqId"
+        />
+      </div>
     </el-card>
   </div>
 </template>
@@ -56,127 +77,111 @@ import PaperChoiceQuestion from "@/components/makePapers/subject/PaperChoiceQues
 import PaperBlanksTest from "@/components/makePapers/subject/PaperBlanksTest"; // 填空题组件
 import PaperEssayQuestion from "@/components/makePapers/subject/PaperEssayQuestion"; // 问答题组件
 import ModifyChoice from "@/components/makePapers/modify/ModifyChoice"; // 修改选择题组件
+import ModifyEssay from "@/components/makePapers/modify/ModifyEssay"; // 修改问答题组件
+
+
 
 export default {
   data() {
     return {
-      radio: { typeId: "0", typeName: "", type: "click" }, // 单选按钮
+      radio: { typeId: "1", typeName: "", type: "click" }, // 单选按钮
       allPaperData: {}, // 试卷的所有数据
-      allChoiceSubject: [], // 选择题
-      allBlankSubject: [], // 填空题
-      allEssaySubject: [], // 问答题
+      allQuestions: [], // 试卷所有题目
       choiceNum: 0,
       blankNum: 0,
       essayNum: 0,
     };
   },
-  props:{
-    testPaperId:[String, Number]
+  props: {
+    testPaperId: [String, Number]
   },
   created() {
-    let id = this.testPaperId || sessionStorage.getItem('testPaperId')
+    let id = this.testPaperId || sessionStorage.getItem("testPaperId");
     Api.GetTestPaper({ id }).then(res => {
-        this.allPaperData = res.data;
-        res.data.questions.forEach(item=>{
-          switch (item.tpqQuestion.questionTypeId){ // 筛选题目类型
-            case 1:
-              this.allChoiceSubject.push(item)
-              break;
-            case 2:
-              this.allBlankSubject.push(item)
-              break;
-            case 3:
-              this.allEssaySubject.push(item)
-              break;
-          }
-        })
+      this.allQuestions = res.data.questions;
+      this.allPaperData = res.data;
     });
   },
   computed: {
-    /** 填空题分数 */
+    /** 选择题 */
+    allChoiceSubject() {
+      return this.allQuestions.filter(
+        item => item.tpqQuestion.questionTypeId === 1
+      );
+    },
+    /** 选择题分数 */
     choiceScore() {
       this.choiceNum = 0;
-      let sum = 0
-      try {
-        this.allChoiceSubject.map(item => {
-            sum += item.tpqScore;
-            ++this.choiceNum;
-        });
-      } catch (error) {}
-
-      return sum;
+      return this.allChoiceSubject.reduce((oldSum, num) => {
+        ++this.choiceNum;
+        return oldSum + num.tpqScore;
+      }, 0);
+    },
+    /** 填空题 */
+    allBlankSubject() {
+      return this.allQuestions.filter(
+        item => item.tpqQuestion.questionTypeId === 2
+      );
     },
     /** 填空题分数 */
     blankScore() {
-      this.choiceNum = 0;
-      let sum = 0
-      try {
-        this.allBlankSubject.map(item => {
-            sum += item.tpqScore;
-            ++this.blankNum;
-        });
-      } catch (error) {}
-
-      return sum;
+      this.blankNum = 0;
+      return this.allBlankSubject.reduce((oldSum, num) => {
+        ++this.blankNum;
+        return oldSum + num.tpqScore;
+      }, 0);
+    },
+    /** 问答题 */
+    allEssaySubject() {
+      return this.allQuestions.filter(
+        item => item.tpqQuestion.questionTypeId === 3
+      );
     },
     /** 问答题分数 */
     essayScore() {
-      this.choiceNum = 0;
-      let sum = 0
-      try {
-        this.allEssaySubject.map(item => {
-            sum += item.tpqScore;
-            ++this.essayNum;
-        });
-      } catch (error) {}
-
-      return sum;
+      this.essayNum = 0;
+      return this.allEssaySubject.reduce((oldSum, num) => {
+        ++this.essayNum;
+        return oldSum + num.tpqScore;
+      }, 0);
     },
     /** 总分 */
-    zf(){
-      let num = 0
-      try {
-        this.allChoiceSubject.map(item => {
-            num += item.tpqScore;
-        });
-        this.allBlankSubject.map(item => {
-            num += item.tpqScore;
-        });
-        this.allEssaySubject.map(item => {
-            num += item.tpqScore;
-        });
-      } catch (error) {}
-
-      return  num
+    zf() {
+      return this.allQuestions.reduce(
+        (oldSum, num) => oldSum + num.tpqScore,
+        0
+      );
     }
   },
   methods: {
     /** 添加选择题 */
-    choiceQuestion(res) {
-      this.allChoiceSubject.push({
-        tpqId: res.tpqId,
-        tpqPaperId: res.tpqPaperId,
-        tpqQuestion: res.tpqQuestion,
-        tpqQuestionId: res.tpqQuestionId,
-        tpqScore: res.tpqScore
-      });
+    choiceQuestion(data) {
+      this.allQuestions.push(data);
     },
     /** 选择题修改分数 */
-    handleChange(index,score){
-      this.allChoiceSubject[index].tpqScore = score
-      console.log(score);
+    handleChange(id, score) {
+      this.allQuestions.find(item => item.tpqId === id).tpqScore = score;
     },
     /** 选择题删除题目 */
-    deleteQuestion(index){
-      this.allChoiceSubject.splice(index,1)
+    deleteQuestion(id) {
+      let index = this.allQuestions.findIndex(item => item.tpqId === id);
+      this.allQuestions.splice(index, 1);
+    },
+
+    /** 添加问答题 */
+    essayQuestion(data) {
+      this.allQuestions.push(data);
     }
+    /** 问答题修改分数 */
+    /** 问答题删除题目 */
   },
   components: {
     SelectQuestionType,
     PaperChoiceQuestion,
     PaperBlanksTest,
     PaperEssayQuestion,
-    ModifyChoice
+    ModifyChoice,
+    ModifyEssay,
   }
 };
 </script>

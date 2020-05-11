@@ -46,7 +46,7 @@
                       <div class="account_1">
 
                         <div class="demo-type">
-                          <el-avatar :size="60" :src="userData.userHeader" @error="errorHandler">
+                          <el-avatar :size="60" :src="img" @error="errorHandler">
                             <img class="img" src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
                           </el-avatar>
                         </div>
@@ -94,6 +94,7 @@ export default {
   data(){
     return{
       userData:null, // 用户数据
+      img:'',
       height:0, // 定义左边菜单栏高度
       active:'', // 左侧菜单栏选中目标
       isCollapse:false, // 缩展
@@ -127,6 +128,9 @@ export default {
     ]
     this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
     this.userData = JSON.parse(sessionStorage.getItem('userData')) // 获取登录用户数据
+    try {
+      this.img = this.userData.userHeader
+    } catch (error) {}
     this.active = this.$route.fullPath; // 改变左菜单栏目标
   },
   beforeMount() {
