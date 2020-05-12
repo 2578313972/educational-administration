@@ -35,7 +35,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item  label="参考答案：" class="enum">
+        <el-form-item label="参考答案：" class="enum">
           <Rich-Text-Box v-model="qusetionData.tpqQuestion.answerQuestion.aqAnswer" />
         </el-form-item>
 
@@ -57,11 +57,9 @@ import RichTextBox from "@/components/makePapers/RichTextBox";
 export default {
   data() {
     return {
-      usa: ["A", "B", "C", "D", "E", "F", "G"],
       qusetionData: {},
       qusetionDataClone: {},
       balBool: false,
-      aa:"<p>66666666666</p>"
     };
   },
   props: {
@@ -69,10 +67,10 @@ export default {
     index: Number
   },
   created() {
-    // console.log(this.item);
-
     this.qusetionData = JSON.parse(JSON.stringify(this.item));
     this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
+    console.log(this.qusetionData);
+
   },
   methods: {
     /** 切换布局事件 */
@@ -104,13 +102,6 @@ export default {
         }
       });
     },
-    /** 添加选项 */
-    addValue() {
-      this.qusetionData.tpqQuestion.chooseQuestion.push({
-        cqIsRight: false,
-        cqOption: ""
-      });
-    },
     /** 删除题目 */
     deleteQuestion() {
       Api.RemoveQuestionFromTestPaper({
@@ -132,50 +123,17 @@ export default {
         this.$message({ message: "题干不能为空", type: "warning" });
         return this.$refs.textarea[0].focus();
       }
-      let bool = true;
-      let againObj = {};
-      let arrItem = this.qusetionData.tpqQuestion.chooseQuestion;
-      let len = arrItem.length;
-      for (let i = 0; i < len; i++) {
-        if (arrItem[i].cqOption.trim() === "") {
-          // 查找未填写答案的输入框
-          this.$refs["value" + i][0].focus();
-          this.$message({
-            message: `${this.usa[i]}选项未填写答案。请输入答案`,
-            type: "warning"
-          });
-          return;
-        }
-        // 去重
-        if (againObj[arrItem[i].cqOption]) {
-          let oldIndex = Object.keys(againObj).indexOf(arrItem[i].cqOption);
-          this.$refs["value" + i][0].focus();
-          this.$message({
-            message: `${this.usa[oldIndex]}选项与${this.usa[i]}选项出现重复答案,请重新填写`,
-            type: "warning"
-          });
-          return;
-        } else {
-          againObj[arrItem[i].cqOption] = arrItem[i].cqOption;
-        }
-        if (arrItem[i].cqIsRight === true) {
-          // 检查是否有正确答案，如果没有则返回提示
-          bool = false;
-        }
+      if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
+        this.$message({ message: "答案不能为空", type: "warning" });
+        return
       }
-      if (bool) {
-        this.$message({
-          message: `至少选择一个正确答案，请选择`,
-          type: "warning"
-        });
-        return;
-      }
-      Api.ModifyQuestion({
-        questionId: this.qusetionData.tpqQuestion.questionId,
-        questionTitle: this.qusetionData.tpqQuestion.questionTitle,
-        questionTypeId: this.qusetionData.tpqQuestion.questionTypeId,
-        chooseQuestion: this.qusetionData.tpqQuestion.chooseQuestion
-      }).then(res => {
+      delete this.qusetionData.tpqQuestion.chooseQuestion
+      delete this.qusetionData.tpqQuestion.fillQuestion
+      delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId
+
+      Api.ModifyQuestion(this.qusetionData.tpqQuestion).then(res => {
+        console.log(res);
+
         switch (res.data.code) {
           case 1:
             this.qusetionDataClone = JSON.parse(
@@ -196,8 +154,8 @@ export default {
 
 <style lang="less" scoped>
 #ModifyEssay {
-    padding: 10px 0;
-    border-bottom: 1px solid #888;
+  padding: 10px 0;
+  border-bottom: 1px solid #888;
   ul,
   li,
   div,
@@ -225,7 +183,9 @@ export default {
     //   height: 50px;
     // }
   }
-
+  .enum{
+    margin-top: 15px;
+  }
   .el-button.is-circle {
     padding: 8px;
   }

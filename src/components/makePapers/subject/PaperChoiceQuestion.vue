@@ -137,7 +137,7 @@ export default {
           }).then(res => {
             switch (res.data.code) {
               case 1:
-                this.$emit('choiceQuestion',res.data.data)
+                this.$emit('addQuestion',res.data.data)
                 this.resetForm(); // 调用重置表单函数
                 this.$message({ message: res.data.message, type: "success" });
                 break;

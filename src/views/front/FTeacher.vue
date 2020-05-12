@@ -11,9 +11,7 @@
             </div>
             <div class="text item">
                 <el-table :data="tableData" style="width: 100%">
-
                     <el-table-column label="#" type="index" width="50"></el-table-column>
-
                     <el-table-column label="用户名称" min-width="100px">
                         <template slot-scope="scope">
                         <span>{{ scope.row.userName }}</span>
@@ -166,7 +164,7 @@ export default {
   components:{SelectUser},
   methods: {
     addItem(){ // 点击添加
-      this.comUserType={TypeName:'',TypeId:"0"}
+      this.comUserType={TypeName:'',TypeId:"0",type:'select'}
       this.ruleForm.userTypeTypeName=''
       this.ruleForm.userName=''
       this.ruleForm.userMobile=''

@@ -15,10 +15,10 @@ import "tinymce/plugins/link";
 import "tinymce/plugins/code";
 import "tinymce/plugins/table";
 import "tinymce/plugins/lists";
-import "tinymce/plugins/contextmenu";
+// import "tinymce/plugins/contextmenu";
 import "tinymce/plugins/wordcount";
-import "tinymce/plugins/colorpicker";
-import "tinymce/plugins/textcolor";
+// import "tinymce/plugins/colorpicker";
+// import "tinymce/plugins/textcolor";
 import "tinymce/plugins/paste";
 export default {
   name: "tinymce",
@@ -30,11 +30,10 @@ export default {
         language_url: "tinymce/langs/zh_CN.js",
         language: "zh_CN",
         skin_url: "tinymce/skins/ui/oxide",
-        height: 400,
         plugins:
-          "link paste lists image code table colorpicker textcolor wordcount contextmenu",
+          "link paste lists image code table wordcount",
         toolbar:
-          "bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat",
+          "bold italic underline strikethrough | fontsizeselect | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat",
         branding: false,
         paste_data_images: true,
         image_advtab: true,
@@ -54,9 +53,6 @@ export default {
     }
   },
   created() {
-
-      console.log(this.value);
-
     this.tinymceHtml = this.value;
   },
   watch: {
@@ -66,9 +62,6 @@ export default {
     tinymceHtml(newVal) {
       this.$emit("input", newVal);
     }
-  },
-  mounted() {
-    // console.log(this.$refs.aaa);
   },
   components: { Editor }
 };

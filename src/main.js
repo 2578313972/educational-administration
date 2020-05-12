@@ -11,12 +11,14 @@ Vue.use(ElementUI);
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
 import SaveTraffic from '@/plug-in/SaveTraffic'
+import deepClone from '@/plug-in/deepClone'
 
 Vue.config.productionTip = false
 
 Vue.prototype.Base64 = Base64
 Vue.prototype.Cookie = Cookie
 Vue.prototype.SaveTraffic = SaveTraffic
+Vue.prototype.DeepClone = deepClone
 
 new Vue({
   router,

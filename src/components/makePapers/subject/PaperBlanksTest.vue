@@ -9,6 +9,8 @@
         <el-input
           type="textarea"
           autosize
+          @blur="blurInput"
+          @input="changeInput"
           ref="questionTitle"
           placeholder="请输入内容"
           v-model="question.tpqQuestion.questionTitle"
@@ -22,7 +24,6 @@
         <span slot="label">{{item.fqOrder}}</span>
         <el-input
           class="paperbtn"
-          :placeholder="'请输入第'+item.fqOrder+'个空的答案'"
           v-model="item.fqAnswer"
         ></el-input>
         <el-input-number
@@ -48,10 +49,10 @@ import Api from "@/http/BMakePaper";
 export default {
   data() {
     return {
-      num: 0,
       newNum: 0,
       oldNum: 0,
-
+      inputBlurIndex: "",
+      inputChangeIndex: "",
       paperForm: {
         textarea: "",
         data: []
@@ -84,7 +85,28 @@ export default {
   },
   methods: {
     addValue() {
-      this.question.tpqQuestion.questionTitle += "_";
+      if (this.inputBlurIndex) {
+        this.question.tpqQuestion.questionTitle =
+          this.question.tpqQuestion.questionTitle.slice(
+            0,
+            this.inputBlurIndex
+          ) +
+          "_" +
+          this.question.tpqQuestion.questionTitle.slice(this.inputBlurIndex);
+        this.inputBlurIndex = "";
+      } else {
+        this.question.tpqQuestion.questionTitle += "_";
+      }
+    },
+    blurInput(e) {
+      if (e.relatedTarget) {
+        this.inputBlurIndex = e.path[0].selectionEnd
+        this.inputChangeIndex = e.path[0].selectionEnd+1
+      };
+    },
+    changeInput(e) {
+      // console.log(event.target.selectionEnd);
+      this.inputChangeIndex = event.target.selectionEnd;
     },
     resetForm() {
       this.question.tpqQuestion.questionTitle = "";
@@ -113,28 +135,28 @@ export default {
   },
   computed: {
     lessHtml() {
-      this.newNum = 0;
       let text = this.question.tpqQuestion.questionTitle;
-      for (var i = 0; i < text.length; i++) {
-        var res = text.indexOf("_", i);
-        if (res === -1) break;
-        i = res;
-        ++this.newNum;
-      }
+      this.newNum = text.split("_").length - 1;
+      let len = text.slice(0, this.inputChangeIndex).split("_").length - 1;
+      // console.log(len);
+
       if (this.newNum > this.oldNum) {
-        for (let i = this.oldNum; i < this.newNum; i++) {
-          this.question.tpqQuestion.fillQuestion.push({
-            fqOrder: i + 1,
+        console.log(len);
+        for (let i = 0; i < this.newNum - this.oldNum; i++) {
+          this.question.tpqQuestion.fillQuestion.splice(len-1, 0, {
             fqAnswer: "",
             fillQuestionScore: [{ fqsScore: 2 }]
           });
         }
       } else if (this.newNum < this.oldNum) {
+          console.log(len,"little");
         for (let i = 0; i < this.oldNum - this.newNum; i++) {
-          this.question.tpqQuestion.fillQuestion.pop();
+          this.question.tpqQuestion.fillQuestion.splice(len,1);
         }
       }
       this.oldNum = this.newNum;
+
+
       let sum = 0;
       for (var i = 0; i < text.length; i++) {
         var res = text.indexOf("_", i);
@@ -146,6 +168,41 @@ export default {
         ++sum;
         i = res;
       }
+
+      // this.newNum = 0;
+      // let text = this.question.tpqQuestion.questionTitle;
+      // for (var i = 0; i < text.length; i++) {
+      //   var res = text.indexOf("_", i);
+      //   if (res === -1) break;
+      //   i = res;
+      //   ++this.newNum;
+      // }
+      // if (this.newNum > this.oldNum) {
+      //   for (let i = this.oldNum; i < this.newNum; i++) {
+      //     this.question.tpqQuestion.fillQuestion.push({
+      //       fqOrder: i + 1,
+      //       fqAnswer: "",
+      //       fillQuestionScore: [{ fqsScore: 2 }]
+      //     });
+      //   }
+      // } else if (this.newNum < this.oldNum) {
+      //   for (let i = 0; i < this.oldNum - this.newNum; i++) {
+      //     this.question.tpqQuestion.fillQuestion.pop();
+      //   }
+      // }
+      // this.oldNum = this.newNum;
+
+      // let sum = 0;
+      // for (var i = 0; i < text.length; i++) {
+      //   var res = text.indexOf("_", i);
+      //   if (res === -1) break;
+      //   text = text.replace(
+      //     "_",
+      //     ` <span style='padding:2px 35px;border-bottom: 1px solid black;'>${this.question.tpqQuestion.fillQuestion[sum].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
+      //   );
+      //   ++sum;
+      //   i = res;
+      // }
       return text;
     }
   }

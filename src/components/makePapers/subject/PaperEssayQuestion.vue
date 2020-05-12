@@ -21,8 +21,8 @@
       </el-form-item>
 
       <el-form-item class="btn">
-        <el-button round @click="resetForm">重置</el-button>
-        <el-button type="primary" @click="submit" round>新增题目</el-button>
+        <el-button size="small" round @click="resetForm">重置</el-button>
+        <el-button size="small" type="primary" @click="submit" round>新增题目</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -76,7 +76,7 @@ export default {
         console.log(res);
         switch (res.data.code) {
           case 1:
-            this.$emit('essayQuestion',res.data.data)
+            this.$emit('addQuestion',res.data.data)
             this.resetForm();
             this.$message({ message: res.data.message, type: "success" });
             break;

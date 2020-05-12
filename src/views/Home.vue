@@ -44,17 +44,11 @@
                     <span class="el-dropdown-link">
                       <i class="el-icon-s-custom"></i>退出
                       <div class="account_1">
-
                         <div class="demo-type">
                           <el-avatar :size="60" :src="img" @error="errorHandler">
                             <img class="img" src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
                           </el-avatar>
                         </div>
-
-
-
-
-
                       </div>
                     </span>
                     <el-dropdown-menu slot="dropdown">
@@ -123,6 +117,23 @@ export default {
         {url:"/BTest",name:"测试成绩"}
       ]}
     ]
+    let a = {
+      fun(){
+        console.log(666)
+        return 5
+      },
+      b:"b"
+    }
+    let b = {}
+    // console.log(this.DeepClone(a,a).fun());
+    let c = JSON.parse(JSON.stringify(a))
+console.log(c);
+
+    // a[0].name = 6666666
+    // console.log(a);
+    // console.log(this.selectData[0].name);
+
+
     this.editableTabs = [
       {title: '首页', name: '1',url:'/'}
     ]

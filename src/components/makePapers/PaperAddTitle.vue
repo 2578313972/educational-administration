@@ -10,15 +10,11 @@
       </div>
       <div class="text item">
         <!-- 选择题 -->
-        <paper-choice-question
-          :testPaperId="testPaperId"
-          @choiceQuestion="choiceQuestion"
-          v-show="radio.typeId===1"
-        />
+        <paper-choice-question :testPaperId="testPaperId" @addQuestion="addQuestion" v-show="radio.typeId===1" />
         <!-- 填空题 -->
         <paper-blanks-test :testPaperId="testPaperId" v-show="radio.typeId===2" />
         <!-- 问答题 -->
-        <paper-essay-question @essayQuestion="essayQuestion" v-show="radio.typeId===3" />
+        <paper-essay-question @addQuestion="addQuestion" v-show="radio.typeId===3" />
       </div>
     </el-card>
 
@@ -64,6 +60,8 @@
           :item="item"
           :index="index"
           :key="item.tpqId"
+          @handleChange="handleChange"
+          @deleteQuestion="deleteQuestion"
         />
       </div>
     </el-card>
@@ -154,26 +152,20 @@ export default {
     }
   },
   methods: {
-    /** 添加选择题 */
-    choiceQuestion(data) {
+    /** 添加选择题、问答题 */
+    addQuestion(data) {
       this.allQuestions.push(data);
     },
-    /** 选择题修改分数 */
+    /** 选择题、问答题 修改分数 */
     handleChange(id, score) {
       this.allQuestions.find(item => item.tpqId === id).tpqScore = score;
     },
-    /** 选择题删除题目 */
+    /** 选择题、问答题 删除题目 */
     deleteQuestion(id) {
       let index = this.allQuestions.findIndex(item => item.tpqId === id);
       this.allQuestions.splice(index, 1);
     },
 
-    /** 添加问答题 */
-    essayQuestion(data) {
-      this.allQuestions.push(data);
-    }
-    /** 问答题修改分数 */
-    /** 问答题删除题目 */
   },
   components: {
     SelectQuestionType,
