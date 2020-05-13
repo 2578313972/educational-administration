@@ -19,6 +19,8 @@ import "tinymce/plugins/lists";
 import "tinymce/plugins/wordcount";
 // import "tinymce/plugins/colorpicker";
 // import "tinymce/plugins/textcolor";
+import "tinymce/plugins/fullscreen";
+
 import "tinymce/plugins/paste";
 export default {
   name: "tinymce",
@@ -31,9 +33,9 @@ export default {
         language: "zh_CN",
         skin_url: "tinymce/skins/ui/oxide",
         plugins:
-          "link paste lists image code table wordcount",
+          "link paste lists image code table wordcount fullscreen",
         toolbar:
-          "bold italic underline strikethrough | fontsizeselect | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat",
+          "bold italic underline strikethrough | fontsizeselect | fullscreen alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat",
         branding: false,
         paste_data_images: true,
         image_advtab: true,

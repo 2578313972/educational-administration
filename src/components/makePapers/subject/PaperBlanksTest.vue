@@ -18,12 +18,13 @@
       </el-form-item>
       <el-form-item
         class="enum"
-        v-for="item in question.tpqQuestion.fillQuestion"
+        v-for="(item,index) in question.tpqQuestion.fillQuestion"
         :key="item.fqOrder"
       >
         <span slot="label">{{item.fqOrder}}</span>
         <el-input
           class="paperbtn"
+          :placeholder="'请输入第'+(index+1)+'个空的答案'"
           v-model="item.fqAnswer"
         ></el-input>
         <el-input-number
@@ -85,17 +86,17 @@ export default {
   },
   methods: {
     addValue() {
-      if (this.inputBlurIndex) {
+      if (this.inputBlurIndex>=0) {
         this.question.tpqQuestion.questionTitle =
           this.question.tpqQuestion.questionTitle.slice(
             0,
             this.inputBlurIndex
           ) +
-          "_" +
+          "▁" +
           this.question.tpqQuestion.questionTitle.slice(this.inputBlurIndex);
-        this.inputBlurIndex = "";
+        this.inputBlurIndex = -1;
       } else {
-        this.question.tpqQuestion.questionTitle += "_";
+        this.question.tpqQuestion.questionTitle += "▁";
       }
     },
     blurInput(e) {
@@ -136,8 +137,8 @@ export default {
   computed: {
     lessHtml() {
       let text = this.question.tpqQuestion.questionTitle;
-      this.newNum = text.split("_").length - 1;
-      let len = text.slice(0, this.inputChangeIndex).split("_").length - 1;
+      this.newNum = text.split("▁").length - 1;
+      let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1;
       // console.log(len);
 
       if (this.newNum > this.oldNum) {
@@ -159,50 +160,15 @@ export default {
 
       let sum = 0;
       for (var i = 0; i < text.length; i++) {
-        var res = text.indexOf("_", i);
+        var res = text.indexOf("▁", i);
         if (res === -1) break;
         text = text.replace(
-          "_",
+          "▁",
           ` <span style='padding:2px 35px;border-bottom: 1px solid black;'>${this.question.tpqQuestion.fillQuestion[sum].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
         );
         ++sum;
         i = res;
       }
-
-      // this.newNum = 0;
-      // let text = this.question.tpqQuestion.questionTitle;
-      // for (var i = 0; i < text.length; i++) {
-      //   var res = text.indexOf("_", i);
-      //   if (res === -1) break;
-      //   i = res;
-      //   ++this.newNum;
-      // }
-      // if (this.newNum > this.oldNum) {
-      //   for (let i = this.oldNum; i < this.newNum; i++) {
-      //     this.question.tpqQuestion.fillQuestion.push({
-      //       fqOrder: i + 1,
-      //       fqAnswer: "",
-      //       fillQuestionScore: [{ fqsScore: 2 }]
-      //     });
-      //   }
-      // } else if (this.newNum < this.oldNum) {
-      //   for (let i = 0; i < this.oldNum - this.newNum; i++) {
-      //     this.question.tpqQuestion.fillQuestion.pop();
-      //   }
-      // }
-      // this.oldNum = this.newNum;
-
-      // let sum = 0;
-      // for (var i = 0; i < text.length; i++) {
-      //   var res = text.indexOf("_", i);
-      //   if (res === -1) break;
-      //   text = text.replace(
-      //     "_",
-      //     ` <span style='padding:2px 35px;border-bottom: 1px solid black;'>${this.question.tpqQuestion.fillQuestion[sum].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
-      //   );
-      //   ++sum;
-      //   i = res;
-      // }
       return text;
     }
   }
