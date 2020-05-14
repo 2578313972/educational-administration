@@ -117,23 +117,6 @@ export default {
         {url:"/BTest",name:"测试成绩"}
       ]}
     ]
-    let a = {
-      fun(){
-        console.log(666)
-        return 5
-      },
-      b:"b"
-    }
-    let b = {}
-    // console.log(this.DeepClone(a,a).fun());
-    let c = JSON.parse(JSON.stringify(a))
-console.log(c);
-
-    // a[0].name = 6666666
-    // console.log(a);
-    // console.log(this.selectData[0].name);
-
-
     this.editableTabs = [
       {title: '首页', name: '1',url:'/'}
     ]

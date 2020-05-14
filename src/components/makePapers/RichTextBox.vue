@@ -1,6 +1,6 @@
 <template>
   <div class="RichTextBox">
-    <editor :id="id" v-model="tinymceHtml" :init="init"></editor>
+    <editor v-model="tinymceHtml" :init="init"></editor>
   </div>
 </template>
 
@@ -12,9 +12,9 @@ import "tinymce/themes/silver/theme";
 import Editor from "@tinymce/tinymce-vue";
 import "tinymce/plugins/image";
 import "tinymce/plugins/link";
-import "tinymce/plugins/code";
-import "tinymce/plugins/table";
-import "tinymce/plugins/lists";
+// import "tinymce/plugins/code";
+// import "tinymce/plugins/table";
+// import "tinymce/plugins/lists";
 // import "tinymce/plugins/contextmenu";
 import "tinymce/plugins/wordcount";
 // import "tinymce/plugins/colorpicker";
@@ -26,16 +26,16 @@ export default {
   name: "tinymce",
   data() {
     return {
-      id:"",
+      name:"rich",
       tinymceHtml: "",
       init: {
         language_url: "tinymce/langs/zh_CN.js",
         language: "zh_CN",
         skin_url: "tinymce/skins/ui/oxide",
         plugins:
-          "link paste lists image code table wordcount fullscreen",
+          "link paste image wordcount fullscreen",
         toolbar:
-          "bold italic underline strikethrough | fontsizeselect | fullscreen alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat",
+          "bold italic underline strikethrough | fontsizeselect | fullscreen alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image | removeformat",
         branding: false,
         paste_data_images: true,
         image_advtab: true,

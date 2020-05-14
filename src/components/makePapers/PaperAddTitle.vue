@@ -10,9 +10,17 @@
       </div>
       <div class="text item">
         <!-- 选择题 -->
-        <paper-choice-question :testPaperId="testPaperId" @addQuestion="addQuestion" v-show="radio.typeId===1" />
+        <paper-choice-question
+          :testPaperId="testPaperId"
+          @addQuestion="addQuestion"
+          v-show="radio.typeId===1"
+        />
         <!-- 填空题 -->
-        <paper-blanks-test :testPaperId="testPaperId" v-show="radio.typeId===2" />
+        <paper-blanks-test
+          :testPaperId="testPaperId"
+          @addQuestion="addQuestion"
+          v-show="radio.typeId===2"
+        />
         <!-- 问答题 -->
         <paper-essay-question @addQuestion="addQuestion" v-show="radio.typeId===3" />
       </div>
@@ -44,7 +52,16 @@
           <b>{{blankScore}}/{{zf}}</b>分）
         </span>
       </div>
-      <div class="text item"></div>
+      <div class="text item">
+        <ModifyBlank
+          v-for="(item,index) in allBlankSubject"
+          :item="item"
+          :index="index"
+          :key="item.tpqId"
+          @handleChange="handleChange"
+          @deleteQuestion="deleteQuestion"
+        />
+      </div>
     </el-card>
 
     <el-card class="box-card cardbox">
@@ -75,9 +92,8 @@ import PaperChoiceQuestion from "@/components/makePapers/subject/PaperChoiceQues
 import PaperBlanksTest from "@/components/makePapers/subject/PaperBlanksTest"; // 填空题组件
 import PaperEssayQuestion from "@/components/makePapers/subject/PaperEssayQuestion"; // 问答题组件
 import ModifyChoice from "@/components/makePapers/modify/ModifyChoice"; // 修改选择题组件
+import ModifyBlank from "@/components/makePapers/modify/ModifyBlank"; // 修改填空题组件
 import ModifyEssay from "@/components/makePapers/modify/ModifyEssay"; // 修改问答题组件
-
-
 
 export default {
   data() {
@@ -87,7 +103,7 @@ export default {
       allQuestions: [], // 试卷所有题目
       choiceNum: 0,
       blankNum: 0,
-      essayNum: 0,
+      essayNum: 0
     };
   },
   props: {
@@ -164,8 +180,7 @@ export default {
     deleteQuestion(id) {
       let index = this.allQuestions.findIndex(item => item.tpqId === id);
       this.allQuestions.splice(index, 1);
-    },
-
+    }
   },
   components: {
     SelectQuestionType,
@@ -173,7 +188,8 @@ export default {
     PaperBlanksTest,
     PaperEssayQuestion,
     ModifyChoice,
-    ModifyEssay,
+    ModifyBlank,
+    ModifyEssay
   }
 };
 </script>

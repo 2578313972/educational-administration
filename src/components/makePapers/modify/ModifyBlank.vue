@@ -1,0 +1,297 @@
+<template>
+  <div id="ModifyBlank">
+    <div class="box">
+      <el-form class="one" label-width="80px" v-if="!balBool" ref="paperForm" :model="qusetionData">
+        <el-form-item :label="'第'+(index+1)+'题、'">{{qusetionData.tpqQuestion.questionTitle}}</el-form-item>
+        <el-form-item>
+          <el-button size="small" disabled>参考答案：</el-button>
+        </el-form-item>
+        <el-form-item
+          class="enum"
+          v-for="(item,index) in qusetionData.tpqQuestion.fillQuestion"
+          :key="item.fqId"
+        >
+          <span class="boxspan" slot="label">{{index+1}}</span>
+          <el-input class="paperbtn" v-model="item.fqAnswer" disabled></el-input>
+          <el-input-number
+            size="small"
+            :min="1"
+            :max="10"
+            @change="handleChange(index)"
+            v-model="item.fillQuestionScore[0].fqsScore"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item style="outline: none;" label="题目预览">
+          <div class="ls" v-html="lessHtml"></div>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button size="small" @click="switchBox(index)" round>编辑</el-button>
+        </el-form-item>
+      </el-form>
+
+      <!--  -->
+      <el-form label-width="80px" v-else :model="qusetionData">
+        <el-form-item label="题干">
+          <el-button round @click="addValue">插入填空</el-button>
+        </el-form-item>
+
+        <el-form-item>
+          <el-input
+            type="textarea"
+            autosize
+            @input="changeInput"
+            ref="questionTitle"
+            placeholder="请输入内容"
+            v-model="qusetionData.tpqQuestion.questionTitle"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          class="enum"
+          v-for="(item,index) in qusetionData.tpqQuestion.fillQuestion"
+          :key="item.fqOrder"
+        >
+          <span class="boxspan" slot="label">{{index+1}}</span>
+          <el-input
+            class="paperbtn"
+            :placeholder="'请输入第'+(index+1)+'个空的答案'"
+            v-model="item.fqAnswer"
+          ></el-input>
+        </el-form-item>
+        <el-form-item style="outline: none;" label="题目预览">
+          <div class="ls" v-html="lessHtml"></div>
+        </el-form-item>
+        <el-form-item class="btn">
+          <el-button size="mini" disabled type="primary" round>编辑</el-button>
+          <el-button size="mini" type="primary" @click="switchBoxElse" round>取消</el-button>
+          <el-button size="mini" type="primary" @click="submitTitle" round>保存修改</el-button>
+          <el-button size="mini" type="danger" @click="deleteQuestion" round>删除题目</el-button>
+        </el-form-item>
+      </el-form>
+      <!--  -->
+    </div>
+  </div>
+</template>
+
+<script>
+import Api from "@/http/BMakePaper";
+import RichTextBox from "@/components/makePapers/RichTextBox";
+
+export default {
+  data() {
+    return {
+      newNum: 0,
+      oldNum: 0,
+      inputChangeIndex: "",
+      qusetionData: {},
+      qusetionDataClone: {},
+      qusetionDataClone2:{},
+      balBool: false
+    };
+  },
+  props: {
+    item: Object,
+    index: Number
+  },
+  created() {
+    this.qusetionData = JSON.parse(JSON.stringify(this.item));
+    this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
+    console.log(this.qusetionData);
+  },
+  mounted() {
+      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
+  },
+  computed: {
+    lessHtml() {
+      let text = this.qusetionData.tpqQuestion.questionTitle;
+      this.newNum = text.split("▁").length - 1;
+      let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1;
+      if (this.newNum > this.oldNum) {
+        for (let i = 0; i < this.newNum - this.oldNum; i++) {
+          this.qusetionData.tpqQuestion.fillQuestion.splice(len - 1, 0, {
+            fqAnswer: "",
+            fillQuestionScore: [{ fqsScore: 2 }]
+          });
+        }
+      } else if (this.newNum < this.oldNum) {
+        for (let i = 0; i < this.oldNum - this.newNum; i++) {
+          this.qusetionData.tpqQuestion.fillQuestion.splice(len, 1);
+        }
+      }
+      this.oldNum = this.newNum;
+      let sum = 0;
+      for (var i = 0; i < text.length; i++) {
+        var res = text.indexOf("▁", i);
+        if (res === -1) break;
+        text = text.replace(
+          "▁",
+          ` <span style='padding:2px 35px;border-bottom: 1px solid black;'>${this.qusetionData.tpqQuestion.fillQuestion[sum].fqAnswer}</span>(${this.qusetionData.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
+        );
+        ++sum;
+        i = res;
+      }
+      return text;
+    }
+  },
+  methods: {
+    /** 插入填空 */
+    addValue() {
+      this.$refs.questionTitle.focus();
+      document.execCommand("insertText", true, "▁");
+    },
+    /** input change事件 */
+    changeInput(e) {
+      this.inputChangeIndex = event.target.selectionEnd;
+    },
+    /** 切换布局事件 */
+    switchBox() {
+      this.balBool = !this.balBool;
+    },
+    /** 点击取消 */
+    switchBoxElse() {
+      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
+      this.switchBox();
+    },
+    /** 修改分数 */
+    handleChange(index) {
+        // this.qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore
+        let data = {
+            tpqId:this.qusetionData.tpqId,
+            tpqScore:this.qusetionData.tpqScore,
+            fillQuestionScore:[
+                // {
+                //    fqsFilleQuestionId:"" ,
+                //    fqsPaperQuestionId:"",
+                //    fqsScore:""
+                // }
+            ],
+        }
+        this.qusetionData.tpqQuestion.fillQuestion.forEach(item=>{
+            data.fillQuestionScore.push(item.fillQuestionScore[0])
+        })
+        data.tpqScore = data.fillQuestionScore.reduce((sum,item)=>sum+item.fqsScore,0)
+
+      Api.ModifyScore(data).then(res => {
+          console.log(res);
+
+        switch (res.data.code) {
+          case 1:
+            // this.$emit(
+            //   "handleChange",
+            //   this.qusetionData.tpqId,
+            //   this.qusetionData.tpqScore
+            // );
+            this.$message({ message: res.data.message, type: "success" });
+            break;
+          default:
+            this.$message({ message: res.data.message, type: "warning" });
+        }
+      });
+    },
+    /** 删除题目 */
+    deleteQuestion() {
+      Api.RemoveQuestionFromTestPaper({
+        paperQuestionId: this.qusetionData.tpqId
+      }).then(res => {
+        switch (res.data.code) {
+          case 1:
+            this.$emit("deleteQuestion", this.qusetionData.tpqId);
+            this.$message({ message: res.data.message, type: "success" });
+            break;
+          default:
+            this.$message({ message: res.data.message, type: "warning" });
+        }
+      });
+    },
+    /** 保存修改 */
+    submitTitle() {
+      if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
+        this.$message({ message: "题干不能为空", type: "warning" });
+        return this.$refs.textarea[0].focus();
+      }
+      if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
+        this.$message({ message: "答案不能为空", type: "warning" });
+        return;
+      }
+      delete this.qusetionData.tpqQuestion.chooseQuestion;
+      delete this.qusetionData.tpqQuestion.fillQuestion;
+      delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId;
+
+      Api.ModifyQuestion(this.qusetionData.tpqQuestion).then(res => {
+        console.log(res);
+
+        switch (res.data.code) {
+          case 1:
+            this.qusetionDataClone = JSON.parse(
+              JSON.stringify(this.qusetionData)
+            );
+            this.switchBox();
+            this.$message({ message: res.data.message, type: "success" });
+            break;
+          default:
+            this.$message({ message: res.data.message, type: "warning" });
+        }
+      });
+    }
+  },
+  components: { RichTextBox }
+};
+</script>
+
+<style lang="less" scoped>
+#ModifyBlank {
+  padding: 10px 0;
+  ul,
+  li,
+  div,
+  p,
+  a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .box {
+    margin-bottom: 15px;
+    span:nth-child(2) {
+      padding-right: 20px;
+    }
+    ul li {
+      margin: 5px 0;
+    }
+  }
+  .btn {
+    margin-top: 15px;
+  }
+  .el-form {
+    margin-bottom: 20px;
+    // .el-form-item {
+    //   height: 50px;
+    // }
+  }
+
+  .enum {
+    margin-top: 15px;
+  }
+  .el-button.is-circle {
+    padding: 8px;
+  }
+  .one .el-input {
+    width: calc(100% - 150px);
+    margin-right: 12.5px;
+  }
+  .el-form-item__content .el-button.is-round {
+    padding: 7px 15px;
+  }
+  .boxspan {
+    width: 20px;
+    line-height: 20px;
+    display: inline-block;
+    border-radius: 50%;
+    background: #f36b72;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+  }
+}
+</style>
