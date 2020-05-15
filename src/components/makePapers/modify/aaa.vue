@@ -2,6 +2,9 @@
   <div id="ModifyBlank">
     <div class="box">
       <el-form class="one" label-width="80px" v-if="!balBool" ref="paperForm" :model="qusetionData">
+        <el-form-item label="参考答案">
+          <span></span>
+        </el-form-item>
         <el-form-item :label="'第'+(index+1)+'题、'">{{qusetionData.tpqQuestion.questionTitle}}</el-form-item>
         <el-form-item>
           <el-button size="small" disabled>参考答案：</el-button>
@@ -20,9 +23,6 @@
             @change="handleChange(index)"
             v-model="item.fillQuestionScore[0].fqsScore"
           ></el-input-number>
-        </el-form-item>
-        <el-form-item style="outline: none;" label="题目预览">
-          <div class="ls" v-html="lessHtml"></div>
         </el-form-item>
 
         <el-form-item>
@@ -95,23 +95,27 @@ export default {
   created() {
     this.qusetionData = JSON.parse(JSON.stringify(this.item));
     this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
+    this.oldNum = this.qusetionData.tpqQuestion.length;
     console.log(this.qusetionData);
   },
   mounted() {
-      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
+    console.log(this.qusetionData.tpqQuestion);
   },
   computed: {
     lessHtml() {
-        try {
-            let text = this.qusetionData.tpqQuestion.questionTitle;
+      let text = this.qusetionData.tpqQuestion.questionTitle;
       this.newNum = text.split("▁").length - 1;
       let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1;
       if (this.newNum > this.oldNum) {
         for (let i = 0; i < this.newNum - this.oldNum; i++) {
-          this.qusetionData.tpqQuestion.fillQuestion.splice(len - 1, 0, {
-            fqAnswer: " ",
-            fillQuestionScore: [{ fqsScore: 2 }]
-          });
+          this.qusetionData.tpqQuestion.fillQuestion.splice(
+            len - this.newNum + this.oldNum,
+            0,
+            {
+              fqAnswer: "",
+              fillQuestionScore: [{ fqsScore: 2 }]
+            }
+          );
         }
       } else if (this.newNum < this.oldNum) {
         for (let i = 0; i < this.oldNum - this.newNum; i++) {
@@ -119,26 +123,38 @@ export default {
         }
       }
       this.oldNum = this.newNum;
-    //   console.log(this.qusetionData.tpqQuestion.fillQuestion);
-      let sum = 0;
-      for (var i = 0; i < text.length; i++) {
-        var res = text.indexOf("▁", i);
-        if (res === -1) break;
-        // console.log(text);
-        text = text.replace(
-          "▁",
-          ` <span style='padding:2px 35px;border-bottom: 1px solid black;' text="${this.qusetionData.tpqQuestion.fillQuestion[sum].fqAnswer}" ></span>(${this.qusetionData.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
-        );
-        ++sum;
-        i = res;
-      }
-      return text;
-        } catch (error) {
-            // console.log(error);
+      console.log("*****", this.qusetionData.tpqQuestion);
 
-            return
+        for (let i = 0; i < this.newNum; i++) {
+            text = text.replace(
+              "▁",
+              ` <span style='padding:2px 35px;border-bottom: 1px solid black;' text="${this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer}" ></span>(${this.qusetionData.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
+            );
         }
-
+      //   let sum = 0;
+      //   for (let i = 0; i < text.length; i++) {
+      //     let res = text.indexOf("▁");
+      //     console.log(res,'fil',this.qusetionData.tpqQuestion.fillQuestion);
+      //     if (res === -1) break;
+      //     try {
+      //       text = text.replace(
+      //         "▁",
+      //         ` <span style='padding:2px 35px;border-bottom: 1px solid black;' text="${this.qusetionData.tpqQuestion.fillQuestion[sum].fqAnswer}" ></span>(${this.qusetionData.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
+      //       );
+      //     } catch (error) {
+      //       console.log("1----------", i, sum);
+      //       console.log("2----------", this.qusetionData.tpqQuestion);
+      //       console.log(
+      //         "3----------",
+      //         this.qusetionData.tpqQuestion.fillQuestion[0],
+      //         sum,
+      //       );
+      //       alert('报错！')
+      //     //   throw error
+      //     }
+      //     ++sum;
+      //   }
+      return text;
     }
   },
   methods: {
@@ -153,34 +169,42 @@ export default {
     },
     /** 切换布局事件 */
     switchBox() {
+        this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone))
+      console.log(this.qusetionData.tpqQuestion);
+
       this.balBool = !this.balBool;
     },
     /** 点击取消 */
     switchBoxElse() {
+      // this.qusetionData = JSON.parse(JSON.stringify(this.item));
+      // this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
       this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
       this.switchBox();
     },
     /** 修改分数 */
     handleChange(index) {
-        // this.qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore
-        let data = {
-            tpqId:this.qusetionData.tpqId,
-            tpqScore:this.qusetionData.tpqScore,
-            fillQuestionScore:[
-                // {
-                //    fqsFilleQuestionId:"" ,
-                //    fqsPaperQuestionId:"",
-                //    fqsScore:""
-                // }
-            ],
-        }
-        this.qusetionData.tpqQuestion.fillQuestion.forEach(item=>{
-            data.fillQuestionScore.push(item.fillQuestionScore[0])
-        })
-        data.tpqScore = data.fillQuestionScore.reduce((sum,item)=>sum+item.fqsScore,0)
+      // this.qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore
+      let data = {
+        tpqId: this.qusetionData.tpqId,
+        tpqScore: this.qusetionData.tpqScore,
+        fillQuestionScore: [
+          // {
+          //    fqsFilleQuestionId:"" ,
+          //    fqsPaperQuestionId:"",
+          //    fqsScore:""
+          // }
+        ]
+      };
+      this.qusetionData.tpqQuestion.fillQuestion.forEach(item => {
+        data.fillQuestionScore.push(item.fillQuestionScore[0]);
+      });
+      data.tpqScore = data.fillQuestionScore.reduce(
+        (sum, item) => sum + item.fqsScore,
+        0
+      );
 
       Api.ModifyScore(data).then(res => {
-          console.log(res);
+        console.log(res);
 
         switch (res.data.code) {
           case 1:
@@ -213,17 +237,17 @@ export default {
     },
     /** 保存修改 */
     submitTitle() {
-    //   if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
-    //     this.$message({ message: "题干不能为空", type: "warning" });
-    //     return this.$refs.textarea[0].focus();
-    //   }
-    //   if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
-    //     this.$message({ message: "答案不能为空", type: "warning" });
-    //     return;
-    //   }
-    //   delete this.qusetionData.tpqQuestion.chooseQuestion;
-    //   delete this.qusetionData.tpqQuestion.fillQuestion;
-    //   delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId;
+      //   if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
+      //     this.$message({ message: "题干不能为空", type: "warning" });
+      //     return this.$refs.textarea[0].focus();
+      //   }
+      //   if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
+      //     this.$message({ message: "答案不能为空", type: "warning" });
+      //     return;
+      //   }
+      //   delete this.qusetionData.tpqQuestion.chooseQuestion;
+      //   delete this.qusetionData.tpqQuestion.fillQuestion;
+      //   delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId;
 
       Api.ModifyQuestion(this.qusetionData.tpqQuestion).then(res => {
         console.log(res);

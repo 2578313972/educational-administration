@@ -52,11 +52,11 @@ export default {
         tpqPaperId: 0, //试卷的编号
         tpqScore: 0, //题目的分值
         tpqQuestion: {
-          questionTitle: "abcd", //填空题的标题
+          questionTitle: "", //填空题的标题
           questionTypeId: 2, //题目类型 1=选择题 2=填空题 3=问题
           fillQuestion: []
         }
-      },
+      }
     };
   },
   props: {
@@ -71,7 +71,6 @@ export default {
     //   function diff(newV, oldV) {
     //     let startChangeInd, endChangeInd, addV, deleteV, abs, len;
     //     len = Math.max(newV.length, oldV.length);
-
     //     for (let i = 0; i < len; i++) {
     //       if (newV.charAt(i) !== oldV.charAt(i)) {
     //         startChangeInd = i;
@@ -92,13 +91,11 @@ export default {
     //         break;
     //       }
     //     }
-
     //     let newStr = newV.length - lodIndex
     //     let oldStr = oldV.length - lodIndex
     //     let newString = newV.substring(startChangeInd,newStr)
     //     let oldString = oldV.substring(startChangeInd,oldStr)
     //     console.log(newString,oldString);
-
     //     // console.log('起始下标:'+startChangeInd+' 新值：'+newV.slice(startChangeInd,endChangeInd)+'\n'+'结束下标:'+lodIndex+' 旧值：');
     //   }
     //   diff(newV, oldV);
@@ -121,6 +118,22 @@ export default {
     },
     /** 新增题目 */
     addQuestion() {
+      if (this.question.tpqQuestion.questionTitle.trim() === "") {
+        this.$message({ message: "未填写题干", type: "warning" });
+        return this.$refs.questionTitle.focus();
+      }
+      if (this.question.tpqQuestion.fillQuestion.length == 0) {
+        this.$message({ message: "未添加题目", type: "warning" });
+        return this.$refs.questionTitle.focus();
+      }
+
+      for (let i in this.question.tpqQuestion.fillQuestion) {
+        if (this.question.tpqQuestion.fillQuestion[i].fqAnswer.trim() === "") {
+          this.$message({ message: "答案不能为空", type: "warning" });
+          return;
+        }
+      }
+
       this.question.tpqQuestion.fillQuestion.map(
         (item, index) => (item.fqOrder = index + 1)
       ); // 添加序号
@@ -149,29 +162,31 @@ export default {
       let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1; // 获取光标前的下划线数量
       if (this.newNum > this.oldNum) {
         /** 当新增下滑线时 */
-        for (let i = 0; i < this.newNum - this.oldNum; i++) { // for 检测一次性添加多少个
-          this.question.tpqQuestion.fillQuestion.splice(len - this.newNum + this.oldNum, 0, {
-            fqAnswer: "",
-            fillQuestionScore: [{ fqsScore: 2 }]
-          });
+        for (let i = 0; i < this.newNum - this.oldNum; i++) {
+          // for 检测一次性添加多少个
+          this.question.tpqQuestion.fillQuestion.splice(
+            len - this.newNum + this.oldNum,
+            0,
+            {
+              fqAnswer: "",
+              fillQuestionScore: [{ fqsScore: 2 }]
+            }
+          );
         }
       } else if (this.newNum < this.oldNum) {
         /** 当新删除下滑线时 */
-        for (let i = 0; i < this.oldNum - this.newNum; i++) { //  for 检测一次性删除多少个
+        for (let i = 0; i < this.oldNum - this.newNum; i++) {
+          //  for 检测一次性删除多少个
           this.question.tpqQuestion.fillQuestion.splice(len, 1);
         }
       }
       this.oldNum = this.newNum; // 更新旧下划线的数量
-      let sum = 0; // 渲染数据需要使用的下标
-      for (var i = 0; i < text.length; i++) {
-        var res = text.indexOf("▁", i); // 当出现 '▁' 时替换成html代码片段
-        if (res === -1) break; // 找不到 '▁' 直接结束循环
+
+      for (let i = 0; i < this.newNum; i++) { // 循环新的下划线数量
         text = text.replace(
           "▁",
-          ` <span style='padding:2px 35px;border-bottom: 1px solid black;'>${this.question.tpqQuestion.fillQuestion[sum].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
+          ` <span style='padding:2px 35px;border-bottom: 1px solid black;' >${this.question.tpqQuestion.fillQuestion[i].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
         );
-        ++sum;
-        i = res;
       }
       return text;
     }

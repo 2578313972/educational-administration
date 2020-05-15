@@ -53,8 +53,16 @@
         </span>
       </div>
       <div class="text item">
-        <ModifyBlank
+        <!-- <ModifyBlank
           v-for="(item,index) in allBlankSubject"
+          :item="item"
+          :index="index"
+          :key="item.tpqId"
+          @handleChange="handleChange"
+          @deleteQuestion="deleteQuestion"
+        /> -->
+        <aaa
+        v-for="(item,index) in allBlankSubject"
           :item="item"
           :index="index"
           :key="item.tpqId"
@@ -93,6 +101,7 @@ import PaperBlanksTest from "@/components/makePapers/subject/PaperBlanksTest"; /
 import PaperEssayQuestion from "@/components/makePapers/subject/PaperEssayQuestion"; // 问答题组件
 import ModifyChoice from "@/components/makePapers/modify/ModifyChoice"; // 修改选择题组件
 import ModifyBlank from "@/components/makePapers/modify/ModifyBlank"; // 修改填空题组件
+import aaa from "@/components/makePapers/modify/aaa"; // 修改填空题组件
 import ModifyEssay from "@/components/makePapers/modify/ModifyEssay"; // 修改问答题组件
 
 export default {
@@ -189,7 +198,8 @@ export default {
     PaperEssayQuestion,
     ModifyChoice,
     ModifyBlank,
-    ModifyEssay
+    ModifyEssay,
+    aaa
   }
 };
 </script>
