@@ -49,15 +49,15 @@ export default {
     };
   },
   created() {
-    // let id = this.testPaperId || sessionStorage.getItem("testPaperId");
-    // if (!id) return;
-    // Api.GetTestPaper({ id }).then(res => {
-    //   this.allPaperData = res.data;
-    //   console.log(res.data);
-    // });
-    // if (sessionStorage.getItem("testPaperId")) {
-    //   this.active = 1;
-    // }
+    let id = this.testPaperId || sessionStorage.getItem("testPaperId");
+    if (!id) return;
+    Api.GetTestPaper({ id }).then(res => {
+      this.allPaperData = res.data;
+      console.log(res.data);
+    });
+    if (sessionStorage.getItem("testPaperId")) {
+      this.active = 1;
+    }
   },
   methods: {
     next() {

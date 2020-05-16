@@ -239,6 +239,7 @@ export default {
         switch (res.data.code) {
           case 1:
             // 计算总分
+            this.qusetionData.tpqQuestion = res.data.data
             this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
 
             this.qusetionDataClone = JSON.parse(

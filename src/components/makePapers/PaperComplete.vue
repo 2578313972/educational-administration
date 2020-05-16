@@ -7,16 +7,16 @@
           <el-table-column align="center" min-width="130px" prop="course" label="科目">
           </el-table-column>
           <el-table-column align="center" width="130px" prop="choice" label="选择题">
-             <el-badge :value="choiceScore" class="item"></el-badge>
+             <el-badge :value="choiceScore+'\''" class="item"></el-badge>
           </el-table-column>
           <el-table-column align="center" min-width="130px" prop="blank" label="填空题">
-            <el-badge :value="blankScore" class="item"></el-badge>
+            <el-badge :value="blankScore+'\''" class="item"></el-badge>
           </el-table-column>
           <el-table-column align="center" width="130px" prop="essay" label="问答题">
-            <el-badge :value="essayScore" class="item"></el-badge>
+            <el-badge :value="essayScore+'\''" class="item"></el-badge>
           </el-table-column>
           <el-table-column align="center" min-width="150px" prop="sum" label="总分">
-            <el-badge :value="zf" class="item"></el-badge>
+            <el-badge :value="zf+'\''" class="item"></el-badge>
           </el-table-column>
     </el-table>
     <div style="text-align:center;margin-top:15px;">
