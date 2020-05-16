@@ -2,7 +2,7 @@
   <div id="PaperBlanksTest">
     <el-form label-width="80px" :model="question.tpqQuestion">
       <el-form-item label="题干">
-        <el-button round @click="addValue">插入填空</el-button>
+        <el-button round icon="el-icon-document-add" @click="addValue">插入填空</el-button>
       </el-form-item>
 
       <el-form-item>
@@ -160,6 +160,17 @@ export default {
       let text = this.question.tpqQuestion.questionTitle; // 将题目用text保存
       this.newNum = text.split("▁").length - 1; // 获取下划线的数量
       let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1; // 获取光标前的下划线数量
+
+
+// //光标前的填空数量
+// let cursorBeforeFill=text.slice(0, this.inputChangeIndex).split("▁").length;
+// //当前填空总数量
+// let fillCount=text.split("▁").length;
+// let disCount=Math.abs(fillCount-cursorBeforeFill)
+// this.question.tpqQuestion.fillQuestion.splice(cursorBeforeFill-disCount,
+// ...new Array(disCount).fill().map(()=>({fqAnswer: "",fillQuestionScore: [{ fqsScore: 2 }]})));
+
+
       if (this.newNum > this.oldNum) {
         /** 当新增下滑线时 */
         for (let i = 0; i < this.newNum - this.oldNum; i++) {

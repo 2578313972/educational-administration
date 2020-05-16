@@ -131,9 +131,7 @@ export default {
       delete this.qusetionData.tpqQuestion.fillQuestion
       delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId
 
-      Api.ModifyQuestion(this.qusetionData.tpqQuestion).then(res => {
-        console.log(res);
-
+      Api.ModifyQuestion(this.qusetionData.tpqQuestion,0).then(res => {
         switch (res.data.code) {
           case 1:
             this.qusetionDataClone = JSON.parse(

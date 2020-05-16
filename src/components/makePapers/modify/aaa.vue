@@ -2,30 +2,27 @@
   <div id="ModifyBlank">
     <div class="box">
       <el-form class="one" label-width="80px" v-if="!balBool" ref="paperForm" :model="qusetionData">
-        <el-form-item label="参考答案">
-          <span></span>
-        </el-form-item>
-        <el-form-item :label="'第'+(index+1)+'题、'">{{qusetionData.tpqQuestion.questionTitle}}</el-form-item>
-        <el-form-item>
-          <el-button size="small" disabled>参考答案：</el-button>
-        </el-form-item>
-        <el-form-item
-          class="enum"
-          v-for="(item,index) in qusetionData.tpqQuestion.fillQuestion"
-          :key="item.fqId"
-        >
-          <span class="boxspan" slot="label">{{index+1}}</span>
-          <el-input class="paperbtn" v-model="item.fqAnswer" disabled></el-input>
-          <el-input-number
-            size="small"
-            :min="1"
-            :max="10"
-            @change="handleChange(index)"
-            v-model="item.fillQuestionScore[0].fqsScore"
-          ></el-input-number>
+        <el-form-item :label="'第'+(+index+1)+'题、'">
+          <span v-for="(item,index) in len" :key="index">
+            {{item}}
+            <span
+              class="itemspan"
+              v-if="qusetionData.tpqQuestion.fillQuestion[index]"
+            >{{qusetionData.tpqQuestion.fillQuestion[index].fqAnswer}}</span>
+
+            <el-input-number
+              v-if="qusetionData.tpqQuestion.fillQuestion[index]"
+              size="mini"
+              :min="1"
+              :max="10"
+              @change="handleChange(index)"
+              v-model="qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore"
+            ></el-input-number>
+          </span>
         </el-form-item>
 
         <el-form-item>
+            <el-button size="mini" type="danger" @click="deleteQuestion" round>删除题目</el-button>
           <el-button size="small" @click="switchBox(index)" round>编辑</el-button>
         </el-form-item>
       </el-form>
@@ -85,7 +82,8 @@ export default {
       inputChangeIndex: "",
       qusetionData: {},
       qusetionDataClone: {},
-      balBool: false
+      balBool: false,
+      len: []
     };
   },
   props: {
@@ -96,12 +94,31 @@ export default {
     this.qusetionData = JSON.parse(JSON.stringify(this.item));
     this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
     this.oldNum = this.qusetionData.tpqQuestion.length;
-    console.log(this.qusetionData);
   },
-  mounted() {
-    console.log(this.qusetionData.tpqQuestion);
+  watch: {
+    "qusetionData.tpqQuestion.questionTitle"(newV, oldV) {
+      this.len = newV.split("▁");
+    }
   },
   computed: {
+    lookHtml() {
+      let text = this.qusetionData.tpqQuestion.questionTitle;
+      this.newNum = text.split("▁").length - 1;
+      for (let i = 0; i < this.newNum; i++) {
+        text = text.replace(
+          "▁",
+          `
+            <el-input
+              size="mini"
+              :min="1"
+              :max="10"
+              @change="handleChange(0)"
+              v-model="${this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer}"
+            ></el-input>`
+        );
+      }
+      return text;
+    },
     lessHtml() {
       let text = this.qusetionData.tpqQuestion.questionTitle;
       this.newNum = text.split("▁").length - 1;
@@ -118,42 +135,19 @@ export default {
           );
         }
       } else if (this.newNum < this.oldNum) {
-        for (let i = 0; i < this.oldNum - this.newNum; i++) {
-          this.qusetionData.tpqQuestion.fillQuestion.splice(len, 1);
-        }
+        this.qusetionData.tpqQuestion.fillQuestion.splice(
+          len,
+          this.oldNum - this.newNum
+        );
       }
       this.oldNum = this.newNum;
-      console.log("*****", this.qusetionData.tpqQuestion);
 
-        for (let i = 0; i < this.newNum; i++) {
-            text = text.replace(
-              "▁",
-              ` <span style='padding:2px 35px;border-bottom: 1px solid black;' text="${this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer}" ></span>(${this.qusetionData.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
-            );
-        }
-      //   let sum = 0;
-      //   for (let i = 0; i < text.length; i++) {
-      //     let res = text.indexOf("▁");
-      //     console.log(res,'fil',this.qusetionData.tpqQuestion.fillQuestion);
-      //     if (res === -1) break;
-      //     try {
-      //       text = text.replace(
-      //         "▁",
-      //         ` <span style='padding:2px 35px;border-bottom: 1px solid black;' text="${this.qusetionData.tpqQuestion.fillQuestion[sum].fqAnswer}" ></span>(${this.qusetionData.tpqQuestion.fillQuestion[sum].fillQuestionScore[0].fqsScore}分) `
-      //       );
-      //     } catch (error) {
-      //       console.log("1----------", i, sum);
-      //       console.log("2----------", this.qusetionData.tpqQuestion);
-      //       console.log(
-      //         "3----------",
-      //         this.qusetionData.tpqQuestion.fillQuestion[0],
-      //         sum,
-      //       );
-      //       alert('报错！')
-      //     //   throw error
-      //     }
-      //     ++sum;
-      //   }
+      for (let i = 0; i < this.newNum; i++) {
+        text = text.replace(
+          "▁",
+          ` <span style='padding:2px 35px;border-bottom: 1px solid black;' >${this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer}</span>(${this.qusetionData.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
+        );
+      }
       return text;
     }
   },
@@ -169,16 +163,12 @@ export default {
     },
     /** 切换布局事件 */
     switchBox() {
-        this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone))
-      console.log(this.qusetionData.tpqQuestion);
-
       this.balBool = !this.balBool;
     },
     /** 点击取消 */
     switchBoxElse() {
-      // this.qusetionData = JSON.parse(JSON.stringify(this.item));
-      // this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
       this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
+      this.oldNum = this.qusetionDataClone.tpqQuestion.length;
       this.switchBox();
     },
     /** 修改分数 */
@@ -237,21 +227,49 @@ export default {
     },
     /** 保存修改 */
     submitTitle() {
-      //   if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
-      //     this.$message({ message: "题干不能为空", type: "warning" });
-      //     return this.$refs.textarea[0].focus();
-      //   }
-      //   if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
-      //     this.$message({ message: "答案不能为空", type: "warning" });
-      //     return;
-      //   }
-      //   delete this.qusetionData.tpqQuestion.chooseQuestion;
-      //   delete this.qusetionData.tpqQuestion.fillQuestion;
-      //   delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId;
+      if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
+        this.$message({ message: "未填写题干", type: "warning" });
+        return this.$refs.questionTitle.focus();
+      }
+      if (this.qusetionData.tpqQuestion.fillQuestion.length == 0) {
+        this.$message({ message: "未添加题目", type: "warning" });
+        return this.$refs.questionTitle.focus();
+      }
 
-      Api.ModifyQuestion(this.qusetionData.tpqQuestion).then(res => {
+      for (let i in this.qusetionData.tpqQuestion.fillQuestion) {
+        if (
+          this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer.trim() === ""
+        ) {
+          this.$message({ message: "答案不能为空", type: "warning" });
+          return;
+        }
+      }
+
+      let paperQuestionId = this.qusetionData.tpqId;
+      let data = {
+        questionId: this.qusetionData.tpqQuestion.questionId,
+        questionTitle: this.qusetionData.tpqQuestion.questionTitle,
+        questionTypeId: 2,
+        fillQuestion: []
+      };
+      this.qusetionData.tpqQuestion.fillQuestion.forEach((item, index) => {
+        if (item.fqId) {
+          data.fillQuestion.push({
+            fqId: item.fqId,
+            fqAnswer: item.fqAnswer,
+            fqOrder: index + 1
+          });
+        } else {
+          data.fillQuestion.push({
+            fqAnswer: item.fqAnswer,
+            fqOrder: index + 1
+          });
+        }
+      });
+      console.log(data);
+
+      Api.ModifyQuestion(data, paperQuestionId).then(res => {
         console.log(res);
-
         switch (res.data.code) {
           case 1:
             this.qusetionDataClone = JSON.parse(
@@ -290,6 +308,11 @@ export default {
     ul li {
       margin: 5px 0;
     }
+  }
+  .itemspan {
+    padding: 2px 15px;
+    margin: 0px 4px;
+    border-bottom: 1px solid black;
   }
   .btn {
     margin-top: 15px;

@@ -6,7 +6,7 @@
         <div id="click">
           <select-question-type v-model="radio" />
         </div>
-        <el-button style="float: right; padding: 6px;" type="primary">操作按钮</el-button>
+        <slot name="but"></slot>
       </div>
       <div class="text item">
         <!-- 选择题 -->
@@ -53,20 +53,11 @@
         </span>
       </div>
       <div class="text item">
-        <!-- <ModifyBlank
+        <ModifyBlank
           v-for="(item,index) in allBlankSubject"
           :item="item"
           :index="index"
           :key="item.tpqId"
-          @handleChange="handleChange"
-          @deleteQuestion="deleteQuestion"
-        /> -->
-        <aaa
-        v-for="(item,index) in allBlankSubject"
-          :item="item"
-          :index="index"
-          :key="item.tpqId"
-          @handleChange="handleChange"
           @deleteQuestion="deleteQuestion"
         />
       </div>
@@ -101,29 +92,29 @@ import PaperBlanksTest from "@/components/makePapers/subject/PaperBlanksTest"; /
 import PaperEssayQuestion from "@/components/makePapers/subject/PaperEssayQuestion"; // 问答题组件
 import ModifyChoice from "@/components/makePapers/modify/ModifyChoice"; // 修改选择题组件
 import ModifyBlank from "@/components/makePapers/modify/ModifyBlank"; // 修改填空题组件
-import aaa from "@/components/makePapers/modify/aaa"; // 修改填空题组件
 import ModifyEssay from "@/components/makePapers/modify/ModifyEssay"; // 修改问答题组件
 
 export default {
   data() {
     return {
       radio: { typeId: "1", typeName: "", type: "click" }, // 单选按钮
-      allPaperData: {}, // 试卷的所有数据
-      allQuestions: [], // 试卷所有题目
+      // allPaperData: {}, // 试卷的所有数据
+      // allQuestions: [], // 试卷所有题目
       choiceNum: 0,
       blankNum: 0,
       essayNum: 0
     };
   },
   props: {
+    allQuestions: Array,
     testPaperId: [String, Number]
   },
   created() {
-    let id = this.testPaperId || sessionStorage.getItem("testPaperId");
-    Api.GetTestPaper({ id }).then(res => {
-      this.allQuestions = res.data.questions;
-      this.allPaperData = res.data;
-    });
+    // let id = this.testPaperId || sessionStorage.getItem("testPaperId");
+    // Api.GetTestPaper({ id }).then(res => {
+    //   this.allQuestions = res.data.questions;
+    //   // this.allPaperData = res.data;
+    // });
   },
   computed: {
     /** 选择题 */
@@ -177,7 +168,7 @@ export default {
     }
   },
   methods: {
-    /** 添加选择题、问答题 */
+    /** 添加选择题、填空题、问答题 */
     addQuestion(data) {
       this.allQuestions.push(data);
     },
@@ -185,7 +176,7 @@ export default {
     handleChange(id, score) {
       this.allQuestions.find(item => item.tpqId === id).tpqScore = score;
     },
-    /** 选择题、问答题 删除题目 */
+    /** 选择题、填空题、问答题 删除题目 */
     deleteQuestion(id) {
       let index = this.allQuestions.findIndex(item => item.tpqId === id);
       this.allQuestions.splice(index, 1);
@@ -198,8 +189,7 @@ export default {
     PaperEssayQuestion,
     ModifyChoice,
     ModifyBlank,
-    ModifyEssay,
-    aaa
+    ModifyEssay
   }
 };
 </script>

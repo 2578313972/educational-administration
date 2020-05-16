@@ -185,7 +185,7 @@ export default {
         questionTitle: this.choiceData.tpqQuestion.questionTitle,
         questionTypeId: this.choiceData.tpqQuestion.questionTypeId,
         chooseQuestion: this.choiceData.tpqQuestion.chooseQuestion
-      }).then(res => {
+      },0).then(res => {
         switch (res.data.code) {
           case 1:
             this.choiceDataClone = JSON.parse(JSON.stringify(this.choiceData))
