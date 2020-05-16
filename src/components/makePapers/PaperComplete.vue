@@ -4,8 +4,7 @@
       <h3 style="text-align:center;">{{allPaperData.tpTitle}}</h3>
     </div>
     <el-table :data='tableData' border style="width: 100%">
-          <el-table-column align="center" min-width="130px" prop="course" label="科目">
-          </el-table-column>
+          <el-table-column align="center" min-width="130px" prop="course" label="科目"></el-table-column>
           <el-table-column align="center" width="130px" prop="choice" label="选择题">
              <el-badge :value="choiceScore+'\''" class="item"></el-badge>
           </el-table-column>

@@ -69,8 +69,6 @@ export default {
   created() {
     this.qusetionData = JSON.parse(JSON.stringify(this.item));
     this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
-    console.log(this.qusetionData);
-
   },
   methods: {
     /** 切换布局事件 */

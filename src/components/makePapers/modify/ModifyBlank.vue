@@ -93,7 +93,9 @@ export default {
   created() {
     this.qusetionData = this.item // 数据渲染
     this.qusetionDataClone = JSON.parse(JSON.stringify(this.item)); // 数据替换
-    this.oldNum = this.qusetionData.tpqQuestion.length; // 获取下划线的数量
+    this.oldNum = this.qusetionData.tpqQuestion.fillQuestion.length; // 获取下划线的数量
+    console.log('props:',this.qusetionData);
+    this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
   },
   watch: {
     "qusetionData.tpqQuestion.questionTitle"(newV, oldV) {
@@ -150,8 +152,8 @@ export default {
     },
     /** 点击取消 */
     switchBoxElse() {
-      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
-      this.oldNum = this.qusetionDataClone.tpqQuestion.length;
+      this.qusetionData.tpqQuestion = JSON.parse(JSON.stringify(this.qusetionDataClone.tpqQuestion));
+      this.oldNum = this.qusetionDataClone.tpqQuestion.fillQuestion.length;
       this.switchBox();
     },
     /** 修改分数 */
@@ -162,6 +164,7 @@ export default {
         fillQuestionScore: []
       };
       this.qusetionData.tpqQuestion.fillQuestion.forEach(item => {
+        console.log(item.fillQuestionScore[0]);
         data.fillQuestionScore.push(item.fillQuestionScore[0]);
       });
       data.tpqScore = data.fillQuestionScore.reduce(
@@ -171,6 +174,7 @@ export default {
       Api.ModifyScore(data).then(res => {
         switch (res.data.code) {
           case 1:
+            this.qusetionDataClone.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore = this.qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore
             this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
             this.$message({ message: res.data.message, type: "success" });
             break;
@@ -222,23 +226,18 @@ export default {
       };
        // 循环添加数据
       this.qusetionData.tpqQuestion.fillQuestion.forEach((item, index) => {
-        if (item.fqId) {
           data.fillQuestion.push({
             fqId: item.fqId,
             fqAnswer: item.fqAnswer,
             fqOrder: index + 1
           });
-        } else {
-          data.fillQuestion.push({
-            fqAnswer: item.fqAnswer,
-            fqOrder: index + 1
-          });
-        }
       });
       Api.ModifyQuestion(data, paperQuestionId).then(res => {
         switch (res.data.code) {
           case 1:
-            // 计算总分
+            res.data.data.fillQuestion = JSON.parse(JSON.stringify(res.data.data.fillQuestion.sort((a,b)=>a.fqOrder-b.fqOrder)))
+            // this.qusetionData.tpqQuestion = res.data.data
+
             this.qusetionData.tpqQuestion = res.data.data
             this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
 
