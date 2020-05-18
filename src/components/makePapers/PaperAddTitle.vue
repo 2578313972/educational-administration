@@ -110,11 +110,7 @@ export default {
     testPaperId: [String, Number]
   },
   created() {
-    // let id = this.testPaperId || sessionStorage.getItem("testPaperId");
-    // Api.GetTestPaper({ id }).then(res => {
-    //   this.allQuestions = res.data.questions;
-    //   // this.allPaperData = res.data;
-    // });
+    // let inb
   },
   computed: {
     /** 选择题 */
