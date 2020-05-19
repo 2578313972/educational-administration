@@ -9,9 +9,7 @@
             <el-table-column prop="userName" label="出卷人" width="100"></el-table-column>
             <el-table-column prop="courseName" label="课程" min-width="100"></el-table-column>
             <el-table-column label="出卷日期" min-width="100">
-                <template slot-scope="scope">
-                {{scope.row.tpDate | time }}
-              </template>
+              <template slot-scope="scope">{{scope.row.tpDate | time }}</template>
             </el-table-column>
             <el-table-column label="操作" width="220">
               <template slot-scope="scope">
@@ -71,7 +69,7 @@
 import Api from "@/http/BPaper";
 import SelectCourse from "@/components/selectionBox/SelectCourse";
 
-import TimeOut from '@/plug-in/TimeOut'
+import TimeOut from "@/plug-in/TimeOut";
 export default {
   data() {
     return {
@@ -116,7 +114,7 @@ export default {
     }
   },
   components: {
-    SelectCourse,
+    SelectCourse
   },
   methods: {
     /** 每页多少条数据 */
@@ -153,11 +151,13 @@ export default {
     },
     /** 修改 */
     modification(formName) {
+      if (this.ruleForm.courseId == 0) this.ruleForm.courseName = ""
       this.$refs[formName].validate(valid => {
         if (valid) {
           let tpTitle = this.ruleForm.paperTitle;
           let tpCourseId = this.ruleForm.courseId;
-          console.log(this.ruleForm);
+          if (tpCourseId == 0)
+            return this.$message.error("请选择专业课程");
           Api.ModifyTestPaper({
             tpId: this.selectData.tpId, //试卷编号
             tpCourseId, //课程编号，可修改
@@ -172,6 +172,7 @@ export default {
                 this.tableData[
                   this.selectIndex
                 ].tpCourseId = this.comCourse.courseId;
+                this.centerDialogVisible = false; // 关闭弹框
                 this.$message({ type: "success", message: res.data.message });
                 break;
               default:
@@ -179,7 +180,6 @@ export default {
             }
           });
         }
-        this.centerDialogVisible = false; // 关闭弹框
       });
     },
     /** 删除 */
@@ -221,9 +221,10 @@ export default {
       this.$router.push(`/BPaperZJ?id=${data.tpId}`);
     }
   },
-  filters:{ // 过滤器
-    time(val){
-      return TimeOut(val)
+  filters: {
+    // 过滤器
+    time(val) {
+      return TimeOut(val);
     }
   }
 };
