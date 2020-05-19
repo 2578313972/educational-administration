@@ -1,14 +1,6 @@
 <template>
   <div id="BPaper">
-    <!-- <el-breadcrumb v-if="!tabWin" separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">
-        <span>首页</span>
-      </el-breadcrumb-item>
-      <el-breadcrumb-item>在线测试</el-breadcrumb-item>
-      <el-breadcrumb-item @click="tabWin=!tabWin" :to="{ path:'/BPaper' }">试卷管理</el-breadcrumb-item>
-      <el-breadcrumb-item>维护试卷题目</el-breadcrumb-item>
-    </el-breadcrumb> -->
-    <div v-if="tabWin">
+    <div>
       <el-card class="box-card">
         <div class="text item">
           <el-table border :data="tableData" style="width: 100%">
@@ -16,7 +8,11 @@
             <el-table-column prop="tpTitle" label="标题" width="80"></el-table-column>
             <el-table-column prop="userName" label="出卷人" width="100"></el-table-column>
             <el-table-column prop="courseName" label="课程" min-width="100"></el-table-column>
-            <el-table-column prop="tpDate" label="出卷日期" min-width="100"></el-table-column>
+            <el-table-column label="出卷日期" min-width="100">
+                <template slot-scope="scope">
+                {{scope.row.tpDate | time }}
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="220">
               <template slot-scope="scope">
                 <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -41,11 +37,6 @@
         :total="total"
       ></el-pagination>
     </div>
-    <div v-else>
-      <PaperComplete :allPaperData="allPaperData" />
-      <PaperAddTitle :testPaperId="testPaperId" :allQuestions="allPaperData.questions" />
-    </div>
-
     <el-dialog
       @close="close('ruleForm')"
       title="修改试卷信息"
@@ -80,15 +71,11 @@
 import Api from "@/http/BPaper";
 import SelectCourse from "@/components/selectionBox/SelectCourse";
 
-import PaperAddTitle from "@/components/makePapers/PaperAddTitle";
-import PaperComplete from "@/components/makePapers/PaperComplete";
+import TimeOut from '@/plug-in/TimeOut'
 export default {
   data() {
     return {
       tableData: [],
-      tabWin: true,
-      testPaperId: 0,
-      allPaperData: { questions: [] }, // 试卷数据
       centerDialogVisible: false, // 控制新增弹框
       comCourse: { courseName: "", courseId: "0" },
       ruleForm: {
@@ -114,9 +101,9 @@ export default {
   },
   created() {
     Api.GetAllTestPaper().then(res => {
-      this.total = res.data.length;
+      this.total = res.data.length; //总共多少数据
     });
-    this.getPaperData();
+    this.getPaperData(); // 拿默认值数据
   },
   watch: {
     comCourse: {
@@ -126,18 +113,10 @@ export default {
         this.ruleForm.courseName = newVla.courseName;
       },
       deep: true
-    },
-    allPaperData: {
-      handler(newV) {
-        this.allPaperData = newV;
-      },
-      deep: true
     }
   },
   components: {
     SelectCourse,
-    PaperAddTitle,
-    PaperComplete
   },
   methods: {
     /** 每页多少条数据 */
@@ -239,12 +218,12 @@ export default {
       this.$refs[formName].resetFields();
     },
     switchTab(index, data) {
-      this.$router.push(`/BPaper?id=${data.tpId}`);
-      Api.GetTestPaper({ id: data.tpId }).then(res => {
-        this.testPaperId = data.tpId;
-        this.allPaperData = res.data;
-        this.tabWin = !this.tabWin;
-      });
+      this.$router.push(`/BPaperZJ?id=${data.tpId}`);
+    }
+  },
+  filters:{ // 过滤器
+    time(val){
+      return TimeOut(val)
     }
   }
 };

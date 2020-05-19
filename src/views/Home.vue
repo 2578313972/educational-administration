@@ -69,11 +69,12 @@
             >
             </el-tab-pane>
             <div class="main">
-              <el-breadcrumb v-if="!Crumb_third" separator-class="el-icon-arrow-right">
+              <el-breadcrumb separator-class="el-icon-arrow-right">
                   <el-breadcrumb-item :to="{ path: '/' }"><span @click="goIndex">首页</span></el-breadcrumb-item>
                   <el-breadcrumb-item v-if="Crumb_first">{{Crumb_first}}</el-breadcrumb-item>
-                  <el-breadcrumb-item :to="{ path:'/BPaper' }"   v-if="Crumb_second">{{Crumb_second}}</el-breadcrumb-item>
-                  <el-breadcrumb-item v-if="Crumb_third">{{Crumb_third}}</el-breadcrumb-item>
+                    <el-breadcrumb-item v-if="Crumb_second && $route.path!=='/BPaperZJ'" >{{Crumb_second}}</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path:'/BPaper' }" v-if="Crumb_second && $route.path==='/BPaperZJ'" >{{Crumb_second}}</el-breadcrumb-item>
+                    <el-breadcrumb-item  v-if="$route.path==='/BPaperZJ'" >维护试卷题目</el-breadcrumb-item>
               </el-breadcrumb>
               <router-view />
             </div>
@@ -154,11 +155,11 @@ export default {
         this.Crumb_first = ''
         this.Crumb_second = ''
       }
-      if(to.fullPath.split("?id")[1]){
-        this.Crumb_third = '维护试卷题目'
-      }else{
-        this.Crumb_third = ''
-      }
+      // if(to.fullPath.split("?id")[1]){
+      //   this.Crumb_third = '维护试卷题目'
+      // }else{
+      //   this.Crumb_third = ''
+      // }
       for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
         for (let j in this.selectData[i].data) {
           if(this.selectData[i].data[j].url === to.fullPath){
@@ -212,10 +213,10 @@ export default {
           }
           tabs.forEach((tab, index) => {
             if(tab.name === historyActiveName){
-              let nextTab = tabs[index]
-              this.active = nextTab.url
+              let nextTab = tabs[index];
+              this.active = nextTab.url;
               this.editableTabsValue = nextTab.name;
-              this.$router.push(nextTab.url)
+              this.$router.push(nextTab.url);
             }
           });
       }

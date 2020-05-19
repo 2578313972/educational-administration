@@ -6,7 +6,7 @@ export default [
     },{
         path: '/BPaper',
         name: 'BPaper',
-        component: () => import('../views/back/BPaper.vue')
+        component: () => import('../views/back/BPaper.vue'),
     },{
         path: '/BReadover',
         name: 'BReadover',
@@ -19,5 +19,9 @@ export default [
         path: '/BTest',
         name: 'BTest',
         component: () => import('../views/back/BTest.vue')
+    },{
+        path: 'BPaperZJ',
+        name: 'BPaperZJ',
+        component:() => import('../views/back/BPaperZJ.vue')
     }
 ]
