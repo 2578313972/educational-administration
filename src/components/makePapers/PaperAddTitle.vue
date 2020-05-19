@@ -22,7 +22,7 @@
           v-show="radio.typeId===2"
         />
         <!-- 问答题 -->
-        <paper-essay-question @addQuestion="addQuestion" v-show="radio.typeId===3" />
+        <paper-essay-question :testPaperId="testPaperId" @addQuestion="addQuestion" v-show="radio.typeId===3" />
       </div>
     </el-card>
 
@@ -98,8 +98,6 @@ export default {
   data() {
     return {
       radio: { typeId: "1", typeName: "", type: "click" }, // 单选按钮
-      // allPaperData: {}, // 试卷的所有数据
-      // allQuestions: [], // 试卷所有题目
       choiceNum: 0,
       blankNum: 0,
       essayNum: 0
@@ -108,9 +106,6 @@ export default {
   props: {
     allQuestions: Array,
     testPaperId: [String, Number]
-  },
-  created() {
-    // let inb
   },
   computed: {
     /** 选择题 */

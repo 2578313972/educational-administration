@@ -62,10 +62,6 @@ export default {
   props: {
     testPaperId: [String, Number] // 试卷id
   },
-  created() {
-    this.question.tpqPaperId =
-      this.testPaperId || sessionStorage.getItem("testPaperId");
-  },
   watch: {
     // "question.tpqQuestion.questionTitle"(newV, oldV) {
     //   function diff(newV, oldV) {
@@ -142,6 +138,8 @@ export default {
         score += item.fillQuestionScore[0].fqsScore;
       }); // 计算分数
       this.question.tpqScore = score;
+      this.question.tpqPaperId =
+        this.testPaperId || sessionStorage.getItem("testPaperId");
       Api.AddQuestionToTestPaper(this.question).then(res => {
         switch (res.data.code) {
           case 1:
@@ -161,15 +159,13 @@ export default {
       this.newNum = text.split("▁").length - 1; // 获取下划线的数量
       let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1; // 获取光标前的下划线数量
 
-
-// //光标前的填空数量
-// let cursorBeforeFill=text.slice(0, this.inputChangeIndex).split("▁").length;
-// //当前填空总数量
-// let fillCount=text.split("▁").length;
-// let disCount=Math.abs(fillCount-cursorBeforeFill)
-// this.question.tpqQuestion.fillQuestion.splice(cursorBeforeFill-disCount,
-// ...new Array(disCount).fill().map(()=>({fqAnswer: "",fillQuestionScore: [{ fqsScore: 2 }]})));
-
+      // //光标前的填空数量
+      // let cursorBeforeFill=text.slice(0, this.inputChangeIndex).split("▁").length;
+      // //当前填空总数量
+      // let fillCount=text.split("▁").length;
+      // let disCount=Math.abs(fillCount-cursorBeforeFill)
+      // this.question.tpqQuestion.fillQuestion.splice(cursorBeforeFill-disCount,
+      // ...new Array(disCount).fill().map(()=>({fqAnswer: "",fillQuestionScore: [{ fqsScore: 2 }]})));
 
       if (this.newNum > this.oldNum) {
         /** 当新增下滑线时 */
@@ -193,7 +189,8 @@ export default {
       }
       this.oldNum = this.newNum; // 更新旧下划线的数量
 
-      for (let i = 0; i < this.newNum; i++) { // 循环新的下划线数量
+      for (let i = 0; i < this.newNum; i++) {
+        // 循环新的下划线数量
         text = text.replace(
           "▁",
           ` <span style='padding:2px 35px;border-bottom: 1px solid black;' >${this.question.tpqQuestion.fillQuestion[i].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `

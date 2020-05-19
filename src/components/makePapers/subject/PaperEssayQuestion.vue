@@ -48,8 +48,8 @@ export default {
       }
     };
   },
-  created() {
-    this.paperForm.tpqPaperId = sessionStorage.getItem("testPaperId");
+  props: {
+    testPaperId: [String, Number] // 试卷id
   },
   watch: {
     html(newVal) {
@@ -72,6 +72,7 @@ export default {
         this.$message({ message: "答案不能为空", type: "warning" });
         return
       }
+      this.paperForm.tpqPaperId = this.testPaperId || sessionStorage.getItem("testPaperId");
       Api.AddQuestionToTestPaper(this.paperForm).then(res => {
         console.log(res);
         switch (res.data.code) {

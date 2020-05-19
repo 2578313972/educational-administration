@@ -130,7 +130,6 @@ export default {
     /** 调接口 */
     getPaperData(pageIndex, pageSize) {
       Api.GetTestPaperList({ pageIndex, pageSize }).then(res => {
-        console.log(res.data);
         res.data.data.forEach((item, index) => {
           item.enum =
             this.pageIndex * this.pageSize + index + 1 - this.pageSize;

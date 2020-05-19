@@ -23,5 +23,9 @@ export default [
         path: 'BPaperZJ',
         name: 'BPaperZJ',
         component:() => import('../views/back/BPaperZJ.vue')
+    },{
+        path: 'BReadoverZJ',
+        name: 'BReadoverZJ',
+        component:() => import('../views/back/BReadoverZJ.vue')
     }
 ]
