@@ -37,6 +37,20 @@
       <el-main>
         <div id="HomeRight">
           <div class="arrows" @click="isCollapse = !isCollapse"><span :class="isCollapse?'el-icon-caret-right':'el-icon-caret-left'"></span></div>
+            <!--  -->
+            <div class="ZHEN">
+              <el-dropdown trigger="click">
+                <span class="el-dropdown-link">
+                  语言
+                  <i class="el-icon-arrow-down el-icon--right"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="zh">简体中文</el-dropdown-item>
+                  <el-dropdown-item @click.native="en">English</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
+            <!--  -->
           <div class="account">
               <el-row class="block-col-2">
                 <el-col :span="12">
@@ -52,7 +66,7 @@
                       </div>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item icon="el-icon-plus"><span @click="backLogin">退出登录</span></el-dropdown-item>
+                      <el-dropdown-item icon="el-icon-plus" @click.native="backLogin">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </el-col>
@@ -229,6 +243,18 @@ export default {
     },
     errorHandler() {
       return true
+    },
+    zh(){
+      let locale = localStorage.getItem('language')||'zh';
+      let temp=locale === 'zh' ? 'en' : 'zh';
+      this.$i18n.locale=temp;//改变当前语言
+      localStorage.language=temp;
+    },
+    en(){
+      let locale = localStorage.getItem('language')||'en';
+      let temp=locale === 'zh' ? 'en' : 'zh';
+      this.$i18n.locale=temp;//改变当前语言
+      localStorage.language=temp;
     }
   },
 }
@@ -253,6 +279,31 @@ export default {
     }
     #HomeRight{
         position: relative;
+        .ZHEN{
+          width:60px;
+          height: 60px;
+          box-sizing: border-box;
+          position: absolute;
+          right: 120px;
+          display: flex;
+          z-index: 2;
+          border-bottom: 1px solid #E4E7ED;
+          background: white;
+          cursor: pointer;
+          .el-dropdown{
+            width:100%;
+            height:100%;
+            margin:auto;
+            .el-dropdown-link.el-dropdown-selfdefine{
+              width:100%;
+              height:100%;
+              display: inline-block;
+              text-align: center;
+              line-height: 60px;
+            }
+          }
+        }
+
         .arrows{
             width: 40px;
             line-height: 60px;
@@ -318,7 +369,7 @@ export default {
             min-width: 370px;
             box-sizing: border-box;
             padding-left: 50px;
-            padding-right: 120px;
+            padding-right: 220px;
             margin:0;
         }
     }

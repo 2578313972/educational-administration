@@ -21,7 +21,7 @@
             <el-radio :label="1">列表</el-radio>
             <el-radio :label="2">图表</el-radio>
           </el-radio-group>
-          <el-button size="small" type="primary" @click="excelOut">导出</el-button>
+          <el-button size="small" type="primary" :loading="excelOutBool" @click="excelOut">导出</el-button>
           <el-button size="small" type="primary" v-print="'#printDiv'">打印</el-button>
         </div>
         <div class="text item" id="printDiv">
@@ -53,12 +53,13 @@ import { export2Excel } from '@/common/js/util'
 export default {
   data() {
     return {
-      title: "",
-      tableData: [],
-      tableData_2: [],
-      comSelectClass: { classId: "0", className: "" },
-      radio: 1,
-      option: {
+      title: "", // 班级名称
+      tableData: [], // 试卷数据
+      tableData_2: [], // 学生成绩数据
+      comSelectClass: { classId: "0", className: "" }, // 下拉组件 传值
+      excelOutBool:false, // 导出加载
+      radio: 1, // 单选按钮
+      option: { // echarts 数据
         color: ['#3398DB'],
         title: {
           text: "",
@@ -104,13 +105,13 @@ export default {
           }
         ]
       },
-      excelTitle:[
+      excelTitle:[ // excel 表头
         {title:"姓名",key:"name"},
         {title:"成绩",key:"score"},
         {title:"提交时间",key:"time"},
         {title:"阅卷老师",key:"teacther"},
       ],
-      exceldata:[]
+      exceldata:[] // excel 内容
     };
   },
   watch: {
@@ -119,6 +120,10 @@ export default {
         Api.GetTestPaperByClassId({ classId: newV }).then(res => {
           this.tableData = res.data.filter(item => item.counter);
         });
+      }else{
+        this.tableData = []
+        this.tableData_2 = []
+        this.option.title.text = ''
       }
     }
   },
@@ -149,15 +154,20 @@ export default {
     /** 改变单选按钮时 触发响应事件 */
     changeRadio() {
       this.reSizeMedia();
+      window.onresize = () => this.reSizeMedia();
     },
     /** 窗口响应事件 */
     reSizeMedia() {
-      window.onresize = () => this.reSizeMedia();
       this.option.grid.width = this.$refs.munWid.clientWidth;
       this.option.title.left = this.$refs.munWid.clientWidth / 2 - (this.option.title.text.length * this.option.title.textStyle.fontSize) / 2;
     },
+    /** 导出 */
     excelOut(){
       if(this.tableData_2.length === 0) return this.$message({ type: "warning", message: '暂时没有数据！' })
+      this.excelOutBool = !this.excelOutBool
+      setTimeout(()=>{
+        this.excelOutBool = !this.excelOutBool
+      },5000)
       this.tableData_2.forEach(item=>{
         this.exceldata.push({name:item.stuName,score:item.testScore,time:item.submitTime,teacther:item.userName})
       })
