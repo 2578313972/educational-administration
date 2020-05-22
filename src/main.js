@@ -13,6 +13,18 @@ import Cookie from '@/plug-in/Cookie.js'
 import SaveTraffic from '@/plug-in/SaveTraffic'
 import deepClone from '@/plug-in/deepClone'
 
+import ECharts from 'vue-echarts'
+// // 手动引入 ECharts 各模块来减小打包体积
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/component/tooltip'
+import 'echarts/lib/component/polar'
+import 'echarts/lib/component/legend'
+import 'echarts/lib/component/title.js'
+Vue.component('v-chart', ECharts)
+
+import Print from 'vue-print-nb'
+Vue.use(Print)
+
 Vue.config.productionTip = false
 
 Vue.prototype.Base64 = Base64

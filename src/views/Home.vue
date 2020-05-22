@@ -68,13 +68,15 @@
               :closable="item.title==='首页'?false:true"
             >
             </el-tab-pane>
-            <div class="main">
+            <div ref="main" class="main">
               <el-breadcrumb separator-class="el-icon-arrow-right">
                   <el-breadcrumb-item :to="{ path: '/' }"><span @click="goIndex">首页</span></el-breadcrumb-item>
                   <el-breadcrumb-item v-if="Crumb_first">{{Crumb_first}}</el-breadcrumb-item>
-                    <el-breadcrumb-item v-if="Crumb_second && $route.path!=='/BPaperZJ'" >{{Crumb_second}}</el-breadcrumb-item>
+                    <el-breadcrumb-item v-if="Crumb_second && $route.path!=='/BPaperZJ'&& $route.path!=='/BReadoverZJ'" >{{Crumb_second}}</el-breadcrumb-item>
                     <el-breadcrumb-item :to="{ path:'/BPaper' }" v-if="Crumb_second && $route.path==='/BPaperZJ'" >{{Crumb_second}}</el-breadcrumb-item>
                     <el-breadcrumb-item  v-if="$route.path==='/BPaperZJ'" >维护试卷题目</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path:'/BReadover' }" v-if="Crumb_second && $route.path==='/BReadoverZJ'" >测试任务</el-breadcrumb-item>
+                    <el-breadcrumb-item  v-if="$route.path==='/BReadoverZJ'" >批阅试卷</el-breadcrumb-item>
               </el-breadcrumb>
               <router-view />
             </div>
@@ -100,7 +102,6 @@ export default {
       editableTabsValue:"1", // 默认显示（Tab标签）
       Crumb_first:'', // 面包屑数据1
       Crumb_second:'', // 面包屑数据2
-      Crumb_third:'', // 面包屑数据3
       historyActive:[] // 历史路由
     }
   },
@@ -155,11 +156,6 @@ export default {
         this.Crumb_first = ''
         this.Crumb_second = ''
       }
-      // if(to.fullPath.split("?id")[1]){
-      //   this.Crumb_third = '维护试卷题目'
-      // }else{
-      //   this.Crumb_third = ''
-      // }
       for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
         for (let j in this.selectData[i].data) {
           if(this.selectData[i].data[j].url === to.fullPath){
@@ -204,9 +200,9 @@ export default {
       if (activeName === name) {
         let historyActiveName = this.historyActive[1]
           if(!historyActiveName){
-            this.active = '/'
+            this.active = '/';
             this.editableTabsValue = '1';
-            this.$router.push('/')
+            this.$router.push('/');
             this.editableTabs = tabs.filter(tab => tab.name !== name);
             this.historyActive = this.historyActive.filter(tab => tab !== name);
             return

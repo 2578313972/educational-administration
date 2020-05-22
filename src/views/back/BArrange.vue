@@ -23,7 +23,13 @@
           </div>
         </el-form-item>
         <el-form-item v-if="timeScore">
-            <el-button style="transform: translateY(-20px);" size="small" disabled type="danger" plain>用时{{timeScore}}分钟</el-button>
+          <el-button
+            style="transform: translateY(-20px);"
+            size="small"
+            disabled
+            type="danger"
+            plain
+          >用时{{timeScore}}分钟</el-button>
         </el-form-item>
         <el-form-item label>
           <el-button size="small" round @click="kon">取消</el-button>
@@ -106,7 +112,13 @@
           </div>
         </el-form-item>
         <el-form-item>
-            <el-button style="transform: translateY(-20px);" size="small" disabled type="danger" plain>用时{{timeScore_2}}分钟</el-button>
+          <el-button
+            style="transform: translateY(-20px);"
+            size="small"
+            disabled
+            type="danger"
+            plain
+          >用时{{timeScore_2}}分钟</el-button>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -151,8 +163,8 @@ export default {
       total: 0, // 总数据
       pageIndex: 1, // 第几页
       pageSize: 10, // 每页多少数据
-      timeScore:0, // 考试所需时间_1
-      timeScore_2:0, // 考试所需时间_2
+      timeScore: 0, // 考试所需时间_1
+      timeScore_2: 0, // 考试所需时间_2
       rules: {
         /**弹框验证*/
         paperTitle: [
@@ -196,7 +208,8 @@ export default {
         time.getMonth(),
         time.getDate(),
         time.getHours() + 1,
-        time.getMinutes()
+        time.getMinutes(),
+        time.getUTCSeconds()
       );
     },
     /** 设置 */
@@ -214,17 +227,23 @@ export default {
         return;
       }
       // 非空验证
-      console.log(this.timeValue);
-
-      if (!this.timeValue || this.timeValue.length<1) {
+      if (!this.timeValue || this.timeValue.length < 1) {
         this.$refs.timeValue.focus();
         this.$message({ type: "info", message: "请选择考试时间" });
         return;
       }
+
+      this.timeValue[0].setHours(this.timeValue[0].getHours() + 8);
+      this.timeValue[1].setHours(this.timeValue[1].getHours() + 8);
+
+
       [
         this.paperData.taskStartTime,
         this.paperData.taskEndTime
       ] = this.timeValue;
+      // this.paperData.taskStartTime = this.paperData.taskStartTime.toLocaleDateString().split("/")
+      // this.paperData.taskEndTime = this.paperData.taskStartTime.toLocaleDateString()
+
       Api.SetTest({
         uid: JSON.parse(sessionStorage.getItem("userData")).userUid,
         data: this.paperData
@@ -245,7 +264,7 @@ export default {
     handleEdit(index, data) {
       this.centerDialogVisible = true;
       this.ruleForm.taskId = data.taskId; // 编号
-      this.selectData = data
+      this.selectData = data;
       this.selectIndex = index; //  修改时需要用到的下标
       // -------------------  组件传值
       this.comSelectPaper_2.tpId = data.taskTestPaperId;
@@ -256,7 +275,7 @@ export default {
       this.timeValue_2[0] = data.taskStartTime; // 保存开始时间
       this.timeValue_2[1] = data.taskEndTime; // 保存结算时间
 
-      this.timeScore_2 = data.taskEscapeTime
+      this.timeScore_2 = data.taskEscapeTime;
 
       this.ruleForm.taskStartTime = data.taskStartTime;
       this.ruleForm.taskEndTime = data.taskEndTime;
@@ -282,6 +301,9 @@ export default {
         return;
       }
 
+      this.timeValue_2[0].setHours(this.timeValue_2[0].getHours() + 8);
+      this.timeValue_2[1].setHours(this.timeValue_2[1].getHours() + 8);
+
       this.ruleForm.taskStartTime = this.timeValue_2[0];
       this.ruleForm.taskEndTime = this.timeValue_2[1];
       Api.ModifyTestTask(this.ruleForm).then(res => {
@@ -289,11 +311,13 @@ export default {
           case 1:
             let item = this.tableData[this.selectIndex]; // 需要操作的数据
             // 赋值操作
+
             item.classId = this.comSelectClass_2.classId;
             item.className = this.comSelectClass_2.className;
             [item.taskStartTime, item.taskEndTime] = this.timeValue_2;
             item.taskTestPaperId = this.comSelectPaper_2.tpId;
             item.tpTitle = this.comSelectPaper_2.tpTitle;
+
             try {
               item.taskEscapeTime =
                 (this.ruleForm.taskEndTime.getTime() -
@@ -333,16 +357,20 @@ export default {
           this.$message({ type: "info", message: "已取消删除" });
         });
     },
-    endTime(){
-        if(this.timeValue===null)return this.timeScore = 0
-        this.timeScore = ~~((this.timeValue[1].getTime() - this.timeValue[0].getTime()) / 60000)+1
+    endTime() {
+      if (this.timeValue === null) return (this.timeScore = 0);
+      this.timeScore = Math.round((this.timeValue[1].getTime() - this.timeValue[0].getTime()) / 60000)
     },
     /** 计算考试时间 */
-    blurDate(){
-        if(this.timeValue_2===null)return this.timeScore_2 = 0
-        try {
-            this.timeScore_2 = (this.timeValue_2[1].getTime() - this.timeValue_2[0].getTime()) / 60000
-        } catch (error) {this.timeScore_2 = this.selectData.taskEscapeTime}
+    blurDate() {
+      if (this.timeValue_2 === null) return (this.timeScore_2 = 0);
+      try {
+        this.timeScore_2 =
+          (this.timeValue_2[1].getTime() - this.timeValue_2[0].getTime()) /
+          60000;
+      } catch (error) {
+        this.timeScore_2 = this.selectData.taskEscapeTime;
+      }
     },
     /** 每页多少条数据 */
     handleSizeChange(val) {
@@ -372,7 +400,7 @@ export default {
         taskStartTime: "", //开始时间
         taskEndTime: "" //结束时间
       };
-      this.timeScore = 0
+      this.timeScore = 0;
     },
     /** 关闭弹出窗口回调 */
     close(formName) {
@@ -382,7 +410,7 @@ export default {
   filters: {
     // 过滤器
     time(val) {
-      return TimeOut(val);
+      return new Date(val).toLocaleDateString().replace(/\//g, "-");
     }
   },
   components: { SelectClass, SelectPaper }
