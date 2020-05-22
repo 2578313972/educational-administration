@@ -10,7 +10,7 @@
           >
             <el-menu-item class="tl-item">
                 <img class="img asideImg" src="../assets/logo.png" />
-                <span style="color:#24A33A;">自学无忧教育</span>
+                <span style="color:#24A33A;">{{ $t('Home.title') }}</span>
             </el-menu-item>
           </el-menu>
           <el-menu
@@ -66,6 +66,7 @@
                       </div>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item icon="el-icon-upload" @click.native="centerDialogVisible=true">设置头像</el-dropdown-item>
                       <el-dropdown-item icon="el-icon-plus" @click.native="backLogin">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -98,10 +99,23 @@
         </div>
       </el-main>
     </el-container>
+
+    <el-dialog title="设置头像" :visible.sync="centerDialogVisible" center>
+      <el-upload
+        action
+        list-type="picture-card"
+        drag
+        :http-request='success'
+      >
+        <i class="el-icon-plus"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+  </el-dialog>
   </div>
 </template>
 
 <script>
+import Api from '../http/Home'
 export default {
   data(){
     return{
@@ -116,7 +130,8 @@ export default {
       editableTabsValue:"1", // 默认显示（Tab标签）
       Crumb_first:'', // 面包屑数据1
       Crumb_second:'', // 面包屑数据2
-      historyActive:[] // 历史路由
+      historyActive:[], // 历史路由
+      centerDialogVisible:false, // set头像弹框
     }
   },
   created() {
@@ -140,24 +155,20 @@ export default {
     ]
     this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
     this.userData = JSON.parse(sessionStorage.getItem('userData')) // 获取登录用户数据
-    try {
-      this.img = this.userData.userHeader
-    } catch (error) {}
+    console.log(this.userData);
+
+    try {this.img = this.userData.userHeader} catch (error) {}
     this.active = this.$route.fullPath; // 改变左菜单栏目标
   },
   beforeMount() {
     for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
       for (let j in this.selectData[i].data) {
         if(this.selectData[i].data[j].url === this.$route.fullPath){
-          /**
-           * 获取菜单栏和tab name值
-           */
+          /** 获取菜单栏和tab name值 */
           this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
           this.historyActive.unshift(this.tabIndex+"")
           this.editableTabsValue = this.tabIndex+""
-          /**
-           *获取面包屑数据
-           */
+          /** 获取面包屑数据 */
           this.Crumb_first = this.selectData[i].name
           this.Crumb_second = this.selectData[i].data[j].name
         }
@@ -255,6 +266,27 @@ export default {
       let temp=locale === 'zh' ? 'en' : 'zh';
       this.$i18n.locale=temp;//改变当前语言
       localStorage.language=temp;
+    },
+
+    success(e){
+      console.log(e);
+
+      if(!/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(e.file.name)) return this.$message.error('请上传正确的图片文件，且不超过500kb');
+      var fm = new FormData();
+      fm.append("userImg", e.file);
+      Api.UploadHeader({userUid:JSON.parse(sessionStorage.getItem("userData")).userUid,fm}).then(res=>{
+        console.log(res);
+        switch (res.data.code){
+          case 1:
+            this.img = res.data.data+'?'+new Date().getTime()
+            this.centerDialogVisible = false
+            this.$message({ message: res.data.message , type: "success" });
+            break;
+          default:
+            this.$message({ message: res.data.message , type: "info" });
+            break;
+        }
+      })
     }
   },
 }
@@ -277,6 +309,9 @@ export default {
             width: 200px;
         }
     }
+    /deep/ .el-dialog{min-width: 400px;}
+    /deep/ .el-dialog--center .el-dialog__body{text-align: center !important;}
+    /deep/ .el-upload-dragger{width:100%;height:100%;}
     #HomeRight{
         position: relative;
         .ZHEN{
@@ -303,7 +338,7 @@ export default {
             }
           }
         }
-
+        /deep/ .el-avatar>img{width:100%;}
         .arrows{
             width: 40px;
             line-height: 60px;

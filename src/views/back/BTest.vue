@@ -50,6 +50,14 @@ import Api from "@/http/BTest";
 import SelectClass from "@/components/selectionBox/SelectClass";
 import { export2Excel } from '@/common/js/util'
 
+import ECharts from 'vue-echarts'
+// // 手动引入 ECharts 各模块来减小打包体积
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/component/tooltip'
+import 'echarts/lib/component/polar'
+import 'echarts/lib/component/legend'
+import 'echarts/lib/component/title.js'
+
 export default {
   data() {
     return {
@@ -106,6 +114,7 @@ export default {
         ]
       },
       excelTitle:[ // excel 表头
+        {title:"#",key:"index"},
         {title:"姓名",key:"name"},
         {title:"成绩",key:"score"},
         {title:"提交时间",key:"time"},
@@ -158,6 +167,7 @@ export default {
     },
     /** 窗口响应事件 */
     reSizeMedia() {
+      if(!this.$refs.munWid) return
       this.option.grid.width = this.$refs.munWid.clientWidth;
       this.option.title.left = this.$refs.munWid.clientWidth / 2 - (this.option.title.text.length * this.option.title.textStyle.fontSize) / 2;
     },
@@ -168,13 +178,13 @@ export default {
       setTimeout(()=>{
         this.excelOutBool = !this.excelOutBool
       },5000)
-      this.tableData_2.forEach(item=>{
-        this.exceldata.push({name:item.stuName,score:item.testScore,time:item.submitTime,teacther:item.userName})
+      this.tableData_2.forEach((item,index)=>{
+        this.exceldata.push({index:index+1,name:item.stuName,score:item.testScore,time:item.submitTime,teacther:item.userName})
       })
       export2Excel(this.excelTitle,this.exceldata)
     },
   },
-  components: { SelectClass }
+  components: { SelectClass,'v-chart':ECharts }
 };
 </script>
 
