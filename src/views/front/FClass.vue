@@ -3,47 +3,47 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <el-button @click="addItem" style="padding: 3px 0;font-size:15px;"  type="text">
-          <i class="el-icon-circle-plus-outline"></i>新增班级
+          <i class="el-icon-circle-plus-outline"></i>{{$t('FClass.newClass')}}
         </el-button>
       </div>
       <div class="text item">
         <el-table :data="tableData" style="width: 100%">
           <el-table-column label="#" type="index" width="50"></el-table-column>
 
-          <el-table-column label="班级名称" min-width="100px">
+          <el-table-column :label="$t('FClass.className')" min-width="100px">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.className }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="授课老师" min-width="80px">
+          <el-table-column :label="$t('FClass.userName')" min-width="80px">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.userName }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="专业" min-width="50px" >
+          <el-table-column :label="$t('FClass.courseName')" min-width="50px" >
             <template slot-scope="scope">
               <span>{{ scope.row.courseName }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="班级人数" min-width="80px">
+          <el-table-column :label="$t('FClass.classStudents')" min-width="80px">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.classStudents }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="开班日期" min-width="100px">
+          <el-table-column :label="$t('FClass.classCreateTime')" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.classCreateTime.substring(0,10)}}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" min-width="150px">
+          <el-table-column :label="$t('FClass.cdom')" min-width="150px">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" :disabled="scope.row.classStudents===0?false:true" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">{{$t('FClass.edit')}}</el-button>
+              <el-button size="mini" type="danger" :disabled="scope.row.classStudents===0?false:true" @click="handleDelete(scope.$index, scope.row)">{{$t('FClass.delect')}}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -52,22 +52,22 @@
 
     <el-dialog @close="close('ruleForm')" :title="selectWin?'新增班级信息':'修改班级信息'" :visible.sync="centerDialogVisible" width="35%" center>
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"  class="demo-ruleForm">
-        <el-form-item label="班级名称" prop="className">
+        <el-form-item :label="$t('FClass.className')" prop="className">
           <el-input v-model="ruleForm.className"></el-input>
         </el-form-item>
-        <el-form-item label="专业课程" prop="courseName">
+        <el-form-item :label="$t('FClass.course')" prop="courseName">
           <SelectCourse v-model="comCourse" />
         </el-form-item>
-        <el-form-item label="授课老师" prop="userName">
+        <el-form-item :label="$t('FClass.userName')" prop="userName">
           <SelectTeacher v-model="comTeacher" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取 消</el-button>
+        <el-button @click="centerDialogVisible = false">{{$t('FClass.no')}}</el-button>
         <el-button
           type="primary"
           @click="selectWin?addData('ruleForm'):modification('ruleForm')"
-        >{{selectWin?'添 加':'修 改'}}</el-button>
+        >{{selectWin?$t('FClass.add'):$t('FClass.xedit')}}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -114,7 +114,6 @@ export default {
     'comTeacher':{
       /**监听选择老师下拉框 */
       handler:function(newVla,oldVal){
-        console.log("~~~~~~~~~",this.comTeacher);
         this.ruleForm.userId = this.comTeacher.userId
         this.ruleForm.userName = this.comTeacher.userName
       },
@@ -123,7 +122,6 @@ export default {
     'comCourse':{
       /**监听选择专业下拉框 */
       handler:function(newVla,oldVal){
-        console.log("~~~~~~~~~",this.comCourse);
         this.ruleForm.courseId = this.comCourse.courseId;
         this.ruleForm.courseName = this.comCourse.courseName;
       },
@@ -161,23 +159,30 @@ export default {
               classTeacherId: this.ruleForm.userId, //老师编号
               classCourseId: this.ruleForm.courseId //课程编号
           }).then(res => {
-              this.tableData.unshift({
-                classCourseId: res.data.data.classCourseId,
-                className: className,
-                userName: teacherName,
-                classId: res.data.data.classId,
-                courseName: courseName,
-                classStudents: res.data.data.classStudents,
-                classCreateTime: res.data.data.classCreateTime.substring(0, 10),
-                classTeacherId: res.data.data.classTeacherId
-              });
+            switch (res.data.code){
+              case 1:
+                this.tableData.unshift({
+                  classCourseId: res.data.data.classCourseId,
+                  className: className,
+                  userName: teacherName,
+                  classId: res.data.data.classId,
+                  courseName: courseName,
+                  classStudents: res.data.data.classStudents,
+                  classCreateTime: res.data.data.classCreateTime.substring(0, 10),
+                  classTeacherId: res.data.data.classTeacherId
+                });
+                this.$message({ message: res.data.message,type: "success" });
+                break;
+              default:
+                this.$message.error( res.data.message );
+                break;
+            }
           });
           this.centerDialogVisible = false;
         }
       })
     },
     handleEdit(index, row) { // 编辑
-      // console.log(index, row);
 
       this.selectWin = false; // 改为编辑框
       this.centerDialogVisible = true; // 显示弹框
@@ -222,21 +227,24 @@ export default {
           classCourseId, //课程编号
           classTeacherId //老师编号
         }).then(res => {
-          /**虚拟修改*/
+          switch (res.data.code){
+            case 1:
+              /**虚拟修改*/
+              let teachName = this.comTeacher.userName // 授课老师
+              let courses = this.comCourse.courseName // 专业  （临时变量）
+              let item = this.tableData[this.selectIndex]
+              item.className = className;
+              item.courseName = courses;
+              item.userName = teachName;
+              item.classTeacherId = this.comTeacher.userId
+              item.classCourseId = this.comCourse.courseId
+              this.$message({ message: res.data.message,type: "success" });
+              break;
+            default:
+              this.$message({ message: res.data.message,type: "warning" });
+              break;
+          }
 
-          let teachName = this.comTeacher.userName // 授课老师
-          let courses = this.comCourse.courseName // 专业  （临时变量）
-
-          let item = this.tableData[this.selectIndex]
-          item.className = className;
-          item.courseName = courses;
-          item.userName = teachName;
-          item.classTeacherId = this.comTeacher.userId
-          item.classCourseId = this.comCourse.courseId
-          this.$message({
-              message: "修改成功",
-              type: "success"
-          });
         });
         this.centerDialogVisible = false;
         }
@@ -251,7 +259,6 @@ export default {
           Api.RemoveClass({
               classId: row.classId
           }).then(res=>{
-            // console.log(res)
             if(res.data.code === 1){
               this.tableData.splice(index, 1);
               this.$message({
@@ -259,7 +266,6 @@ export default {
                 message: "删除成功!"
               });
             }else{
-              // console.log(row)
               this.$message({
                 type: "info",
                 message: "删除失败！"
@@ -273,6 +279,7 @@ export default {
           });
         });
     },
+
 
 
     close(formName){ // 关闭弹出窗口回调

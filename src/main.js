@@ -33,7 +33,6 @@ Vue.prototype.Base64 = Base64
 Vue.prototype.Cookie = Cookie
 Vue.prototype.SaveTraffic = SaveTraffic
 
-
 new Vue({
   router,
   store,

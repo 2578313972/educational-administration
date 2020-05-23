@@ -18,8 +18,12 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('../views/Login.vue')
+  },{
+    path:'*',
+    component:()=> import('../views/404.vue')
   }
 ]
+
 
 const router = new VueRouter({
   mode: 'history',
