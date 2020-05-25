@@ -1,5 +1,5 @@
 module.exports = {
-  lintOnSave: true,
+  lintOnSave: false,
     // 所有 webpack-dev-server 的选项都支持。
     devServer: {
       host: "localhost",
@@ -8,12 +8,12 @@ module.exports = {
       open: true, //配置自动启动浏览器
       // 配置多个代理
       proxy: {
-        "/FY": {
-          target: "http://api.fanyi.baidu.com/api/trans/vip/translate",
+        "/api": {
+          target: "http://192.168.1.188:12",
           changeOrigin: true,
-          pathRewrite: {
-            "^/FY": "" // 去掉接口地址中的api字符串
-          }
+          // pathRewrite: {
+          //   "^/api": "" // 去掉接口地址中的api字符串
+          // }
         }
       }
     }

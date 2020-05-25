@@ -139,6 +139,11 @@ export default {
     }
   },
   created() {
+    // this.$store.state.token = sessionStorage.getItem("token")
+    // this.$store.state.userData = JSON.parse(sessionStorage.getItem("userData"))
+    // sessionStorage.clear();
+    // console.log(this.$store);
+
     this.selectData = [
       {name:"Home.Basics",data:[
         {url:"/FClass",name:"Home.FClass"},
@@ -163,6 +168,8 @@ export default {
 
     this.name = this.userData.userName
     this.active = this.$route.path; // 改变左菜单栏目标
+
+    window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
   beforeMount() {
     for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
@@ -178,6 +185,9 @@ export default {
         }
       }
     }
+  },
+  destroyed() {
+    window.removeEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
   watch: {
     $route(to,from){
@@ -217,6 +227,10 @@ export default {
     }
   },
   methods:{
+    beforeunloadFn(e) {
+      // sessionStorage.userData = JSON.stringify(this.$store.state.userData)
+      // sessionStorage.token = this.$store.state.token
+    },
     /** 点击Tab数据 */
     clickTab(e,index){
       if(this.$route.path!==this.editableTabs[e.index].url) this.$router.push(this.editableTabs[e.index].url)
@@ -262,12 +276,10 @@ export default {
     },
     /** 上传图片的回调函数 */
     success(e){
-      console.log(e);
       if(!/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(e.file.name)) return this.$message.error('请上传正确的图片文件，且不超过500kb');
       var fm = new FormData();
       fm.append("userImg", e.file);
       Api.UploadHeader({userUid:JSON.parse(sessionStorage.getItem("userData")).userUid,fm}).then(res=>{
-        console.log(res);
         switch (res.data.code){
           case 1:
             this.img = res.data.data+'?'+new Date().getTime()
@@ -404,7 +416,9 @@ export default {
         }
         .name{
           display: inline-block;
+          min-width: 50px;
           max-width: 80px;
+          text-align: center;
           overflow: hidden;
           text-overflow:ellipsis;
           white-space: nowrap;

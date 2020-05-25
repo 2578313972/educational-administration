@@ -5,8 +5,9 @@ import Cookie from '@/plug-in/Cookie.js'
 
 function Http(baseurl) {
     let http = axios.create({
-        baseURL: baseurl || 'http://192.168.1.188:12'
+        baseURL: ''
     })
+    // let http = ''
 
     this.get = (url, queryObj) => {
         /**如果没有传对象 则赋值一个空对象*/

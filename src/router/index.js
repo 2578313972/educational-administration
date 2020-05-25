@@ -5,7 +5,34 @@ Vue.use(VueRouter)
 
 import Front from './front';
 import Back from './back';
-const routes = [
+
+// const routes = [
+//   {
+//     path: '/',
+//     name: 'Home',
+//     component: () => import('../views/Home.vue'),
+//     children:[
+//       ...Front,
+//       ...Back
+//     ]
+//   },{
+//     path: '/login',
+//     name: 'login',
+//     component: () => import('../views/Login.vue')
+//   },{
+//     path:'*',
+//     component:()=> import('../views/404.vue')
+//   }
+// ]
+
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  // routes
+})
+
+router.addRoutes([
   {
     path: '/',
     name: 'Home',
@@ -22,14 +49,8 @@ const routes = [
     path:'*',
     component:()=> import('../views/404.vue')
   }
-]
+])
 
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-})
 
 import Cookie from '@/plug-in/Cookie.js'
 

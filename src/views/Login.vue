@@ -112,6 +112,9 @@ export default {
                     res.data.token_type + " " + res.data.access_token
                   )
                 );
+                this.$store.state.token = res.data.token_type + " " + res.data.access_token
+                this.$store.state.userData = res.data.profile
+
                 // 储存用户信息
                 sessionStorage.setItem(
                   "userData",
