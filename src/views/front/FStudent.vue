@@ -8,93 +8,93 @@
                   </el-form-item>
                 </el-form>
                 <el-button @click="addItem" style="padding: 3px 0;font-size:15px;"  type="text">
-                <i class="el-icon-circle-plus-outline"></i>新增学生
+                <i class="el-icon-circle-plus-outline"></i>{{$t('FStudent.addStudent')}}
                 </el-button>
             </div>
             <div class="text item">
                 <el-table v-loading="loading" :data="tableData" style="width: 100%">
                 <el-table-column label="#" type="index" width="50"></el-table-column>
 
-                <el-table-column label="班级名称" min-width="70px">
+                <el-table-column :label='$t("FStudent.classname")' min-width="70px">
                     <template slot-scope="scope">
                     <span>{{ scope.row.className }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="学生姓名" min-width="80px">
+                <el-table-column :label='$t("FStudent.stuname")' min-width="80px">
                     <template slot-scope="scope">
                     <span>{{ scope.row.stuName }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="性别" min-width="45px">
+                <el-table-column :label='$t("FStudent.sex")' min-width="45px">
                     <template slot-scope="scope">
                     <span>{{ scope.row.stuSex }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="手机号" min-width="120px" >
+                <el-table-column :label='$t("FStudent.phone")' min-width="120px" >
                     <template slot-scope="scope">
                     <span>{{ scope.row.stuMobile }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="出生日期" min-width="80px">
+                <el-table-column :label='$t("FStudent.birthday")' min-width="80px">
                     <template slot-scope="scope">
                     <span>{{ scope.row.stuBirthDay | time }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="年龄" min-width="45px">
+                <el-table-column :label='$t("FStudent.age")' min-width="45px">
                     <template slot-scope="scope">
                     <span>{{ scope.row.stuAge}}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="操作" min-width="150px">
+                <el-table-column :label='$t("FStudent.cz")' min-width="150px">
                     <template slot-scope="scope">
-                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">{{$t("FStudent.edit")}}</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">{{$t("FStudent.delect")}}</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
             </div>
         </el-card>
 
-        <el-dialog @close="close('ruleForm')" :title="selectWin?'新增班级信息':'修改班级信息'" :visible.sync="centerDialogVisible" width="35%" center>
+        <el-dialog @close="close('ruleForm')" :title="selectWin? $t('FStudent.addclassinfo'):$t('FStudent.editclassinfo')" :visible.sync="centerDialogVisible" width="35%" center>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"  class="demo-ruleForm">
-                <el-form-item label="班级">
+                <el-form-item :label='$t("FStudent.class")'>
                     <Select-Class v-model="selectFrame" />
                 </el-form-item>
 
-                <el-form-item label="学生名称" prop="stuName">
+                <el-form-item :label='$t("FStudent.stuname_2")' prop="stuName">
                   <el-input v-model="ruleForm.stuName"></el-input>
                 </el-form-item>
 
-                <el-form-item label="生日" prop="stuBirthDay">
+                <el-form-item :label='$t("FStudent.birthday_2")' prop="stuBirthDay">
                       <el-date-picker v-model="ruleForm.stuBirthDay" type="date" placeholder="选择日期"></el-date-picker>
                 </el-form-item>
 
-                <el-form-item label="手机号" prop="stuMobile">
+                <el-form-item :label='$t("FStudent.phone")' prop="stuMobile">
                   <el-input v-model="ruleForm.stuMobile"></el-input>
                 </el-form-item>
 
-                <el-form-item label="性别" prop="stuSex">
-                  <el-radio v-model="ruleForm.stuSex" label="男">男</el-radio>
-                  <el-radio v-model="ruleForm.stuSex" label="女">女</el-radio>
+                <el-form-item :label='$t("FStudent.sex")' prop="stuSex">
+                  <el-radio v-model="ruleForm.stuSex" label="男">{{$t("FStudent.man")}}</el-radio>
+                  <el-radio v-model="ruleForm.stuSex" label="女">{{$t("FStudent.woman")}}</el-radio>
                 </el-form-item>
 
-                <el-form-item label="密码" prop="stuPassword">
+                <el-form-item :label='$t("FStudent.password")' prop="stuPassword">
                   <el-input type="password" v-model="ruleForm.stuPassword"></el-input>
                 </el-form-item>
 
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="centerDialogVisible = false">取 消</el-button>
+                <el-button @click="centerDialogVisible = false">{{$t("FStudent.no")}}</el-button>
                 <el-button
                 type="primary"
                 @click="selectWin?addData('ruleForm'):modification('ruleForm')"
-                >{{selectWin?'添 加':'修 改'}}</el-button>
+                >{{selectWin?$t("FStudent.add"):$t("FStudent.xedit")}}</el-button>
             </span>
         </el-dialog>
     </div>
@@ -123,7 +123,7 @@ export default {
       loading:false, // 加载效果
       formInline: {classId:"0"}, // 子组件选择班级
       selectFrame: {classId:""}, // 子组件选择班级（弹框）
-      classId:'',
+      classId:'0',
       tableData: [], // 显示的班级数据
       selectWin: true, // 控制添加和修改
       centerDialogVisible: false, // 控制新增弹框
@@ -161,7 +161,7 @@ export default {
   methods: {
     addItem(){ // 点击新增
       this.formInline = {classId:this.classId}
-      this.ruleForm.className= this.classId
+      this.ruleForm.className = this.classId
       this.ruleForm.stuName= ''
       this.ruleForm.stuBirthDay=''
       this.ruleForm.stuMobile= ''
@@ -171,7 +171,6 @@ export default {
       this.centerDialogVisible=true
     },
     handleEdit(index, row) { // 编辑
-      console.log(index,row);
       this.selectWin = false; // 改为编辑框
       this.centerDialogVisible = true; // 显示弹框
 

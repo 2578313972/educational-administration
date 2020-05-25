@@ -113,7 +113,6 @@ export default {
                   )
                 );
                 // 储存用户信息
-
                 sessionStorage.setItem(
                   "userData",
                   JSON.stringify(res.data.profile)

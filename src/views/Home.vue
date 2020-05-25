@@ -55,7 +55,7 @@
                 <el-col :span="12">
                   <el-dropdown trigger="click">
                     <span class="el-dropdown-link">
-                      <i class="el-icon-s-custom"></i>{{$t('Home.out')}}
+                      <i class="el-icon-s-custom"></i><span class="name">{{this.name}}</span>
                       <div class="account_1">
                         <div class="demo-type">
                           <el-avatar :size="60" :src="img">
@@ -79,7 +79,7 @@
               :key="item.name"
               :label="$t(item.title)"
               :name="item.name"
-              :closable="item.title==='首页'?false:true"
+              :closable="item.name==='1'?false:true"
             >
             </el-tab-pane>
             <div ref="main" class="main">
@@ -94,9 +94,8 @@
               </el-breadcrumb>
 
               <transition name="fade">
-                <router-view />
+                  <router-view />
               </transition>
-
             </div>
           </el-tabs>
         </div>
@@ -135,7 +134,8 @@ export default {
       Crumb_second:'', // 面包屑数据2
       historyActive:[], // 历史路由
       centerDialogVisible:false, // set头像弹框
-      language:'简体中文'
+      language:'',
+      name:'',
     }
   },
   created() {
@@ -159,9 +159,10 @@ export default {
     ]
     this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
     this.userData = JSON.parse(sessionStorage.getItem('userData')) // 获取登录用户数据
+    if(/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/.test(this.userData.userHeader)) this.img = this.userData.userHeader
 
-    try {this.img = this.userData.userHeader} catch (error) {}
-    this.active = this.$route.fullPath; // 改变左菜单栏目标
+    this.name = this.userData.userName
+    this.active = this.$route.path; // 改变左菜单栏目标
   },
   beforeMount() {
     for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
@@ -270,6 +271,9 @@ export default {
         switch (res.data.code){
           case 1:
             this.img = res.data.data+'?'+new Date().getTime()
+            let data = JSON.parse(sessionStorage.getItem('userData'))
+            data.userHeader = this.img
+            sessionStorage.setItem('userData',JSON.stringify(data))
             this.centerDialogVisible = false
             this.$message({ message: res.data.message , type: "success" });
             break;
@@ -310,7 +314,7 @@ export default {
           height: 60px;
           box-sizing: border-box;
           position: absolute;
-          right: 120px;
+          right: 150px;
           display: flex;
           z-index: 2;
           border-bottom: 1px solid #E4E7ED;
@@ -344,7 +348,7 @@ export default {
             cursor: pointer;
         }
         .account{
-            width: 120px;
+            width: 150px;
             height: 60px;
             background-color: white;
             cursor: pointer;
@@ -395,8 +399,15 @@ export default {
             min-width: 370px;
             box-sizing: border-box;
             padding-left: 50px;
-            padding-right: 200px;
+            padding-right: 230px;
             margin:0;
+        }
+        .name{
+          display: inline-block;
+          max-width: 80px;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
         }
     }
     .main{
