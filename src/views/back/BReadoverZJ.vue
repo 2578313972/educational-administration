@@ -293,7 +293,7 @@ export default {
     },
     /** 保存分数 */
     commitPaper() {
-      let userUid = JSON.parse(sessionStorage.getItem("userData")).userUid;
+      let userUid = this.$store.state.userData.userUid;
       let data = {
         id: this.allPaperData.id,
         testScore: this.allPaperData.testScore,

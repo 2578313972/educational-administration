@@ -92,10 +92,6 @@ export default {
             userPassword: this.ruleForm.userPassword
           })
             .then(res => {
-              that.$message({
-                message: "登录成功正在进行跳转……",
-                type: "success"
-              });
               setTimeout(() => {
                 if (that.ruleForm.type) {
                   that.Cookie.setCookie(
@@ -105,6 +101,7 @@ export default {
                 } else {
                   that.Cookie.removeCookie("userInfo");
                 }
+
                 // 将token值加密并将加密token存在cookie中
                 that.Cookie.setCookie(
                   "token",
@@ -112,20 +109,24 @@ export default {
                     res.data.token_type + " " + res.data.access_token
                   )
                 );
-                this.$store.state.token = res.data.token_type + " " + res.data.access_token
-                this.$store.state.userData = res.data.profile
+
+                this.$store.dispatch('modifyData',res.data.profile)
+                this.$store.dispatch('modifyToken',res.data.token_type + " " + res.data.access_token)
 
                 // 储存用户信息
-                sessionStorage.setItem(
+                /* sessionStorage.setItem(
                   "userData",
                   JSON.stringify(res.data.profile)
-                );
+                ); */
+
                 if (this.$route.query.redirect) {
                   this.$router.replace(this.$route.query.redirect); // 不记住历史路由
                 } else {
+                  console.log(that.$router.replace);
                   that.$router.replace("/");
                 }
               }, 1000);
+              that.$message({ message: "登录成功正在进行跳转……", type: "success" });
             })
             .catch(function(error) {
               that.$message.error("账号或密码错误！");

@@ -29,6 +29,7 @@
               <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 size="mini"
+                v-has="$store.state.userData.userUserTypeId"
                 :disabled="scope.row.disable"
                 type="danger"
                 @click="handleDelete(scope.$index, scope.row)"

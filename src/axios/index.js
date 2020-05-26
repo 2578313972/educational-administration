@@ -2,6 +2,7 @@ import axios from 'axios'
 import router from '../router'
 import Base64 from '@/plug-in/Base64.js'
 import Cookie from '@/plug-in/Cookie.js'
+import store from '@/store'
 
 function Http(baseurl) {
     let http = axios.create({
@@ -35,9 +36,9 @@ function Http(baseurl) {
     }
 
     http.interceptors.request.use(config => {
-        if (Cookie.getCookie("token")) {
+        if (store.state.token) {
             try {
-                config.headers.Authorization = Base64.decode(Cookie.getCookie("token"));
+                config.headers.Authorization = store.state.token
             } catch (err) {
                 console.log(err)
             }

@@ -54,7 +54,7 @@
                 <el-table-column :label='$t("FStudent.cz")' min-width="150px">
                     <template slot-scope="scope">
                     <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">{{$t("FStudent.edit")}}</el-button>
-                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">{{$t("FStudent.delect")}}</el-button>
+                    <el-button size="mini" v-has="$store.state.userData.userUserTypeId" type="danger" @click="handleDelete(scope.$index, scope.row)">{{$t("FStudent.delect")}}</el-button>
                     </template>
                 </el-table-column>
                 </el-table>

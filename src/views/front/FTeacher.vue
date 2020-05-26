@@ -45,7 +45,7 @@
                     <el-table-column label="操作" min-width="150px">
                         <template slot-scope="scope">
                         <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                        <el-button size="mini" :disabled='scope.row.disableDelete?true:false' type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button size="mini" v-has="$store.state.userData.userUserTypeId" :disabled='scope.row.disableDelete?true:false' type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -208,9 +208,7 @@ export default {
       });
     },
     modification(formName) {// 修改
-      /**
-       * 后台修改
-       */
+      /** 后台修改 */
       this.$refs[formName].validate((valid) => {
         if (valid) {
             let userUid = this.selectData.userUid
@@ -229,6 +227,11 @@ export default {
             }).then(res=>{
               switch (res.data.code){
                   case 1:
+                    if(this.selectData.userUid === this.$store.state.userData.userUid){
+                      let data = this.$store.state.userData
+                      data.userUserTypeId = userUserTypeId
+                      this.$store.dispatch('modifyData',data)
+                    }
                       let typeName = this.arrFind(this.allData,'userUserTypeId',userUserTypeId).userTypeTypeName
                       if( this.radio.TypeId!=="全部" && userUserTypeId !== this.radio.TypeId){
                         /* 判断是否移除 */

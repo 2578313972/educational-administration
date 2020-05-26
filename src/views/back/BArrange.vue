@@ -245,7 +245,7 @@ export default {
       // this.paperData.taskEndTime = this.paperData.taskStartTime.toLocaleDateString()
 
       Api.SetTest({
-        uid: JSON.parse(sessionStorage.getItem("userData")).userUid,
+        uid: this.$store.state.userData.userUid,
         data: this.paperData
       }).then(res => {
         switch (res.data.code) {

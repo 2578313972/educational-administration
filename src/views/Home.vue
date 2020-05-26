@@ -139,10 +139,12 @@ export default {
     }
   },
   created() {
-    // this.$store.state.token = sessionStorage.getItem("token")
-    // this.$store.state.userData = JSON.parse(sessionStorage.getItem("userData"))
-    // sessionStorage.clear();
-    // console.log(this.$store);
+    if(sessionStorage.getItem("storeToken")){
+      this.$store.dispatch('modifyData',JSON.parse(sessionStorage.getItem("storeUserData")))
+      this.$store.dispatch('modifyToken',sessionStorage.getItem("storeToken"))
+      sessionStorage.removeItem('storeToken');
+      sessionStorage.removeItem('storeUserData');
+    }
 
     this.selectData = [
       {name:"Home.Basics",data:[
@@ -163,7 +165,7 @@ export default {
       {title: 'Home.index', name: '1',url:'/'}
     ]
     this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
-    this.userData = JSON.parse(sessionStorage.getItem('userData')) // 获取登录用户数据
+    this.userData = this.$store.state.userData // 获取登录用户数据
     if(/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/.test(this.userData.userHeader)) this.img = this.userData.userHeader
 
     this.name = this.userData.userName
@@ -228,8 +230,8 @@ export default {
   },
   methods:{
     beforeunloadFn(e) {
-      // sessionStorage.userData = JSON.stringify(this.$store.state.userData)
-      // sessionStorage.token = this.$store.state.token
+      sessionStorage.storeUserData = JSON.stringify(this.$store.state.userData)
+      sessionStorage.storeToken = this.$store.state.token
     },
     /** 点击Tab数据 */
     clickTab(e,index){
@@ -279,13 +281,13 @@ export default {
       if(!/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(e.file.name)) return this.$message.error('请上传正确的图片文件，且不超过500kb');
       var fm = new FormData();
       fm.append("userImg", e.file);
-      Api.UploadHeader({userUid:JSON.parse(sessionStorage.getItem("userData")).userUid,fm}).then(res=>{
+      Api.UploadHeader({userUid:this.$store.state.userData.userUid,fm}).then(res=>{
         switch (res.data.code){
           case 1:
             this.img = res.data.data+'?'+new Date().getTime()
-            let data = JSON.parse(sessionStorage.getItem('userData'))
+            let data = this.$store.state.userData
             data.userHeader = this.img
-            sessionStorage.setItem('userData',JSON.stringify(data))
+            this.$store.dispatch('modifyData',data)
             this.centerDialogVisible = false
             this.$message({ message: res.data.message , type: "success" });
             break;
@@ -433,8 +435,9 @@ export default {
     }
     .fade-enter-active, .fade-leave-active {
       opacity: 1;
+      display: none;
       transform: translate(100%,100%),rotate(90deg);
-      transition: all .2s;
+      transition: all .1s;
     }
     .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
       opacity: 0;

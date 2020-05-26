@@ -82,13 +82,13 @@ export default {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             Api.ModifyPassword({
-                uid:JSON.parse(sessionStorage.getItem('userData')).userUid,
+                uid:this.$store.state.userData.userUid,
                 oldPassword:this.ruleForm.oldPassword,
                 newPassword:this.ruleForm.pass
             }).then(res=>{
                 switch (res.data.code){
                   case 1:
-                    sessionStorage.removeItem('userData')
+                    // sessionStorage.removeItem('userData')
                     this.Cookie.removeCookie('userInfo')
                     this.$message({message: '密码修改成功,请重新登录',type: 'success'});
                     setTimeout(()=>{

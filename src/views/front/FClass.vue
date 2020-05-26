@@ -43,7 +43,7 @@
           <el-table-column :label="$t('FClass.cdom')" min-width="150px">
             <template slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">{{$t('FClass.edit')}}</el-button>
-              <el-button size="mini" type="danger" :disabled="scope.row.classStudents===0?false:true" @click="handleDelete(scope.$index, scope.row)">{{$t('FClass.delect')}}</el-button>
+              <el-button size="mini" type="danger" v-has="$store.state.userData.userUserTypeId" :disabled="scope.row.classStudents===0?false:true" @click="handleDelete(scope.$index, scope.row)">{{$t('FClass.delect')}}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -106,6 +106,8 @@ export default {
     };
   },
   created() {
+      // console.log(this.$store.state.userData );
+      // this.$store.commit("add");
     Api.GetAllClass().then(res=>{
       this.tableData = res.data
     })

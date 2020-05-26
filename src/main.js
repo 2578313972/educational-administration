@@ -17,17 +17,15 @@ require('default-passive-events')
 import Print from 'vue-print-nb'
 Vue.use(Print)
 
-import VueI18n from 'vue-i18n';
-Vue.use(VueI18n);
-const i18n = new VueI18n({
-  locale: localStorage.getItem('language') || 'zh', //使用localStorage缓存到本地，当下次使用时可默认当前使用语言
-  messages: {
-    'zh': require('@/common/lang/zh'),
-    'en': require('@/common/lang/en')
-  }
-})
+import i18n from './common/lang/i18n'
 
-Vue.config.productionTip = false
+require('./common/directive')
+
+
+// Vue.config.productionTip = false
+
+
+
 
 Vue.prototype.Base64 = Base64
 Vue.prototype.Cookie = Cookie
