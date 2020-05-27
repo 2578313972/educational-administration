@@ -1,4 +1,4 @@
-export default{
-    token:'',
-    userData:''
+export default {
+  token: '',
+  userData: ''
 }

@@ -26,13 +26,13 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       tableData: []
-    };
+    }
   },
   props: { allPaperData: Object },
-  mounted() {
+  mounted () {
     this.tableData = [
       {
         course: this.allPaperData.courseName,
@@ -41,11 +41,11 @@ export default {
         essay: this.essayScore,
         sum: this.zf
       }
-    ];
+    ]
   },
   watch: {
     allPaperData: {
-      handler(newObj) {
+      handler (newObj) {
         this.tableData = [
           {
             course: this.allPaperData.courseName,
@@ -54,43 +54,43 @@ export default {
             essay: this.essayScore,
             sum: this.zf
           }
-        ];
+        ]
       },
       deep: true
     }
   },
   computed: {
     /** 选择题分数 */
-    choiceScore() {
+    choiceScore () {
       return this.allPaperData.questions
         .filter(item => item.tpqQuestion.questionTypeId === 1)
         .reduce((oldSum, num) => {
-          return oldSum + num.tpqScore;
-        }, 0);
+          return oldSum + num.tpqScore
+        }, 0)
     },
     /** 填空题分数 */
-    blankScore() {
+    blankScore () {
       return this.allPaperData.questions
         .filter(item => item.tpqQuestion.questionTypeId === 2)
         .reduce((oldSum, num) => {
-          return oldSum + num.tpqScore;
-        }, 0);
+          return oldSum + num.tpqScore
+        }, 0)
     },
     /** 问答题分数 */
-    essayScore() {
+    essayScore () {
       return this.allPaperData.questions
         .filter(item => item.tpqQuestion.questionTypeId === 3)
         .reduce((oldSum, num) => {
-          return oldSum + num.tpqScore;
-        }, 0);
+          return oldSum + num.tpqScore
+        }, 0)
     },
-    zf() {
+    zf () {
       return this.allPaperData.questions.reduce((oldSum, num) => {
-        return oldSum + num.tpqScore;
-      }, 0);
+        return oldSum + num.tpqScore
+      }, 0)
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

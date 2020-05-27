@@ -40,133 +40,133 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
+import Api from '@/http/BMakePaper'
 export default {
-  data() {
+  data () {
     return {
-      usa: ["A", "B", "C", "D", "E", "F", "G"],
+      usa: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
       paperForm: {
         data: [], // 选项数据
-        textarea: "", //　题干
+        textarea: '', //　题干
         num: 2　// 分数
-      },
-    };
+      }
+    }
   },
-  props:{
-    testPaperId:[String, Number]
+  props: {
+    testPaperId: [String, Number]
   },
-  created() {
+  created () {
     this.paperForm.data = [ // 初始值数据
-      { serial: "A", tar: false, value: "" },
-      { serial: "B", tar: false, value: "" },
-      { serial: "C", tar: false, value: "" },
-      { serial: "D", tar: false, value: "" }
-    ];
+      { serial: 'A', tar: false, value: '' },
+      { serial: 'B', tar: false, value: '' },
+      { serial: 'C', tar: false, value: '' },
+      { serial: 'D', tar: false, value: '' }
+    ]
   },
   methods: {
-    addValue() {
+    addValue () {
       /** 添加选项 */
-      let serial = this.usa[this.paperForm.data.length];
-      if (!serial)
-        return this.$message({ type: "info", message: "已达最大上限" });
-      this.paperForm.data.push({ serial, tar: false, value: "" });
+      const serial = this.usa[this.paperForm.data.length]
+      if (!serial) { return this.$message({ type: 'info', message: '已达最大上限' }) }
+      this.paperForm.data.push({ serial, tar: false, value: '' })
     },
-    deleteSer(index) {
+    deleteSer (index) {
       /** 删除选项并排序 */
-      this.paperForm.data.splice(index, 1);
+      this.paperForm.data.splice(index, 1)
       for (let i = index; i < this.paperForm.data.length; i++) {
-        this.paperForm.data[i].serial = this.usa[i];
+        this.paperForm.data[i].serial = this.usa[i]
       }
     },
-    submitTitle() {
+    submitTitle () {
       /** 提交选择题 */
       this.SaveTraffic(500) /** 需要多少的间隔时间 不填写默认为1000毫秒 */
         .then(() => {
-          let bool = true;
-          let againObj = {}
-          let arrItem = this.paperForm.data;
+          let bool = true
+          const againObj = {}
+          const arrItem = this.paperForm.data
           if (!this.paperForm.textarea) {
-            this.$refs.textarea.focus();
+            this.$refs.textarea.focus()
             this.$message({
-              message: `题干不能为空。请输入题目`,
-              type: "warning"
-            });
-            return;
+              message: '题干不能为空。请输入题目',
+              type: 'warning'
+            })
+            return
           }
-          for (let i = 0,len = arrItem.length;i<len;i++) {
+          for (let i = 0, len = arrItem.length; i < len; i++) {
             if (!arrItem[i].value) {
               // 查找未填写答案的输入框
-              this.$refs["value" + i][0].focus();
+              this.$refs['value' + i][0].focus()
               this.$message({
                 message: `${this.usa[i]}选项未填写答案。请输入答案`,
-                type: "warning"
-              });
-              return;
-            }
-            if(againObj[arrItem[i].value]){
-              let oldIndex = Object.keys(againObj).indexOf(arrItem[i].value)
-              this.$refs["value" + i][0].focus();
-              this.$message({message: `${this.usa[oldIndex]}选项与${this.usa[i]}选项出现重复答案,请重新填写`,type: "warning"});
+                type: 'warning'
+              })
               return
-            }else{
+            }
+            if (againObj[arrItem[i].value]) {
+              const oldIndex = Object.keys(againObj).indexOf(arrItem[i].value)
+              this.$refs['value' + i][0].focus()
+              this.$message({ message: `${this.usa[oldIndex]}选项与${this.usa[i]}选项出现重复答案,请重新填写`, type: 'warning' })
+              return
+            } else {
               againObj[arrItem[i].value] = arrItem[i].value
             }
             if (arrItem[i].tar === true) {
               // 检查是否有正确答案，如果没有则返回提示
-              bool = false;
+              bool = false
             }
           }
-          if (bool)
+          if (bool) {
             return this.$message({
-              message: "没有选择答案,请选择",
-              type: "warning"
-            });
-          let chooseQuestion = arrItem.map(item => {
-            return { cqOption: item.value, cqIsRight: item.tar };
-          }); // map映射导入数据
-          let tpqPaperId = this.testPaperId || sessionStorage.getItem("testPaperId")
+              message: '没有选择答案,请选择',
+              type: 'warning'
+            })
+          }
+          const chooseQuestion = arrItem.map(item => {
+            return { cqOption: item.value, cqIsRight: item.tar }
+          }) // map映射导入数据
+          const tpqPaperId = this.testPaperId || sessionStorage.getItem('testPaperId')
 
           Api.AddQuestionToTestPaper({
-            tpqPaperId, //试卷主键编号
-            tpqScore: this.paperForm.num, //分值
+            tpqPaperId, // 试卷主键编号
+            tpqScore: this.paperForm.num, // 分值
             tpqQuestion: {
-              questionTitle: this.paperForm.textarea, //题目的标题
-              questionTypeId: 1, //题目的类型 1=选择题 2=填空题 3=问答题
+              questionTitle: this.paperForm.textarea, // 题目的标题
+              questionTypeId: 1, // 题目的类型 1=选择题 2=填空题 3=问答题
               chooseQuestion
             }
           }).then(res => {
             switch (res.data.code) {
               case 1:
-                this.$emit('addQuestion',res.data.data)
-                this.resetForm(); // 调用重置表单函数
-                this.$message({ message: res.data.message, type: "success" });
-                break;
+                this.$emit('addQuestion', res.data.data)
+                this.resetForm() // 调用重置表单函数
+                this.$message({ message: res.data.message, type: 'success' })
+                break
               default:
-                this.$message({ message: res.data.message, type: "warning" });
+                this.$message({ message: res.data.message, type: 'warning' })
             }
-          });
+          })
         })
         .catch(err => {
           // this.$message({ message: '操作过于频繁', type: "warning" });
-          return;
-        });
+
+        })
     },
-    resetForm() {
+    resetForm () {
       /** 重置表单 */
       this.paperForm = {
         data: [
-          { serial: "A", tar: false, value: "" },
-          { serial: "B", tar: false, value: "" },
-          { serial: "C", tar: false, value: "" },
-          { serial: "D", tar: false, value: "" }
+          { serial: 'A', tar: false, value: '' },
+          { serial: 'B', tar: false, value: '' },
+          { serial: 'C', tar: false, value: '' },
+          { serial: 'D', tar: false, value: '' }
         ],
-        textarea: "",
+        textarea: '',
         num: 2
-      };
-      this.$refs["paperForm"].resetFields();
+      }
+      this.$refs.paperForm.resetFields()
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

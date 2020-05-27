@@ -65,140 +65,140 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
+import Api from '@/http/BMakePaper'
 
 export default {
-  data() {
+  data () {
     return {
-      usa: ["A", "B", "C", "D", "E", "F", "G"],
+      usa: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
       choiceData: {},
       choiceDataClone: {},
       balBool: false
-    };
+    }
   },
   props: {
-    item:Object,
-    index:Number
+    item: Object,
+    index: Number
   },
-  created() {
+  created () {
     this.choiceData = JSON.parse(JSON.stringify(this.item))
     this.choiceDataClone = JSON.parse(JSON.stringify(this.item))
   },
   methods: {
     /** 切换布局事件 */
-    switchBox() {
+    switchBox () {
       this.balBool = !this.balBool
     },
     /** 点击取消 */
-    switchBoxElse() {
+    switchBoxElse () {
       this.choiceData = JSON.parse(JSON.stringify(this.choiceDataClone))
       this.switchBox()
     },
     /** 修改分数 */
-    handleChange() {
+    handleChange () {
       Api.ModifyScore({
-        tpqId: this.choiceData.tpqId, //主键编号
-        tpqScore: this.choiceData.tpqScore //要修改的分值
+        tpqId: this.choiceData.tpqId, // 主键编号
+        tpqScore: this.choiceData.tpqScore // 要修改的分值
       }).then(res => {
         switch (res.data.code) {
           case 1:
-            this.$emit("handleChange",this.choiceData.tpqId,this.choiceData.tpqScore);
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.$emit('handleChange', this.choiceData.tpqId, this.choiceData.tpqScore)
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     },
     /** 添加选项 */
-    addValue() {
+    addValue () {
       this.choiceData.tpqQuestion.chooseQuestion.push({
         cqIsRight: false,
-        cqOption: ""
-      });
+        cqOption: ''
+      })
     },
     /** 删除行 */
-    deleteSer(index) {
-      this.choiceData.tpqQuestion.chooseQuestion.splice(index, 1); // 删除选项
+    deleteSer (index) {
+      this.choiceData.tpqQuestion.chooseQuestion.splice(index, 1) // 删除选项
     },
     /** 删除题目 */
-    deleteQuestion() {
+    deleteQuestion () {
       Api.RemoveQuestionFromTestPaper({ paperQuestionId: this.choiceData.tpqId }).then(
         res => {
           switch (res.data.code) {
             case 1:
-              this.$emit("deleteQuestion", this.choiceData.tpqId );
-              this.$message({ message: res.data.message, type: "success" });
-              break;
+              this.$emit('deleteQuestion', this.choiceData.tpqId)
+              this.$message({ message: res.data.message, type: 'success' })
+              break
             default:
-              this.$message({ message: res.data.message, type: "warning" });
+              this.$message({ message: res.data.message, type: 'warning' })
           }
         }
-      );
+      )
     },
     /** 保存修改 */
-    submitTitle() {
-      if (this.choiceData.tpqQuestion.questionTitle.trim() === "") {
-        this.$message({ message: "题干不能为空", type: "warning" });
-        return this.$refs.textarea[0].focus();
+    submitTitle () {
+      if (this.choiceData.tpqQuestion.questionTitle.trim() === '') {
+        this.$message({ message: '题干不能为空', type: 'warning' })
+        return this.$refs.textarea[0].focus()
       }
-      let bool = true;
-      let againObj = {};
-      let arrItem = this.choiceData.tpqQuestion.chooseQuestion;
-      let len = arrItem.length;
+      let bool = true
+      const againObj = {}
+      const arrItem = this.choiceData.tpqQuestion.chooseQuestion
+      const len = arrItem.length
       for (let i = 0; i < len; i++) {
-        if (arrItem[i].cqOption.trim() === "") {
+        if (arrItem[i].cqOption.trim() === '') {
           // 查找未填写答案的输入框
-          this.$refs["value" + i][0].focus();
+          this.$refs['value' + i][0].focus()
           this.$message({
             message: `${this.usa[i]}选项未填写答案。请输入答案`,
-            type: "warning"
-          });
-          return;
+            type: 'warning'
+          })
+          return
         }
         // 去重
         if (againObj[arrItem[i].cqOption]) {
-          let oldIndex = Object.keys(againObj).indexOf(arrItem[i].cqOption);
-          this.$refs["value" + i][0].focus();
+          const oldIndex = Object.keys(againObj).indexOf(arrItem[i].cqOption)
+          this.$refs['value' + i][0].focus()
           this.$message({
             message: `${this.usa[oldIndex]}选项与${this.usa[i]}选项出现重复答案,请重新填写`,
-            type: "warning"
-          });
-          return;
+            type: 'warning'
+          })
+          return
         } else {
-          againObj[arrItem[i].cqOption] = arrItem[i].cqOption;
+          againObj[arrItem[i].cqOption] = arrItem[i].cqOption
         }
         if (arrItem[i].cqIsRight === true) {
           // 检查是否有正确答案，如果没有则返回提示
-          bool = false;
+          bool = false
         }
       }
       if (bool) {
         this.$message({
-          message: `至少选择一个正确答案，请选择`,
-          type: "warning"
-        });
-        return;
+          message: '至少选择一个正确答案，请选择',
+          type: 'warning'
+        })
+        return
       }
       Api.ModifyQuestion({
         questionId: this.choiceData.tpqQuestion.questionId,
         questionTitle: this.choiceData.tpqQuestion.questionTitle,
         questionTypeId: this.choiceData.tpqQuestion.questionTypeId,
         chooseQuestion: this.choiceData.tpqQuestion.chooseQuestion
-      },0).then(res => {
+      }, 0).then(res => {
         switch (res.data.code) {
           case 1:
             this.choiceDataClone = JSON.parse(JSON.stringify(this.choiceData))
-            this.switchBox();
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.switchBox()
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

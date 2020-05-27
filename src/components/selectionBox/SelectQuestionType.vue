@@ -26,37 +26,37 @@
 <script>
 import Api from '@/http/BMakePaper'
 export default {
-    data() {
-        return {
-            allData:{},
-            allUser:[]
-        }
-    },
-    props:{
-        value:{
-            type:Object,
-            required: true
-        }
-    },
-    created() {
-        Api.GetQuestionType().then(res=>{
-            this.allUser = res.data
-            this.$nextTick(()=>{
-                this.allData = this.value
-                this.allData.typeId = Number(this.value.typeId)
-                if(!this.allData.type) this.allData.type = 'select'
-            })
-        })
-    },
-    watch: {
-        'allData.typeId'(newVal){
-            // console.log(newVal);
-            // try{
-            //     newVal.typeName = this.allUser.find(item=>item.userTypeId===newVal.typeId).userTypeTypeName
-            // }catch{}
-            // this.$emit("input",newVal)
-        }
-    },
+  data () {
+    return {
+      allData: {},
+      allUser: []
+    }
+  },
+  props: {
+    value: {
+      type: Object,
+      required: true
+    }
+  },
+  created () {
+    Api.GetQuestionType().then(res => {
+      this.allUser = res.data
+      this.$nextTick(() => {
+        this.allData = this.value
+        this.allData.typeId = Number(this.value.typeId)
+        if (!this.allData.type) this.allData.type = 'select'
+      })
+    })
+  },
+  watch: {
+    'allData.typeId' (newVal) {
+      // console.log(newVal);
+      // try{
+      //     newVal.typeName = this.allUser.find(item=>item.userTypeId===newVal.typeId).userTypeTypeName
+      // }catch{}
+      // this.$emit("input",newVal)
+    }
+  }
 }
 </script>
 

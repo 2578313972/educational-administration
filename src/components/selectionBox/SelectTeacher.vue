@@ -14,33 +14,33 @@
 <script>
 import Api from '@/http/FClass'
 export default {
-    data() {
-        return {
-            allTeacher:[]
-        }
-    },
-    props:{
-        value:{
-            userName:String,
-            userId:String,
-        }
-    },
-    created() {
-        Api.GetTeachers().then(res=>{
-            this.allTeacher = res.data
-        })
-    },
-    watch: {
-        'value':{
-            handler:function(newVal,oldVal){
-                try{
-                    this.value.userName = this.allTeacher.find(item=>item.userId===this.value.userId).userName;
-                }catch{}
-                this.$emit("input",this.value);
-            },
-            deep:true
-        }
-    },
+  data () {
+    return {
+      allTeacher: []
+    }
+  },
+  props: {
+    value: {
+      userName: String,
+      userId: String
+    }
+  },
+  created () {
+    Api.GetTeachers().then(res => {
+      this.allTeacher = res.data
+    })
+  },
+  watch: {
+    value: {
+      handler: function (newVal, oldVal) {
+        try {
+          this.value.userName = this.allTeacher.find(item => item.userId === this.value.userId).userName
+        } catch {}
+        this.$emit('input', this.value)
+      },
+      deep: true
+    }
+  }
 }
 </script>
 

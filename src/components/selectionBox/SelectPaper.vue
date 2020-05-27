@@ -8,13 +8,13 @@
 </template>
 
 <script>
-import Api from "@/http/BPaper";
+import Api from '@/http/BPaper'
 export default {
-  data() {
+  data () {
     return {
       userData: {},
       allData: [] // 选择框所有数据
-    };
+    }
   },
   props: {
     value: {
@@ -22,23 +22,23 @@ export default {
       required: true
     }
   },
-  created() {
+  created () {
     Api.GetAllTestPaper().then(res => {
-      this.allData = res.data;
-      this.userData = this.value;
-    });
+      this.allData = res.data
+      this.userData = this.value
+    })
   },
   watch: {
-    "value.tpId"(newV) {
+    'value.tpId' (newV) {
       if (newV !== '-1') {
-         this.userData.tpTitle = this.allData.find(
+        this.userData.tpTitle = this.allData.find(
           item => item.tpId === newV
-        ).tpTitle;
+        ).tpTitle
       }
-      this.$emit("input", this.userData);
+      this.$emit('input', this.userData)
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

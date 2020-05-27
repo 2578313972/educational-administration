@@ -41,23 +41,23 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
+import Api from '@/http/BMakePaper'
 export default {
-  data() {
+  data () {
     return {
       newNum: 0, // 新下划线的数量
       oldNum: 0, // 旧下划线的数量
-      inputChangeIndex: "", // input光标位置
+      inputChangeIndex: '', // input光标位置
       question: {
-        tpqPaperId: 0, //试卷的编号
-        tpqScore: 0, //题目的分值
+        tpqPaperId: 0, // 试卷的编号
+        tpqScore: 0, // 题目的分值
         tpqQuestion: {
-          questionTitle: "", //填空题的标题
-          questionTypeId: 2, //题目类型 1=选择题 2=填空题 3=问题
+          questionTitle: '', // 填空题的标题
+          questionTypeId: 2, // 题目类型 1=选择题 2=填空题 3=问题
           fillQuestion: []
         }
       }
-    };
+    }
   },
   props: {
     testPaperId: [String, Number] // 试卷id
@@ -99,65 +99,65 @@ export default {
   },
   methods: {
     /** 点击插入填空 */
-    addValue() {
-      this.$refs.questionTitle.focus();
-      document.execCommand("insertText", true, "▁");
+    addValue () {
+      this.$refs.questionTitle.focus()
+      document.execCommand('insertText', true, '▁')
     },
     /** input change事件 */
-    changeInput(e) {
-      this.inputChangeIndex = event.target.selectionEnd; // 将光标的位置保存
+    changeInput (e) {
+      this.inputChangeIndex = event.target.selectionEnd // 将光标的位置保存
     },
     /** 重置 */
-    resetForm() {
-      this.question.tpqQuestion.questionTitle = "";
-      this.$refs.questionTitle.focus();
+    resetForm () {
+      this.question.tpqQuestion.questionTitle = ''
+      this.$refs.questionTitle.focus()
     },
     /** 新增题目 */
-    addQuestion() {
-      if (this.question.tpqQuestion.questionTitle.trim() === "") {
-        this.$message({ message: "未填写题干", type: "warning" });
-        return this.$refs.questionTitle.focus();
+    addQuestion () {
+      if (this.question.tpqQuestion.questionTitle.trim() === '') {
+        this.$message({ message: '未填写题干', type: 'warning' })
+        return this.$refs.questionTitle.focus()
       }
       if (this.question.tpqQuestion.fillQuestion.length == 0) {
-        this.$message({ message: "未添加题目", type: "warning" });
-        return this.$refs.questionTitle.focus();
+        this.$message({ message: '未添加题目', type: 'warning' })
+        return this.$refs.questionTitle.focus()
       }
 
-      for (let i in this.question.tpqQuestion.fillQuestion) {
-        if (this.question.tpqQuestion.fillQuestion[i].fqAnswer.trim() === "") {
-          this.$message({ message: "答案不能为空", type: "warning" });
-          return;
+      for (const i in this.question.tpqQuestion.fillQuestion) {
+        if (this.question.tpqQuestion.fillQuestion[i].fqAnswer.trim() === '') {
+          this.$message({ message: '答案不能为空', type: 'warning' })
+          return
         }
       }
 
       this.question.tpqQuestion.fillQuestion.map(
         (item, index) => (item.fqOrder = index + 1)
-      ); // 添加序号
-      let score = 0;
+      ) // 添加序号
+      let score = 0
       this.question.tpqQuestion.fillQuestion.forEach(item => {
-        score += item.fillQuestionScore[0].fqsScore;
-      }); // 计算分数
-      this.question.tpqScore = score;
+        score += item.fillQuestionScore[0].fqsScore
+      }) // 计算分数
+      this.question.tpqScore = score
       this.question.tpqPaperId =
-        this.testPaperId || sessionStorage.getItem("testPaperId");
+        this.testPaperId || sessionStorage.getItem('testPaperId')
       Api.AddQuestionToTestPaper(this.question).then(res => {
         switch (res.data.code) {
           case 1:
-            this.$emit("addQuestion", res.data.data);
-            this.resetForm();
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.$emit('addQuestion', res.data.data)
+            this.resetForm()
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     }
   },
   computed: {
-    lessHtml() {
-      let text = this.question.tpqQuestion.questionTitle; // 将题目用text保存
-      this.newNum = text.split("▁").length - 1; // 获取下划线的数量
-      let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1; // 获取光标前的下划线数量
+    lessHtml () {
+      let text = this.question.tpqQuestion.questionTitle // 将题目用text保存
+      this.newNum = text.split('▁').length - 1 // 获取下划线的数量
+      const len = text.slice(0, this.inputChangeIndex).split('▁').length - 1 // 获取光标前的下划线数量
 
       // //光标前的填空数量
       // let cursorBeforeFill=text.slice(0, this.inputChangeIndex).split("▁").length;
@@ -175,31 +175,31 @@ export default {
             len - this.newNum + this.oldNum,
             0,
             {
-              fqAnswer: "",
+              fqAnswer: '',
               fillQuestionScore: [{ fqsScore: 2 }]
             }
-          );
+          )
         }
       } else if (this.newNum < this.oldNum) {
         /** 当新删除下滑线时 */
         for (let i = 0; i < this.oldNum - this.newNum; i++) {
           //  for 检测一次性删除多少个
-          this.question.tpqQuestion.fillQuestion.splice(len, 1);
+          this.question.tpqQuestion.fillQuestion.splice(len, 1)
         }
       }
-      this.oldNum = this.newNum; // 更新旧下划线的数量
+      this.oldNum = this.newNum // 更新旧下划线的数量
 
       for (let i = 0; i < this.newNum; i++) {
         // 循环新的下划线数量
         text = text.replace(
-          "▁",
+          '▁',
           ` <span style='padding:2px 35px;border-bottom: 1px solid black;' >${this.question.tpqQuestion.fillQuestion[i].fqAnswer}</span>(${this.question.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
-        );
+        )
       }
-      return text;
+      return text
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

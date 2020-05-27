@@ -41,45 +41,45 @@
 </template>
 
 <script>
-import Api from "@/http/BReadover";
+import Api from '@/http/BReadover'
 
 export default {
-  data() {
+  data () {
     return {
       tableData: [], // 渲染table数据
       total: 0, // 总数据
       pageIndex: 1, // 第几页
       pageSize: 10 // 每页多少数据
-    };
+    }
   },
-  created() {
-    this.getPaperData();
+  created () {
+    this.getPaperData()
   },
   methods: {
     /** 批阅试卷 */
-    handleEdit(index,row) {
-        console.log(index,row);
-        this.$router.push(`/BReadoverZJ?paperId=${row.taskId}`)
+    handleEdit (index, row) {
+      console.log(index, row)
+      this.$router.push(`/BReadoverZJ?paperId=${row.taskId}`)
     },
     /** 每页多少条数据 */
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getPaperData(this.pageIndex, this.pageSize);
+    handleSizeChange (val) {
+      this.pageSize = val
+      this.getPaperData(this.pageIndex, this.pageSize)
     },
     /** 第几页数据 */
-    handleCurrentChange(val) {
-      this.pageIndex = val;
-      this.getPaperData(this.pageIndex, this.pageSize);
+    handleCurrentChange (val) {
+      this.pageIndex = val
+      this.getPaperData(this.pageIndex, this.pageSize)
     },
     /** 获取渲染数据 */
-    getPaperData(pageIndex, pageSize) {
+    getPaperData (pageIndex, pageSize) {
       Api.GetTestTask({ pageIndex, pageSize }).then(res => {
-        this.tableData = res.data.data;
-        this.total = res.data.items;
-      });
+        this.tableData = res.data.data
+        this.total = res.data.items
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less">

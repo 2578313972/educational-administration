@@ -119,68 +119,74 @@
 <script>
 import Api from '../http/Home'
 export default {
-  data(){
-    return{
-      userData:null, // 用户数据
-      img:'',
-      height:0, // 定义左边菜单栏高度
-      active:'', // 左侧菜单栏选中目标
-      isCollapse:false, // 缩展
-      selectData:[], // 菜单栏选择数据
+  data () {
+    return {
+      userData: null, // 用户数据
+      img: '',
+      height: 0, // 定义左边菜单栏高度
+      active: '', // 左侧菜单栏选中目标
+      isCollapse: false, // 缩展
+      selectData: [], // 菜单栏选择数据
       editableTabs: [], // Tab页数据
       tabIndex: 1, // 不断变化的name值
-      editableTabsValue:"1", // 默认显示（Tab标签）
-      Crumb_first:'', // 面包屑数据1
-      Crumb_second:'', // 面包屑数据2
-      historyActive:[], // 历史路由
-      centerDialogVisible:false, // set头像弹框
-      language:'',
-      name:'',
+      editableTabsValue: '1', // 默认显示（Tab标签）
+      Crumb_first: '', // 面包屑数据1
+      Crumb_second: '', // 面包屑数据2
+      historyActive: [], // 历史路由
+      centerDialogVisible: false, // set头像弹框
+      language: '',
+      name: ''
     }
   },
-  created() {
-    if(sessionStorage.getItem("storeToken")){
-      this.$store.dispatch('modifyData',JSON.parse(sessionStorage.getItem("storeUserData")))
-      this.$store.dispatch('modifyToken',sessionStorage.getItem("storeToken"))
-      sessionStorage.removeItem('storeToken');
-      sessionStorage.removeItem('storeUserData');
+  created () {
+    if (sessionStorage.getItem('storeToken')) {
+      this.$store.dispatch('modifyData', JSON.parse(sessionStorage.getItem('storeUserData')))
+      this.$store.dispatch('modifyToken', sessionStorage.getItem('storeToken'))
+      sessionStorage.removeItem('storeToken')
+      sessionStorage.removeItem('storeUserData')
     }
 
     this.selectData = [
-      {name:"Home.Basics",data:[
-        {url:"/FClass",name:"Home.FClass"},
-        {url:"/FStudent",name:"Home.FStudent"},
-        {url:"/FTeacher",name:"Home.FTeacher"},
-        {url:"/FRole",name:"Home.FRole"},
-        {url:"/FPassword",name:"Home.FPassword"}
-      ]},{name:"Home.test",data:[
-        {url:"/BMakePaper",name:"Home.BMakePaper"},
-        {url:"/BPaper",name:"Home.BPaper"},
-        {url:"/BArrange",name:"Home.BArrange"},
-        {url:"/BReadover",name:"Home.BReadover"},
-        {url:"/BTest",name:"Home.BTest"}
-      ]}
+      {
+        name: 'Home.Basics',
+        data: [
+          { url: '/FClass', name: 'Home.FClass' },
+          { url: '/FStudent', name: 'Home.FStudent' },
+          { url: '/FTeacher', name: 'Home.FTeacher' },
+          { url: '/FRole', name: 'Home.FRole' },
+          { url: '/FPassword', name: 'Home.FPassword' }
+        ]
+      }, {
+        name: 'Home.test',
+        data: [
+          { url: '/BMakePaper', name: 'Home.BMakePaper' },
+          { url: '/BPaper', name: 'Home.BPaper' },
+          { url: '/BArrange', name: 'Home.BArrange' },
+          { url: '/BReadover', name: 'Home.BReadover' },
+          { url: '/BTest', name: 'Home.BTest' }
+        ]
+      }
     ]
-    this.editableTabs = [
-      {title: 'Home.index', name: '1',url:'/'}
-    ]
-    this.height = window.innerHeight; // 获取屏幕高度给左菜单栏 和 路由视图
+
+    this.editableTabs = [{ title: 'Home.index', name: '1', url: '/' }]
+
+    this.height = window.innerHeight // 获取屏幕高度给左菜单栏 和 路由视图
     this.userData = this.$store.state.userData // 获取登录用户数据
-    if(/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/.test(this.userData.userHeader)) this.img = this.userData.userHeader
+    if (/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/.test(this.userData.userHeader)) this.img = this.userData.userHeader
 
     this.name = this.userData.userName
-    this.active = this.$route.path; // 改变左菜单栏目标
+    this.active = this.$route.path // 改变左菜单栏目标
 
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
-  beforeMount() {
-    for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
-      for (let j in this.selectData[i].data) {
-        if(this.selectData[i].data[j].url === this.$route.path){
+  beforeMount () {
+    for (const i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
+      for (const j in this.selectData[i].data) {
+        if (this.selectData[i].data[j].url === this.$route.path) {
           /** 获取菜单栏和tab name值 */
-          this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:this.$route.fullPath})
-          this.historyActive.unshift(this.tabIndex+"")
-          this.editableTabsValue = this.tabIndex+""
+          this.editableTabs.push({ title: this.selectData[i].data[j].name, name: ++this.tabIndex + '', url: this.$route.fullPath })
+          this.historyActive.unshift(this.tabIndex + '')
+          this.editableTabsValue = this.tabIndex + ''
           /** 获取面包屑数据 */
           this.Crumb_first = this.selectData[i].name
           this.Crumb_second = this.selectData[i].data[j].name
@@ -188,12 +194,12 @@ export default {
       }
     }
   },
-  destroyed() {
+  destroyed () {
     window.removeEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
   watch: {
-    $route(to,from){
-      if(to.path==="/"){
+    $route (to, from) {
+      if (to.path === '/') {
         this.Crumb_first = ''
         this.Crumb_second = ''
         this.editableTabsValue = '1'
@@ -201,103 +207,108 @@ export default {
         return
       }
 
-      for (let i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
-        for (let j in this.selectData[i].data) {
-          if(this.selectData[i].data[j].url === to.path){
+      for (const i in this.selectData) { // 循环遍历相同的路由并创建tab切换页
+        for (const j in this.selectData[i].data) {
+          if (this.selectData[i].data[j].url === to.path) {
             /** 监听获取面包屑数据 */
             this.Crumb_first = this.selectData[i].name
             this.Crumb_second = this.selectData[i].data[j].name
             /** 点击返回 切换Tab页数据的样式、左菜单栏样式、如果没有Tab页数据则添加添加一个新的数据 */
-            if(!this.editableTabs.find(item=>item.url === this.selectData[i].data[j].url)) this.editableTabs.push({title:this.selectData[i].data[j].name,name:++this.tabIndex+"",url:to.fullPath});
-            this.editableTabsValue = this.editableTabs.find(item=>item.url === this.selectData[i].data[j].url).name
-            this.active = to.path;
+            if (!this.editableTabs.find(item => item.url === this.selectData[i].data[j].url)) this.editableTabs.push({ title: this.selectData[i].data[j].name, name: ++this.tabIndex + '', url: to.fullPath })
+            this.editableTabsValue = this.editableTabs.find(item => item.url === this.selectData[i].data[j].url).name
+            this.active = to.path
           }
         }
       }
       /** 给历史路由数组更新数据 */
-      this.historyActive.unshift(this.editableTabsValue);
-      this.historyActive = [...new Set(this.historyActive)];
+      this.historyActive.unshift(this.editableTabsValue)
+      this.historyActive = [...new Set(this.historyActive)]
     }
   },
-  mounted() {
+  mounted () {
     this.isCollapse = true
     localStorage.language = localStorage.getItem('language') || 'zh'
-    if(localStorage.language === 'zh'){
+    if (localStorage.language === 'zh') {
       this.language = '简体中文'
-    }else{
+    } else {
       this.language = 'English'
     }
   },
-  methods:{
-    beforeunloadFn(e) {
+  methods: {
+    beforeunloadFn (e) {
       sessionStorage.storeUserData = JSON.stringify(this.$store.state.userData)
       sessionStorage.storeToken = this.$store.state.token
     },
     /** 点击Tab数据 */
-    clickTab(e,index){
-      if(this.$route.path!==this.editableTabs[e.index].url) this.$router.push(this.editableTabs[e.index].url)
+    clickTab (e, index) {
+      if (this.$route.path !== this.editableTabs[e.index].url) this.$router.push(this.editableTabs[e.index].url)
     },
     /** 删除Tab数据 */
-    removeTab(name){
-      let tabs = this.editableTabs;
-      let activeName = this.editableTabsValue;
+    removeTab (name) {
+      const tabs = this.editableTabs
+      const activeName = this.editableTabsValue
       if (activeName === name) {
-        let historyActiveName = this.historyActive[1]
-          if(!historyActiveName){
-            this.$router.push('/');
-            this.editableTabs = tabs.filter(tab => tab.name !== name);
-            this.historyActive = this.historyActive.filter(tab => tab !== name);
-            return
+        const historyActiveName = this.historyActive[1]
+        if (!historyActiveName) {
+          this.$router.push('/')
+          this.editableTabs = tabs.filter(tab => tab.name !== name)
+          this.historyActive = this.historyActive.filter(tab => tab !== name)
+          return
+        }
+        tabs.forEach((tab, index) => {
+          if (tab.name === historyActiveName) {
+            const nextTab = tabs[index]
+            this.active = nextTab.url
+            this.editableTabsValue = nextTab.name
+            this.$router.push(nextTab.url)
           }
-          tabs.forEach((tab, index) => {
-            if(tab.name === historyActiveName){
-              let nextTab = tabs[index];
-              this.active = nextTab.url;
-              this.editableTabsValue = nextTab.name;
-              this.$router.push(nextTab.url);
-            }
-          });
+        })
       }
-      this.editableTabs = tabs.filter(tab => tab.name !== name);
-      this.historyActive = this.historyActive.filter(tab => tab !== name);
+      this.editableTabs = tabs.filter(tab => tab.name !== name)
+      this.historyActive = this.historyActive.filter(tab => tab !== name)
     },
     /** 退出登录 */
-    backLogin(){
-      this.Cookie.removeCookie("token")
-      this.$router.push({path:"/login",query: {redirect: this.$route.fullPath}})
+    backLogin () {
+      this.Cookie.removeCookie('token')
+      this.$store.state.userData = {}
+      this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } })
     },
     /** 切换到简体中文 */
-    zh(){
-      this.$i18n.locale = 'zh';//改变当前语言
-      localStorage.language = 'zh';
+    zh () {
+      this.$i18n.locale = 'zh'// 改变当前语言
+      localStorage.language = 'zh'
     },
     /** 切换到English */
-    en(){
-      this.$i18n.locale = 'en';//改变当前语言
-      localStorage.language = 'en';
+    en () {
+      this.$i18n.locale = 'en'// 改变当前语言
+      localStorage.language = 'en'
     },
     /** 上传图片的回调函数 */
-    success(e){
-      if(!/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(e.file.name)) return this.$message.error('请上传正确的图片文件，且不超过500kb');
-      var fm = new FormData();
-      fm.append("userImg", e.file);
-      Api.UploadHeader({userUid:this.$store.state.userData.userUid,fm}).then(res=>{
-        switch (res.data.code){
+    success (e) {
+      if (!/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(e.file.name)) return this.$message.error('请上传正确的图片文件，且不超过500kb')
+      var fm = new FormData()
+      fm.append('userImg', e.file)
+      Api.UploadHeader({ userUid: this.$store.state.userData.userUid, fm }).then(res => {
+        switch (res.data.code) {
           case 1:
-            this.img = res.data.data+'?'+new Date().getTime()
-            let data = this.$store.state.userData
+            this.img = res.data.data + '?' + new Date().getTime()
+            const data = this.$store.state.userData
             data.userHeader = this.img
-            this.$store.dispatch('modifyData',data)
+            console.log(res.data.data);
+
+            console.log(this.$store.state.userData.userHeader)
+            this.$store.dispatch('modifyData', data)
+            console.log(this.$store.state.userData.userHeader)
             this.centerDialogVisible = false
-            this.$message({ message: res.data.message , type: "success" });
-            break;
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message , type: "info" });
-            break;
+            this.$message({ message: res.data.message, type: 'info' })
+            break
         }
       })
     }
-  },
+  }
 }
 </script>
 

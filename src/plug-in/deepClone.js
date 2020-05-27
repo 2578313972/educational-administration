@@ -19,16 +19,16 @@
 //     }
 // }
 
-function Clone(obj,target){
-    target = target || []
-    for (var i in obj) {
-        if(typeof obj[i] === 'object'){
-            target[i] = obj[i].constructor===Array?[]:{}
-            Clone(obj[i],target[i],)
-        }else{
-            target[i] = obj[i]
-        }
+function Clone (obj, target) {
+  target = target || []
+  for (var i in obj) {
+    if (typeof obj[i] === 'object') {
+      target[i] = obj[i].constructor === Array ? [] : {}
+      Clone(obj[i], target[i])
+    } else {
+      target[i] = obj[i]
     }
-    return target
+  }
+  return target
 }
 export default Clone

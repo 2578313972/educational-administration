@@ -18,32 +18,31 @@
 <script>
 import Api from '@/http/FTeacher'
 export default {
-    data() {
-        return {
-            allUser:[]
-        }
-    },
-    props:{
-        value:Object
-    },
-    created() {
-        Api.GetUserRoles().then(res=>{
-            this.allUser = res.data
-        })
-        if(!this.value.type)this.value.type = 'select'
-
-    },
-    watch: {
-        value:{
-            handler:function(newVal,oldVal){
-                try{
-                    newVal.TypeName = this.allUser.find(item=>item.userTypeId===newVal.TypeId).userTypeTypeName
-                }catch{}
-                this.$emit("input",newVal)
-            },
-            deep:true
-        }
-    },
+  data () {
+    return {
+      allUser: []
+    }
+  },
+  props: {
+    value: Object
+  },
+  created () {
+    Api.GetUserRoles().then(res => {
+      this.allUser = res.data
+    })
+    if (!this.value.type) this.value.type = 'select'
+  },
+  watch: {
+    value: {
+      handler: function (newVal, oldVal) {
+        try {
+          newVal.TypeName = this.allUser.find(item => item.userTypeId === newVal.TypeId).userTypeTypeName
+        } catch {}
+        this.$emit('input', newVal)
+      },
+      deep: true
+    }
+  }
 }
 </script>
 

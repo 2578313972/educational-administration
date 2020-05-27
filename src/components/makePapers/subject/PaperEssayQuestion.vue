@@ -29,74 +29,66 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
-import RichTextBox from "@/components/makePapers/RichTextBox";
+import Api from '@/http/BMakePaper'
+import RichTextBox from '@/components/makePapers/RichTextBox'
 export default {
-  data() {
+  data () {
     return {
-      html: "",
+      html: '',
       paperForm: {
-        tpqPaperId: "", //试卷主键编号
-        tpqScore: 5, //分值
+        tpqPaperId: '', // 试卷主键编号
+        tpqScore: 5, // 分值
         tpqQuestion: {
-          questionTitle: "", //题目的标题
-          questionTypeId: 3, //题目的类型 1=选择题 2=填空题 3=问答题
+          questionTitle: '', // 题目的标题
+          questionTypeId: 3, // 题目的类型 1=选择题 2=填空题 3=问答题
           answerQuestion: {
-            aqAnswer: "" //问答题的答案
+            aqAnswer: '' // 问答题的答案
           }
         }
       }
-    };
+    }
   },
   props: {
     testPaperId: [String, Number] // 试卷id
   },
   watch: {
-    html(newVal) {
-      this.html = newVal;
+    html (newVal) {
+      this.html = newVal
     }
   },
   components: { RichTextBox },
   methods: {
-    resetForm() {
-      this.paperForm.tpqQuestion.questionTitle = "";
-      this.paperForm.tpqQuestion.answerQuestion.aqAnswer = "";
-      this.$refs.textarea.focus();
+    resetForm () {
+      this.paperForm.tpqQuestion.questionTitle = ''
+      this.paperForm.tpqQuestion.answerQuestion.aqAnswer = ''
+      this.$refs.textarea.focus()
     },
-    submit() {
+    submit () {
       if (!this.paperForm.tpqQuestion.questionTitle.trim()) {
-        this.$message({ message: "题干不能为空", type: "warning" });
-        return this.$refs.textarea.focus();
+        this.$message({ message: '题干不能为空', type: 'warning' })
+        return this.$refs.textarea.focus()
       }
       if (!this.paperForm.tpqQuestion.answerQuestion.aqAnswer.trim()) {
-        this.$message({ message: "答案不能为空", type: "warning" });
+        this.$message({ message: '答案不能为空', type: 'warning' })
         return
       }
-      this.paperForm.tpqPaperId = this.testPaperId || sessionStorage.getItem("testPaperId");
+      this.paperForm.tpqPaperId = this.testPaperId || sessionStorage.getItem('testPaperId')
       Api.AddQuestionToTestPaper(this.paperForm).then(res => {
-        console.log(res);
+        console.log(res)
         switch (res.data.code) {
           case 1:
-            this.$emit('addQuestion',res.data.data)
-            this.resetForm();
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.$emit('addQuestion', res.data.data)
+            this.resetForm()
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
 </style>
-
-
-
-
-
-
-
-

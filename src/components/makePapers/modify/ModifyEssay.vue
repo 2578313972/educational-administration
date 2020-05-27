@@ -51,101 +51,101 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
-import RichTextBox from "@/components/makePapers/RichTextBox";
+import Api from '@/http/BMakePaper'
+import RichTextBox from '@/components/makePapers/RichTextBox'
 
 export default {
-  data() {
+  data () {
     return {
       qusetionData: {},
       qusetionDataClone: {},
-      balBool: false,
-    };
+      balBool: false
+    }
   },
   props: {
     item: Object,
     index: Number
   },
-  created() {
-    this.qusetionData = JSON.parse(JSON.stringify(this.item));
-    this.qusetionDataClone = JSON.parse(JSON.stringify(this.item));
+  created () {
+    this.qusetionData = JSON.parse(JSON.stringify(this.item))
+    this.qusetionDataClone = JSON.parse(JSON.stringify(this.item))
   },
   methods: {
     /** 切换布局事件 */
-    switchBox() {
-      this.balBool = !this.balBool;
+    switchBox () {
+      this.balBool = !this.balBool
     },
     /** 点击取消 */
-    switchBoxElse() {
-      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone));
-      this.switchBox();
+    switchBoxElse () {
+      this.qusetionData = JSON.parse(JSON.stringify(this.qusetionDataClone))
+      this.switchBox()
     },
     /** 修改分数 */
-    handleChange() {
+    handleChange () {
       Api.ModifyScore({
-        tpqId: this.qusetionData.tpqId, //主键编号
-        tpqScore: this.qusetionData.tpqScore //要修改的分值
+        tpqId: this.qusetionData.tpqId, // 主键编号
+        tpqScore: this.qusetionData.tpqScore // 要修改的分值
       }).then(res => {
         switch (res.data.code) {
           case 1:
             this.$emit(
-              "handleChange",
+              'handleChange',
               this.qusetionData.tpqId,
               this.qusetionData.tpqScore
-            );
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            )
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     },
     /** 删除题目 */
-    deleteQuestion() {
+    deleteQuestion () {
       Api.RemoveQuestionFromTestPaper({
         paperQuestionId: this.qusetionData.tpqId
       }).then(res => {
         switch (res.data.code) {
           case 1:
-            this.$emit("deleteQuestion", this.qusetionData.tpqId);
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.$emit('deleteQuestion', this.qusetionData.tpqId)
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     },
     /** 保存修改 */
-    submitTitle() {
-      if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
-        this.$message({ message: "题干不能为空", type: "warning" });
-        return this.$refs.textarea[0].focus();
+    submitTitle () {
+      if (this.qusetionData.tpqQuestion.questionTitle.trim() === '') {
+        this.$message({ message: '题干不能为空', type: 'warning' })
+        return this.$refs.textarea[0].focus()
       }
-      if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === "") {
-        this.$message({ message: "答案不能为空", type: "warning" });
+      if (this.qusetionData.tpqQuestion.answerQuestion.aqAnswer.trim() === '') {
+        this.$message({ message: '答案不能为空', type: 'warning' })
         return
       }
       delete this.qusetionData.tpqQuestion.chooseQuestion
       delete this.qusetionData.tpqQuestion.fillQuestion
       delete this.qusetionData.tpqQuestion.answerQuestion.aqQuestionId
 
-      Api.ModifyQuestion(this.qusetionData.tpqQuestion,0).then(res => {
+      Api.ModifyQuestion(this.qusetionData.tpqQuestion, 0).then(res => {
         switch (res.data.code) {
           case 1:
             this.qusetionDataClone = JSON.parse(
               JSON.stringify(this.qusetionData)
-            );
-            this.switchBox();
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            )
+            this.switchBox()
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     }
   },
   components: { RichTextBox }
-};
+}
 </script>
 
 <style lang="less" scoped>

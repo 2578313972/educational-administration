@@ -39,52 +39,52 @@
 </template>
 
 <script>
-import Api from "@/http/Login";
+import Api from '@/http/Login'
 export default {
-  data() {
+  data () {
     var validatePass = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入账号！"));
+      if (value === '') {
+        callback(new Error('请输入账号！'))
       } else {
-        let a = /^\w{4,16}$/;
-        if (!a.test(value)) callback(new Error("账号长度 4~16"));
-        setTimeout(callback, 500);
+        const a = /^\w{4,16}$/
+        if (!a.test(value)) callback(new Error('账号长度 4~16'))
+        setTimeout(callback, 500)
       }
-    };
+    }
     var validatePass2 = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入密码！"));
+      if (value === '') {
+        callback(new Error('请输入密码！'))
       } else {
-        let a = /^\w{4,16}$/;
-        if (!a.test(value)) callback(new Error("密码长度 4~16"));
-        setTimeout(callback, 500);
+        const a = /^\w{4,16}$/
+        if (!a.test(value)) callback(new Error('密码长度 4~16'))
+        setTimeout(callback, 500)
       }
-    };
+    }
     return {
       ruleForm: {
-        userName: "", // 用户名
-        userPassword: "", // 密码
+        userName: '', // 用户名
+        userPassword: '', // 密码
         type: true // 是否记住密码（默认记住）
       },
       rules: {
-        userName: [{ validator: validatePass, trigger: "blur" }],
-        userPassword: [{ validator: validatePass2, trigger: "blur" }]
+        userName: [{ validator: validatePass, trigger: 'blur' }],
+        userPassword: [{ validator: validatePass2, trigger: 'blur' }]
       }
-    };
+    }
   },
-  created() {
-    if (this.Cookie.getCookie("userInfo")) {
+  created () {
+    if (this.Cookie.getCookie('userInfo')) {
       /** 检查是否记住过密码 */
-      let userInof = JSON.parse(
-        this.Base64.decode(this.Cookie.getCookie("userInfo"))
-      );
-      this.ruleForm.userName = userInof.userMobile;
-      this.ruleForm.userPassword = userInof.userPassword;
+      const userInof = JSON.parse(
+        this.Base64.decode(this.Cookie.getCookie('userInfo'))
+      )
+      this.ruleForm.userName = userInof.userMobile
+      this.ruleForm.userPassword = userInof.userPassword
     }
   },
   methods: {
-    submitForm(formName) {
-      let that = this;
+    submitForm (formName) {
+      const that = this
       this.$refs[formName].validate(valid => {
         if (valid) {
           Api.authenticate({
@@ -95,47 +95,34 @@ export default {
               setTimeout(() => {
                 if (that.ruleForm.type) {
                   that.Cookie.setCookie(
-                    "userInfo",
+                    'userInfo',
                     that.Base64.encode(JSON.stringify(res.config.params))
-                  ); // 加密保存用户信息的账号密码
+                  ) // 加密保存用户信息的账号密码
                 } else {
-                  that.Cookie.removeCookie("userInfo");
+                  that.Cookie.removeCookie('userInfo')
                 }
 
-                // 将token值加密并将加密token存在cookie中
-                that.Cookie.setCookie(
-                  "token",
-                  that.Base64.encode(
-                    res.data.token_type + " " + res.data.access_token
-                  )
-                );
-
-                this.$store.dispatch('modifyData',res.data.profile)
-                this.$store.dispatch('modifyToken',res.data.token_type + " " + res.data.access_token)
-
-                // 储存用户信息
-                /* sessionStorage.setItem(
-                  "userData",
-                  JSON.stringify(res.data.profile)
-                ); */
+                res.data.profile.userHeader += '?'+new Date().getTime()
+                this.$store.dispatch('modifyData', res.data.profile)
+                this.$store.dispatch('modifyToken', res.data.token_type + ' ' + res.data.access_token)
 
                 if (this.$route.query.redirect) {
-                  this.$router.replace(this.$route.query.redirect); // 不记住历史路由
+                  this.$router.replace(this.$route.query.redirect) // 不记住历史路由
                 } else {
-                  console.log(that.$router.replace);
-                  that.$router.replace("/");
+                  console.log(that.$router.replace)
+                  that.$router.replace('/')
                 }
-              }, 1000);
-              that.$message({ message: "登录成功正在进行跳转……", type: "success" });
+              }, 1000)
+              that.$message({ message: '登录成功正在进行跳转……', type: 'success' })
             })
-            .catch(function(error) {
-              that.$message.error("账号或密码错误！");
-            });
-        } else return false;
-      });
+            .catch(function (error) {
+              that.$message.error('账号或密码错误！')
+            })
+        } else return false
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

@@ -130,34 +130,34 @@
 </template>
 
 <script>
-import Api from "@/http/BArrange";
+import Api from '@/http/BArrange'
 
-import TimeOut from "@/plug-in/TimeOut";
+import TimeOut from '@/plug-in/TimeOut'
 
-import SelectClass from "@/components/selectionBox/SelectClass";
-import SelectPaper from "@/components/selectionBox/SelectPaper";
+import SelectClass from '@/components/selectionBox/SelectClass'
+import SelectPaper from '@/components/selectionBox/SelectPaper'
 export default {
-  data() {
+  data () {
     return {
       paperData: {
-        taskTestPaperId: "-1", //试卷编号
-        taskClassId: "0", //班级编号
-        taskStartTime: "", //开始时间
-        taskEndTime: "" //结束时间
+        taskTestPaperId: '-1', // 试卷编号
+        taskClassId: '0', // 班级编号
+        taskStartTime: '', // 开始时间
+        taskEndTime: '' // 结束时间
       },
       ruleForm: {
-        taskId: 0, //主键编号
-        taskTestPaperId: "-1", //试卷编号
-        taskClassId: "0", //班级编号，可修改
-        taskStartTime: "", //测试开始时间，可修改
-        taskEndTime: "" //测试结束时间，可修改
+        taskId: 0, // 主键编号
+        taskTestPaperId: '-1', // 试卷编号
+        taskClassId: '0', // 班级编号，可修改
+        taskStartTime: '', // 测试开始时间，可修改
+        taskEndTime: '' // 测试结束时间，可修改
       },
       centerDialogVisible: false, // 控制新增弹框
       tableData: [], // 渲染table数据
-      comSelectClass: { classId: "0", className: "" }, // 选择班级
-      comSelectPaper: { tpId: "-1", tpTitle: "" }, // 选择试卷
-      comSelectClass_2: { classId: "0", className: "" }, // 选择班级
-      comSelectPaper_2: { tpId: "-1", tpTitle: "" }, // 选择试卷
+      comSelectClass: { classId: '0', className: '' }, // 选择班级
+      comSelectPaper: { tpId: '-1', tpTitle: '' }, // 选择试卷
+      comSelectClass_2: { classId: '0', className: '' }, // 选择班级
+      comSelectPaper_2: { tpId: '-1', tpTitle: '' }, // 选择试卷
       timeValue: [], // 获取时间数组_1
       timeValue_2: [], // 获取时间数组_2
       total: 0, // 总数据
@@ -166,43 +166,43 @@ export default {
       timeScore: 0, // 考试所需时间_1
       timeScore_2: 0, // 考试所需时间_2
       rules: {
-        /**弹框验证*/
+        /** 弹框验证 */
         paperTitle: [
-          { required: true, message: "请输入班级名称", trigger: "blur" }
+          { required: true, message: '请输入班级名称', trigger: 'blur' }
         ],
         courseName: [
-          { required: true, message: "请选择专业名称", trigger: "blur" }
+          { required: true, message: '请选择专业名称', trigger: 'blur' }
         ]
       }
-    };
+    }
   },
-  created() {
-    this.getPaperData();
+  created () {
+    this.getPaperData()
   },
   watch: {
-    "comSelectClass.classId"(newV) {
+    'comSelectClass.classId' (newV) {
       // 班级——1
-      this.paperData.taskClassId = newV;
+      this.paperData.taskClassId = newV
     },
-    "comSelectPaper.tpId"(newV) {
+    'comSelectPaper.tpId' (newV) {
       // 试卷——1
-      this.paperData.taskTestPaperId = newV;
+      this.paperData.taskTestPaperId = newV
     },
-    "comSelectClass_2.classId"(newV) {
+    'comSelectClass_2.classId' (newV) {
       // 班级——2
-      this.ruleForm.taskClassId = newV;
+      this.ruleForm.taskClassId = newV
     },
-    "comSelectPaper_2.tpId"(newV) {
+    'comSelectPaper_2.tpId' (newV) {
       // 试卷——2
-      this.ruleForm.taskTestPaperId = newV;
+      this.ruleForm.taskTestPaperId = newV
     }
   },
   methods: {
     /** 获取时间选择器焦点 */
-    startTime() {
-      this.timeValue = [];
-      let time = new Date();
-      this.timeValue[0] = time;
+    startTime () {
+      this.timeValue = []
+      const time = new Date()
+      this.timeValue[0] = time
       this.timeValue[1] = new Date(
         time.getFullYear(),
         time.getMonth(),
@@ -210,37 +210,36 @@ export default {
         time.getHours() + 1,
         time.getMinutes(),
         time.getUTCSeconds()
-      );
+      )
     },
     /** 设置 */
-    setTest() {
+    setTest () {
       // 非空验证
-      if (this.paperData.taskTestPaperId === "-1") {
-        this.$refs.paperId.$refs.paperId.focus();
-        this.$message({ type: "info", message: "请选择试卷" });
-        return;
+      if (this.paperData.taskTestPaperId === '-1') {
+        this.$refs.paperId.$refs.paperId.focus()
+        this.$message({ type: 'info', message: '请选择试卷' })
+        return
       }
       // 非空验证
-      if (this.paperData.taskClassId === "0") {
-        this.$refs.calssId.$refs.calssId.focus();
-        this.$message({ type: "info", message: "请选择班级" });
-        return;
+      if (this.paperData.taskClassId === '0') {
+        this.$refs.calssId.$refs.calssId.focus()
+        this.$message({ type: 'info', message: '请选择班级' })
+        return
       }
       // 非空验证
       if (!this.timeValue || this.timeValue.length < 1) {
-        this.$refs.timeValue.focus();
-        this.$message({ type: "info", message: "请选择考试时间" });
-        return;
+        this.$refs.timeValue.focus()
+        this.$message({ type: 'info', message: '请选择考试时间' })
+        return
       }
 
-      this.timeValue[0].setHours(this.timeValue[0].getHours() + 8);
+      this.timeValue[0].setHours(this.timeValue[0].getHours() + 8)
       this.timeValue[1].setHours(this.timeValue[1].getHours() + 8);
-
 
       [
         this.paperData.taskStartTime,
         this.paperData.taskEndTime
-      ] = this.timeValue;
+      ] = this.timeValue
       // this.paperData.taskStartTime = this.paperData.taskStartTime.toLocaleDateString().split("/")
       // this.paperData.taskEndTime = this.paperData.taskStartTime.toLocaleDateString()
 
@@ -250,171 +249,171 @@ export default {
       }).then(res => {
         switch (res.data.code) {
           case 1:
-            this.kon();
-            this.getPaperData(this.pageIndex, this.pageSize);
-            this.$message({ type: "success", message: res.data.message });
-            break;
+            this.kon()
+            this.getPaperData(this.pageIndex, this.pageSize)
+            this.$message({ type: 'success', message: res.data.message })
+            break
           default:
-            this.$message({ type: "info", message: res.data.message });
-            break;
+            this.$message({ type: 'info', message: res.data.message })
+            break
         }
-      });
+      })
     },
     /** 点击编辑 */
-    handleEdit(index, data) {
-      this.centerDialogVisible = true;
-      this.ruleForm.taskId = data.taskId; // 编号
-      this.selectData = data;
-      this.selectIndex = index; //  修改时需要用到的下标
+    handleEdit (index, data) {
+      this.centerDialogVisible = true
+      this.ruleForm.taskId = data.taskId // 编号
+      this.selectData = data
+      this.selectIndex = index //  修改时需要用到的下标
       // -------------------  组件传值
-      this.comSelectPaper_2.tpId = data.taskTestPaperId;
-      this.comSelectPaper_2.tpTitle = data.tpTitle;
-      this.comSelectClass_2.classId = data.classId;
-      this.comSelectClass_2.className = data.className;
+      this.comSelectPaper_2.tpId = data.taskTestPaperId
+      this.comSelectPaper_2.tpTitle = data.tpTitle
+      this.comSelectClass_2.classId = data.classId
+      this.comSelectClass_2.className = data.className
       // -------------------
-      this.timeValue_2[0] = data.taskStartTime; // 保存开始时间
-      this.timeValue_2[1] = data.taskEndTime; // 保存结算时间
+      this.timeValue_2[0] = data.taskStartTime // 保存开始时间
+      this.timeValue_2[1] = data.taskEndTime // 保存结算时间
 
-      this.timeScore_2 = data.taskEscapeTime;
+      this.timeScore_2 = data.taskEscapeTime
 
-      this.ruleForm.taskStartTime = data.taskStartTime;
-      this.ruleForm.taskEndTime = data.taskEndTime;
+      this.ruleForm.taskStartTime = data.taskStartTime
+      this.ruleForm.taskEndTime = data.taskEndTime
     },
     /** 修改 */
-    modification() {
+    modification () {
       // 非空验证
-      if (this.ruleForm.taskTestPaperId === "-1") {
-        this.$refs.paperId_2.$refs.paperId.focus();
-        this.$message({ type: "info", message: "请选择试卷" });
-        return;
+      if (this.ruleForm.taskTestPaperId === '-1') {
+        this.$refs.paperId_2.$refs.paperId.focus()
+        this.$message({ type: 'info', message: '请选择试卷' })
+        return
       }
       // 非空验证
-      if (this.ruleForm.taskClassId === "0") {
-        this.$refs.calssId_2.$refs.calssId.focus();
-        this.$message({ type: "info", message: "请选择班级" });
-        return;
+      if (this.ruleForm.taskClassId === '0') {
+        this.$refs.calssId_2.$refs.calssId.focus()
+        this.$message({ type: 'info', message: '请选择班级' })
+        return
       }
       // 非空验证
       if (!this.timeValue_2) {
-        this.$refs.timeValue_2.focus();
-        this.$message({ type: "info", message: "请选择考试时间" });
-        return;
+        this.$refs.timeValue_2.focus()
+        this.$message({ type: 'info', message: '请选择考试时间' })
+        return
       }
 
-      this.timeValue_2[0].setHours(this.timeValue_2[0].getHours() + 8);
-      this.timeValue_2[1].setHours(this.timeValue_2[1].getHours() + 8);
+      this.timeValue_2[0].setHours(this.timeValue_2[0].getHours() + 8)
+      this.timeValue_2[1].setHours(this.timeValue_2[1].getHours() + 8)
 
-      this.ruleForm.taskStartTime = this.timeValue_2[0];
-      this.ruleForm.taskEndTime = this.timeValue_2[1];
+      this.ruleForm.taskStartTime = this.timeValue_2[0]
+      this.ruleForm.taskEndTime = this.timeValue_2[1]
       Api.ModifyTestTask(this.ruleForm).then(res => {
         switch (res.data.code) {
           case 1:
-            let item = this.tableData[this.selectIndex]; // 需要操作的数据
+            const item = this.tableData[this.selectIndex] // 需要操作的数据
             // 赋值操作
 
-            item.classId = this.comSelectClass_2.classId;
+            item.classId = this.comSelectClass_2.classId
             item.className = this.comSelectClass_2.className;
-            [item.taskStartTime, item.taskEndTime] = this.timeValue_2;
-            item.taskTestPaperId = this.comSelectPaper_2.tpId;
-            item.tpTitle = this.comSelectPaper_2.tpTitle;
+            [item.taskStartTime, item.taskEndTime] = this.timeValue_2
+            item.taskTestPaperId = this.comSelectPaper_2.tpId
+            item.tpTitle = this.comSelectPaper_2.tpTitle
 
             try {
               item.taskEscapeTime =
                 (this.ruleForm.taskEndTime.getTime() -
                   this.ruleForm.taskStartTime.getTime()) /
-                60000;
+                60000
             } catch (error) {}
-            this.centerDialogVisible = false;
-            this.$message({ type: "success", message: res.data.message });
-            break;
+            this.centerDialogVisible = false
+            this.$message({ type: 'success', message: res.data.message })
+            break
           default:
-            this.$message({ type: "warning", message: res.data.message });
-            break;
+            this.$message({ type: 'warning', message: res.data.message })
+            break
         }
-      });
+      })
     },
     /** 删除 */
-    handleDelete(index, data) {
-      this.$confirm("此操作将永久删除试卷, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+    handleDelete (index, data) {
+      this.$confirm('此操作将永久删除试卷, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
           Api.RemoveTestTask({ taskId: data.taskId }).then(res => {
             switch (res.data.code) {
               case 1:
-                this.getPaperData(this.pageIndex, this.pageSize); // 重新掉接口排序
-                this.$message({ type: "success", message: res.data.message });
-                break;
+                this.getPaperData(this.pageIndex, this.pageSize) // 重新掉接口排序
+                this.$message({ type: 'success', message: res.data.message })
+                break
               default:
-                this.$message({ type: "info", message: res.data.message });
-                break;
+                this.$message({ type: 'info', message: res.data.message })
+                break
             }
-          });
+          })
         })
         .catch(() => {
-          this.$message({ type: "info", message: "已取消删除" });
-        });
+          this.$message({ type: 'info', message: '已取消删除' })
+        })
     },
-    endTime() {
-      if (this.timeValue === null) return (this.timeScore = 0);
+    endTime () {
+      if (this.timeValue === null) return (this.timeScore = 0)
       this.timeScore = Math.round((this.timeValue[1].getTime() - this.timeValue[0].getTime()) / 60000)
     },
     /** 计算考试时间 */
-    blurDate() {
-      if (this.timeValue_2 === null) return (this.timeScore_2 = 0);
+    blurDate () {
+      if (this.timeValue_2 === null) return (this.timeScore_2 = 0)
       try {
         this.timeScore_2 =
           (this.timeValue_2[1].getTime() - this.timeValue_2[0].getTime()) /
-          60000;
+          60000
       } catch (error) {
-        this.timeScore_2 = this.selectData.taskEscapeTime;
+        this.timeScore_2 = this.selectData.taskEscapeTime
       }
     },
     /** 每页多少条数据 */
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getPaperData(this.pageIndex, this.pageSize);
+    handleSizeChange (val) {
+      this.pageSize = val
+      this.getPaperData(this.pageIndex, this.pageSize)
     },
     /** 第几页数据 */
-    handleCurrentChange(val) {
-      this.pageIndex = val;
-      this.getPaperData(this.pageIndex, this.pageSize);
+    handleCurrentChange (val) {
+      this.pageIndex = val
+      this.getPaperData(this.pageIndex, this.pageSize)
     },
     /** 获取渲染数据 */
-    getPaperData(pageIndex, pageSize) {
+    getPaperData (pageIndex, pageSize) {
       Api.GetTestTask({ pageIndex, pageSize }).then(res => {
-        this.tableData = res.data.data;
-        this.total = res.data.items;
-      });
+        this.tableData = res.data.data
+        this.total = res.data.items
+      })
     },
     /** 清除添加选项 */
-    kon() {
-      this.comSelectClass.classId = "0";
-      this.comSelectPaper.tpId = "-1";
-      this.timeValue = [];
+    kon () {
+      this.comSelectClass.classId = '0'
+      this.comSelectPaper.tpId = '-1'
+      this.timeValue = []
       this.paperData = {
-        taskTestPaperId: "-1", //试卷编号
-        taskClassId: "0", //班级编号
-        taskStartTime: "", //开始时间
-        taskEndTime: "" //结束时间
-      };
-      this.timeScore = 0;
+        taskTestPaperId: '-1', // 试卷编号
+        taskClassId: '0', // 班级编号
+        taskStartTime: '', // 开始时间
+        taskEndTime: '' // 结束时间
+      }
+      this.timeScore = 0
     },
     /** 关闭弹出窗口回调 */
-    close(formName) {
-      this.$refs[formName].resetFields();
+    close (formName) {
+      this.$refs[formName].resetFields()
     }
   },
   filters: {
     // 过滤器
-    time(val) {
-      return new Date(val).toLocaleDateString().replace(/\//g, "-");
+    time (val) {
+      return new Date(val).toLocaleDateString().replace(/\//g, '-')
     }
   },
   components: { SelectClass, SelectPaper }
-};
+}
 </script>
 
 <style lang="less">

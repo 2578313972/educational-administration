@@ -35,45 +35,45 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
+import Api from '@/http/BMakePaper'
 
-import PaperMessage from "@/components/makePapers/PaperMessage";
-import PaperAddTitle from "@/components/makePapers/PaperAddTitle";
-import PaperComplete from "@/components/makePapers/PaperComplete";
+import PaperMessage from '@/components/makePapers/PaperMessage'
+import PaperAddTitle from '@/components/makePapers/PaperAddTitle'
+import PaperComplete from '@/components/makePapers/PaperComplete'
 export default {
-  data() {
+  data () {
     return {
       active: 0, // 步骤位置
-      testPaperId: "", // 试卷id
+      testPaperId: '', // 试卷id
       allPaperData: { questions: [] } // 试卷数据
-    };
+    }
   },
-  created() {
-    let id = this.testPaperId || sessionStorage.getItem("testPaperId");
-    if (!id) return;
+  created () {
+    const id = this.testPaperId || sessionStorage.getItem('testPaperId')
+    if (!id) return
     Api.GetTestPaper({ id }).then(res => {
-      this.allPaperData = res.data;
-    });
-    if (sessionStorage.getItem("testPaperId")) {
-      this.active = 1;
+      this.allPaperData = res.data
+    })
+    if (sessionStorage.getItem('testPaperId')) {
+      this.active = 1
     }
   },
   methods: {
-    next() {
+    next () {
       /** 跳转至下一步操作 */
-      if (this.active == 1) return (this.active += 2);
-      if (this.active++ > 2) this.active = 0;
+      if (this.active == 1) return (this.active += 2)
+      if (this.active++ > 2) this.active = 0
     },
-    choiceNext(id) {
-      this.testPaperId = id;
-      ++this.active;
+    choiceNext (id) {
+      this.testPaperId = id
+      ++this.active
       Api.GetTestPaper({ id }).then(res => {
-        this.allPaperData = res.data;
-      });
+        this.allPaperData = res.data
+      })
     }
   },
   components: { PaperMessage, PaperAddTitle, PaperComplete }
-};
+}
 </script>
 
 <style lang="less" scoped>

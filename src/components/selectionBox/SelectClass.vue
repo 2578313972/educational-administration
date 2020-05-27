@@ -13,33 +13,33 @@
 </template>
 
 <script>
-import Api from "@/http/FStudent";
+import Api from '@/http/FStudent'
 export default {
-  data() {
+  data () {
     return {
       allClass: [] // 选择框所有数据
-    };
+    }
   },
-  props: ["value"],
-  created() {
+  props: ['value'],
+  created () {
     Api.GetAllClass().then(res => {
       this.allClass = res.data.map(item => ({
         classId: item.classId,
         className: item.className
-      }));
-    });
+      }))
+    })
   },
   watch: {
-    "value.classId"(newVal) {
-      if (newVal !== "0") {
+    'value.classId' (newVal) {
+      if (newVal !== '0') {
         this.value.className = this.allClass.find(
           item => item.classId === newVal
-        ).className;
+        ).className
       }
-      this.$emit("input", this.value);
+      this.$emit('input', this.value)
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

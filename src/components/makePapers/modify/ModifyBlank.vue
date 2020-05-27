@@ -71,190 +71,190 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
-import RichTextBox from "@/components/makePapers/RichTextBox";
+import Api from '@/http/BMakePaper'
+// import RichTextBox from '@/components/makePapers/RichTextBox'
 
 export default {
-  data() {
+  data () {
     return {
       newNum: 0,
       oldNum: 0,
-      inputChangeIndex: "",
+      inputChangeIndex: '',
       qusetionData: {},
       qusetionDataClone: {},
       balBool: false,
       len: []
-    };
+    }
   },
   props: {
     item: Object,
     index: Number
   },
-  created() {
+  created () {
     this.qusetionData = this.item // 数据渲染
-    this.qusetionDataClone = JSON.parse(JSON.stringify(this.item)); // 数据替换
-    this.oldNum = this.qusetionData.tpqQuestion.fillQuestion.length; // 获取下划线的数量
-    console.log('props:',this.qusetionData);
-    this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
+    this.qusetionDataClone = JSON.parse(JSON.stringify(this.item)) // 数据替换
+    this.oldNum = this.qusetionData.tpqQuestion.fillQuestion.length // 获取下划线的数量
+    console.log('props:', this.qusetionData)
+    this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum, item) => sum + item.fillQuestionScore[0].fqsScore, 0)
   },
   watch: {
-    "qusetionData.tpqQuestion.questionTitle"(newV, oldV) {
-      this.len = newV.split("▁"); // 查找下划线截取数据
+    'qusetionData.tpqQuestion.questionTitle' (newV, oldV) {
+      this.len = newV.split('▁') // 查找下划线截取数据
     }
   },
   computed: {
-    lessHtml() {
+    lessHtml () {
       // 插入填空逻辑
-      let text = this.qusetionData.tpqQuestion.questionTitle;
-      this.newNum = text.split("▁").length - 1;
-      let len = text.slice(0, this.inputChangeIndex).split("▁").length - 1;
+      let text = this.qusetionData.tpqQuestion.questionTitle
+      this.newNum = text.split('▁').length - 1
+      const len = text.slice(0, this.inputChangeIndex).split('▁').length - 1
       if (this.newNum > this.oldNum) {
         for (let i = 0; i < this.newNum - this.oldNum; i++) {
           this.qusetionData.tpqQuestion.fillQuestion.splice(
             len - this.newNum + this.oldNum,
             0,
             {
-              fqAnswer: "",
+              fqAnswer: '',
               fillQuestionScore: [{ fqsScore: 1 }]
             }
-          );
+          )
         }
       } else if (this.newNum < this.oldNum) {
         this.qusetionData.tpqQuestion.fillQuestion.splice(
           len,
           this.oldNum - this.newNum
-        );
+        )
       }
-      this.oldNum = this.newNum;
+      this.oldNum = this.newNum
 
       for (let i = 0; i < this.newNum; i++) {
         text = text.replace(
-          "▁",
+          '▁',
           ` <span style='padding:2px 35px;border-bottom: 1px solid black;' >${this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer}</span>(${this.qusetionData.tpqQuestion.fillQuestion[i].fillQuestionScore[0].fqsScore}分) `
-        );
+        )
       }
-      return text;
+      return text
     }
   },
   methods: {
     /** 插入填空 */
-    addValue() {
-      this.$refs.questionTitle.focus();
-      document.execCommand("insertText", true, "▁");
+    addValue () {
+      this.$refs.questionTitle.focus()
+      document.execCommand('insertText', true, '▁')
     },
     /** input change事件 */
-    changeInput(e) {
-      this.inputChangeIndex = event.target.selectionEnd;
+    changeInput (e) {
+      this.inputChangeIndex = event.target.selectionEnd
     },
     /** 切换布局事件 */
-    switchBox() {
-      this.balBool = !this.balBool;
+    switchBox () {
+      this.balBool = !this.balBool
     },
     /** 点击取消 */
-    switchBoxElse() {
-      this.qusetionData.tpqQuestion = JSON.parse(JSON.stringify(this.qusetionDataClone.tpqQuestion));
-      this.oldNum = this.qusetionDataClone.tpqQuestion.fillQuestion.length;
-      this.switchBox();
+    switchBoxElse () {
+      this.qusetionData.tpqQuestion = JSON.parse(JSON.stringify(this.qusetionDataClone.tpqQuestion))
+      this.oldNum = this.qusetionDataClone.tpqQuestion.fillQuestion.length
+      this.switchBox()
     },
     /** 修改分数 */
-    handleChange(index) {
-      let data = {
+    handleChange (index) {
+      const data = {
         tpqId: this.qusetionData.tpqId,
         tpqScore: this.qusetionData.tpqScore,
         fillQuestionScore: []
-      };
+      }
       this.qusetionData.tpqQuestion.fillQuestion.forEach(item => {
-        console.log(item.fillQuestionScore[0]);
-        data.fillQuestionScore.push(item.fillQuestionScore[0]);
-      });
+        console.log(item.fillQuestionScore[0])
+        data.fillQuestionScore.push(item.fillQuestionScore[0])
+      })
       data.tpqScore = data.fillQuestionScore.reduce(
         (sum, item) => sum + item.fqsScore,
         0
-      );
+      )
       Api.ModifyScore(data).then(res => {
         switch (res.data.code) {
           case 1:
             this.qusetionDataClone.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore = this.qusetionData.tpqQuestion.fillQuestion[index].fillQuestionScore[0].fqsScore
-            this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum, item) => sum + item.fillQuestionScore[0].fqsScore, 0)
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     },
     /** 删除题目 */
-    deleteQuestion() {
+    deleteQuestion () {
       Api.RemoveQuestionFromTestPaper({
         paperQuestionId: this.qusetionData.tpqId
       }).then(res => {
         switch (res.data.code) {
           case 1:
-            this.$emit("deleteQuestion", this.qusetionData.tpqId);
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            this.$emit('deleteQuestion', this.qusetionData.tpqId)
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     },
     /** 保存修改 */
-    submitTitle() {
-      if (this.qusetionData.tpqQuestion.questionTitle.trim() === "") {
-        this.$message({ message: "未填写题干", type: "warning" });
-        return this.$refs.questionTitle.focus();
+    submitTitle () {
+      if (this.qusetionData.tpqQuestion.questionTitle.trim() === '') {
+        this.$message({ message: '未填写题干', type: 'warning' })
+        return this.$refs.questionTitle.focus()
       }
       /** 是否添加题目 */
-      if (this.qusetionData.tpqQuestion.fillQuestion.length == 0) {
-        this.$message({ message: "未添加题目", type: "warning" });
-        return this.$refs.questionTitle.focus();
+      if (this.qusetionData.tpqQuestion.fillQuestion.length === 0) {
+        this.$message({ message: '未添加题目', type: 'warning' })
+        return this.$refs.questionTitle.focus()
       }
-      for (let i in this.qusetionData.tpqQuestion.fillQuestion) {
+      for (const i in this.qusetionData.tpqQuestion.fillQuestion) {
         if (
-          this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer.trim() === ""
+          this.qusetionData.tpqQuestion.fillQuestion[i].fqAnswer.trim() === ''
         ) {
-          this.$message({ message: "答案不能为空", type: "warning" });
-          return;
+          this.$message({ message: '答案不能为空', type: 'warning' })
+          return
         }
       }
-      let paperQuestionId = this.qusetionData.tpqId;
-      let data = {
+      const paperQuestionId = this.qusetionData.tpqId
+      const data = {
         questionId: this.qusetionData.tpqQuestion.questionId,
         questionTitle: this.qusetionData.tpqQuestion.questionTitle,
         questionTypeId: 2,
         fillQuestion: []
-      };
-       // 循环添加数据
+      }
+      // 循环添加数据
       this.qusetionData.tpqQuestion.fillQuestion.forEach((item, index) => {
-          data.fillQuestion.push({
-            fqId: item.fqId,
-            fqAnswer: item.fqAnswer,
-            fqOrder: index + 1
-          });
-      });
+        data.fillQuestion.push({
+          fqId: item.fqId,
+          fqAnswer: item.fqAnswer,
+          fqOrder: index + 1
+        })
+      })
       Api.ModifyQuestion(data, paperQuestionId).then(res => {
         switch (res.data.code) {
           case 1:
-            res.data.data.fillQuestion = JSON.parse(JSON.stringify(res.data.data.fillQuestion.sort((a,b)=>a.fqOrder-b.fqOrder)))
+            res.data.data.fillQuestion = JSON.parse(JSON.stringify(res.data.data.fillQuestion.sort((a, b) => a.fqOrder - b.fqOrder)))
             // this.qusetionData.tpqQuestion = res.data.data
 
             this.qusetionData.tpqQuestion = res.data.data
-            this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum,item)=>sum+item.fillQuestionScore[0].fqsScore,0)
+            this.qusetionData.tpqScore = this.qusetionData.tpqQuestion.fillQuestion.reduce((sum, item) => sum + item.fillQuestionScore[0].fqsScore, 0)
 
             this.qusetionDataClone = JSON.parse(
               JSON.stringify(this.qusetionData)
-            );
-            this.switchBox();
-            this.$message({ message: res.data.message, type: "success" });
-            break;
+            )
+            this.switchBox()
+            this.$message({ message: res.data.message, type: 'success' })
+            break
           default:
-            this.$message({ message: res.data.message, type: "warning" });
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-      });
+      })
     }
   },
-  components: { RichTextBox }
-};
+  // components: { RichTextBox }
+}
 </script>
 
 <style lang="less" scoped>

@@ -85,23 +85,23 @@
 </template>
 
 <script>
-import Api from "@/http/BMakePaper";
-import SelectQuestionType from "@/components/selectionBox/SelectQuestionType"; // 题目类型组件
-import PaperChoiceQuestion from "@/components/makePapers/subject/PaperChoiceQuestion"; // 选择题组件
-import PaperBlanksTest from "@/components/makePapers/subject/PaperBlanksTest"; // 填空题组件
-import PaperEssayQuestion from "@/components/makePapers/subject/PaperEssayQuestion"; // 问答题组件
-import ModifyChoice from "@/components/makePapers/modify/ModifyChoice"; // 修改选择题组件
-import ModifyBlank from "@/components/makePapers/modify/ModifyBlank"; // 修改填空题组件
-import ModifyEssay from "@/components/makePapers/modify/ModifyEssay"; // 修改问答题组件
+import Api from '@/http/BMakePaper'
+import SelectQuestionType from '@/components/selectionBox/SelectQuestionType' // 题目类型组件
+import PaperChoiceQuestion from '@/components/makePapers/subject/PaperChoiceQuestion' // 选择题组件
+import PaperBlanksTest from '@/components/makePapers/subject/PaperBlanksTest' // 填空题组件
+import PaperEssayQuestion from '@/components/makePapers/subject/PaperEssayQuestion' // 问答题组件
+import ModifyChoice from '@/components/makePapers/modify/ModifyChoice' // 修改选择题组件
+import ModifyBlank from '@/components/makePapers/modify/ModifyBlank' // 修改填空题组件
+import ModifyEssay from '@/components/makePapers/modify/ModifyEssay' // 修改问答题组件
 
 export default {
-  data() {
+  data () {
     return {
-      radio: { typeId: "1", typeName: "", type: "click" }, // 单选按钮
+      radio: { typeId: '1', typeName: '', type: 'click' }, // 单选按钮
       choiceNum: 0,
       blankNum: 0,
       essayNum: 0
-    };
+    }
   },
   props: {
     allQuestions: Array,
@@ -109,68 +109,68 @@ export default {
   },
   computed: {
     /** 选择题 */
-    allChoiceSubject() {
+    allChoiceSubject () {
       return this.allQuestions.filter(
         item => item.tpqQuestion.questionTypeId === 1
-      );
+      )
     },
     /** 选择题分数 */
-    choiceScore() {
-      this.choiceNum = 0;
+    choiceScore () {
+      this.choiceNum = 0
       return this.allChoiceSubject.reduce((oldSum, num) => {
-        ++this.choiceNum;
-        return oldSum + num.tpqScore;
-      }, 0);
+        ++this.choiceNum
+        return oldSum + num.tpqScore
+      }, 0)
     },
     /** 填空题 */
-    allBlankSubject() {
+    allBlankSubject () {
       return this.allQuestions.filter(
         item => item.tpqQuestion.questionTypeId === 2
-      );
+      )
     },
     /** 填空题分数 */
-    blankScore() {
-      this.blankNum = 0;
+    blankScore () {
+      this.blankNum = 0
       return this.allBlankSubject.reduce((oldSum, num) => {
-        ++this.blankNum;
-        return oldSum + num.tpqScore;
-      }, 0);
+        ++this.blankNum
+        return oldSum + num.tpqScore
+      }, 0)
     },
     /** 问答题 */
-    allEssaySubject() {
+    allEssaySubject () {
       return this.allQuestions.filter(
         item => item.tpqQuestion.questionTypeId === 3
-      );
+      )
     },
     /** 问答题分数 */
-    essayScore() {
-      this.essayNum = 0;
+    essayScore () {
+      this.essayNum = 0
       return this.allEssaySubject.reduce((oldSum, num) => {
-        ++this.essayNum;
-        return oldSum + num.tpqScore;
-      }, 0);
+        ++this.essayNum
+        return oldSum + num.tpqScore
+      }, 0)
     },
     /** 总分 */
-    zf() {
+    zf () {
       return this.allQuestions.reduce(
         (oldSum, num) => oldSum + num.tpqScore,
         0
-      );
+      )
     }
   },
   methods: {
     /** 添加选择题、填空题、问答题 */
-    addQuestion(data) {
-      this.allQuestions.push(data);
+    addQuestion (data) {
+      this.allQuestions.push(data)
     },
     /** 选择题、问答题 修改分数 */
-    handleChange(id, score) {
-      this.allQuestions.find(item => item.tpqId === id).tpqScore = score;
+    handleChange (id, score) {
+      this.allQuestions.find(item => item.tpqId === id).tpqScore = score
     },
     /** 选择题、填空题、问答题 删除题目 */
-    deleteQuestion(id) {
-      let index = this.allQuestions.findIndex(item => item.tpqId === id);
-      this.allQuestions.splice(index, 1);
+    deleteQuestion (id) {
+      const index = this.allQuestions.findIndex(item => item.tpqId === id)
+      this.allQuestions.splice(index, 1)
     }
   },
   components: {
@@ -182,7 +182,7 @@ export default {
     ModifyBlank,
     ModifyEssay
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

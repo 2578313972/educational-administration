@@ -78,90 +78,89 @@ import Api from '@/http/FClass'
 import SelectCourse from '@/components/selectionBox/SelectCourse'
 import SelectTeacher from '@/components/selectionBox/SelectTeacher'
 export default {
-  data() {
+  data () {
     return {
       tableData: [],
       selectWin: true, //
       centerDialogVisible: false, // 控制新增弹框
-      comTeacher:{userName:"",userId:""},
-      comCourse:{courseName:"",courseId:""},
+      comTeacher: { userName: '', userId: '' },
+      comCourse: { courseName: '', courseId: '' },
       ruleForm: {
-        /**弹出框数据*/
-        className: "", // 班级名称
-        courseId:"",
-        courseName: "", // 专业
-        userId:"",
-        userName: "" // 授课老师
+        /** 弹出框数据 */
+        className: '', // 班级名称
+        courseId: '',
+        courseName: '', // 专业
+        userId: '',
+        userName: '' // 授课老师
       },
-      rules:{
-        /**弹框验证*/
-        className:[{ required: true, message: '请输入班级名称', trigger: 'blur' }],
-        courseName:[{ required: true, message: '请选择专业名称', trigger: 'blur' }],
-        userName:[{ required: true, message: '请选择授课老师', trigger: 'blur' }]
+      rules: {
+        /** 弹框验证 */
+        className: [{ required: true, message: '请输入班级名称', trigger: 'blur' }],
+        courseName: [{ required: true, message: '请选择专业名称', trigger: 'blur' }],
+        userName: [{ required: true, message: '请选择授课老师', trigger: 'blur' }]
       },
       selectData: {}, // 修改时需要用到的所有数据
       selectIndex: 0, // 修改时需要时用的下标
       teachers: [], // 所有老师
       courses: [] // 所有专业
-    };
+    }
   },
-  created() {
-      // console.log(this.$store.state.userData );
-      // this.$store.commit("add");
-    Api.GetAllClass().then(res=>{
+  created () {
+    // console.log(this.$store.state.userData );
+    // this.$store.commit("add");
+    Api.GetAllClass().then(res => {
       this.tableData = res.data
     })
   },
   watch: {
-    'comTeacher':{
-      /**监听选择老师下拉框 */
-      handler:function(newVla,oldVal){
+    comTeacher: {
+      /** 监听选择老师下拉框 */
+      handler: function (newVla, oldVal) {
         this.ruleForm.userId = this.comTeacher.userId
         this.ruleForm.userName = this.comTeacher.userName
       },
-      deep:true
+      deep: true
     },
-    'comCourse':{
-      /**监听选择专业下拉框 */
-      handler:function(newVla,oldVal){
-        this.ruleForm.courseId = this.comCourse.courseId;
-        this.ruleForm.courseName = this.comCourse.courseName;
+    comCourse: {
+      /** 监听选择专业下拉框 */
+      handler: function (newVla, oldVal) {
+        this.ruleForm.courseId = this.comCourse.courseId
+        this.ruleForm.courseName = this.comCourse.courseName
       },
-      deep:true
+      deep: true
     }
   },
-  components:{SelectCourse,SelectTeacher},
+  components: { SelectCourse, SelectTeacher },
   methods: {
-    addItem(){
+    addItem () {
       this.selectWin = true
-      this.centerDialogVisible=true
+      this.centerDialogVisible = true
 
       this.ruleForm.className = ''
       this.comTeacher = {
-        userName:"",
-        userId:"0"
+        userName: '',
+        userId: '0'
       }
       this.comCourse = {
-        courseName:"",
-        courseId:"0"
+        courseName: '',
+        courseId: '0'
       }
-
     },
-    addData(formName) { // 添加
+    addData (formName) { // 添加
       /**
        * 添加班级数据
        */
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          let className = this.ruleForm.className
-          let teacherName = this.ruleForm.userName
-          let courseName = this.ruleForm.courseName
+          const className = this.ruleForm.className
+          const teacherName = this.ruleForm.userName
+          const courseName = this.ruleForm.courseName
           Api.AddClass({
-              className: className, //班级名称
-              classTeacherId: this.ruleForm.userId, //老师编号
-              classCourseId: this.ruleForm.courseId //课程编号
+            className: className, // 班级名称
+            classTeacherId: this.ruleForm.userId, // 老师编号
+            classCourseId: this.ruleForm.courseId // 课程编号
           }).then(res => {
-            switch (res.data.code){
+            switch (res.data.code) {
               case 1:
                 this.tableData.unshift({
                   classCourseId: res.data.data.classCourseId,
@@ -172,34 +171,33 @@ export default {
                   classStudents: res.data.data.classStudents,
                   classCreateTime: res.data.data.classCreateTime.substring(0, 10),
                   classTeacherId: res.data.data.classTeacherId
-                });
-                this.$message({ message: res.data.message,type: "success" });
-                break;
+                })
+                this.$message({ message: res.data.message, type: 'success' })
+                break
               default:
-                this.$message.error( res.data.message );
-                break;
+                this.$message.error(res.data.message)
+                break
             }
-          });
-          this.centerDialogVisible = false;
+          })
+          this.centerDialogVisible = false
         }
       })
     },
-    handleEdit(index, row) { // 编辑
-
-      this.selectWin = false; // 改为编辑框
-      this.centerDialogVisible = true; // 显示弹框
+    handleEdit (index, row) { // 编辑
+      this.selectWin = false // 改为编辑框
+      this.centerDialogVisible = true // 显示弹框
 
       this.comCourse = {
-        courseId:row.classCourseId,
-        courseName:row.courseName
+        courseId: row.classCourseId,
+        courseName: row.courseName
       }
       this.comTeacher = {
-        userId:row.classTeacherId,
-        userName:row.userName
+        userId: row.classTeacherId,
+        userName: row.userName
       }
 
-      this.ruleForm.className = row.className;
-      this.ruleForm.courseId = row.classCourseId;
+      this.ruleForm.className = row.className
+      this.ruleForm.courseId = row.classCourseId
       this.ruleForm.userId = row.classTeacherId
       console.log(this.ruleForm)
 
@@ -210,96 +208,93 @@ export default {
       //   userName: "" // 授课老师
       console.log(row)
 
-      this.selectData = row; // 将要编辑的所有数据传给 selectData 在修改时引用
-      this.selectIndex = index; // 将要编辑的下标传给 selectIndex 在修改时引用
+      this.selectData = row // 将要编辑的所有数据传给 selectData 在修改时引用
+      this.selectIndex = index // 将要编辑的下标传给 selectIndex 在修改时引用
     },
-    modification(formName) {// 修改
+    modification (formName) { // 修改
       /**
        * 后台修改
        */
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          let classId = this.selectData.classId
-          let className = this.ruleForm.className
-          let classTeacherId = this.comTeacher.userId
-          let classCourseId = this.comCourse.courseId
-        Api.ModifyClass({
-          classId, //要修改的班级主键
-          className, //要修改的班级名称
-          classCourseId, //课程编号
-          classTeacherId //老师编号
-        }).then(res => {
-          switch (res.data.code){
-            case 1:
-              /**虚拟修改*/
-              let teachName = this.comTeacher.userName // 授课老师
-              let courses = this.comCourse.courseName // 专业  （临时变量）
-              let item = this.tableData[this.selectIndex]
-              item.className = className;
-              item.courseName = courses;
-              item.userName = teachName;
-              item.classTeacherId = this.comTeacher.userId
-              item.classCourseId = this.comCourse.courseId
-              this.$message({ message: res.data.message,type: "success" });
-              break;
-            default:
-              this.$message({ message: res.data.message,type: "warning" });
-              break;
-          }
-
-        });
-        this.centerDialogVisible = false;
+          const classId = this.selectData.classId
+          const className = this.ruleForm.className
+          const classTeacherId = this.comTeacher.userId
+          const classCourseId = this.comCourse.courseId
+          Api.ModifyClass({
+            classId, // 要修改的班级主键
+            className, // 要修改的班级名称
+            classCourseId, // 课程编号
+            classTeacherId // 老师编号
+          }).then(res => {
+            switch (res.data.code) {
+              case 1:{
+              /** 虚拟修改 */
+                const teachName = this.comTeacher.userName // 授课老师
+                const courses = this.comCourse.courseName // 专业  （临时变量）
+                const item = this.tableData[this.selectIndex]
+                item.className = className
+                item.courseName = courses
+                item.userName = teachName
+                item.classTeacherId = this.comTeacher.userId
+                item.classCourseId = this.comCourse.courseId
+                this.$message({ message: res.data.message, type: 'success' })
+                break}
+              default:{
+                this.$message({ message: res.data.message, type: 'warning' })
+                break}
+            }
+          })
+          this.centerDialogVisible = false
         }
       })
     },
-    handleDelete(index, row) { // 删除
+    handleDelete (index, row) { // 删除
       this.$confirm(this.$t('FClass.yun'), this.$t('FClass.Tips'), {
         confirmButtonText: this.$t('FClass.determine'),
         cancelButtonText: this.$t('FClass.cancel'),
-        type: "warning"
+        type: 'warning'
       }).then(() => {
-          Api.RemoveClass({
-              classId: row.classId
-          }).then(res=>{
-            if(res.data.code === 1){
-              this.tableData.splice(index, 1);
-              this.$message({
-                type: "success",
-                message: res.data.message
-              });
-            }else{
-              this.$message({
-                type: "info",
-                message: res.data.message
-              });
-            }
-          })
-        }).catch(() => {
-          this.$message({
-            type: "info",
-            message: this.$t('FClass.cancel1')
-          });
-        });
+        Api.RemoveClass({
+          classId: row.classId
+        }).then(res => {
+          if (res.data.code === 1) {
+            this.tableData.splice(index, 1)
+            this.$message({
+              type: 'success',
+              message: res.data.message
+            })
+          } else {
+            this.$message({
+              type: 'info',
+              message: res.data.message
+            })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: this.$t('FClass.cancel1')
+        })
+      })
     },
 
-
-
-    close(formName){ // 关闭弹出窗口回调
-      this.$refs[formName].resetFields();
+    close (formName) { // 关闭弹出窗口回调
+      this.$refs[formName].resetFields()
     },
-    arrFindTeacher(arr,val){ // 查找老师名称
-      return arr.find(item=>item.userId===val)
+    arrFindTeacher (arr, val) { // 查找老师名称
+      return arr.find(item => item.userId === val)
     },
-    arrFindCourses(arr,val){ // 查找专业名称
-      return arr.find(item=>item.courseId===val)
+    arrFindCourses (arr, val) { // 查找专业名称
+      return arr.find(item => item.courseId === val)
     }
   },
-  filters:{
-    time(){
+  filters: {
+    time () {
 
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

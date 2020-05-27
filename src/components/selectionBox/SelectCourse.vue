@@ -13,38 +13,38 @@
 </template>
 
 <script>
-import Api from "@/http/FClass";
+import Api from '@/http/FClass'
 export default {
-  data() {
+  data () {
     return {
       allCourse: []
-    };
+    }
   },
-  props: ["value"],
-  created() {
+  props: ['value'],
+  created () {
     Api.GetAllCourse().then(res => {
-      this.allCourse = res.data;
-    });
+      this.allCourse = res.data
+    })
   },
   watch: {
-    "value.courseId": {
-      handler: function(newVal, oldVal) {
+    'value.courseId': {
+      handler: function (newVal, oldVal) {
         try {
           this.value.courseName = this.allCourse.find(
             item => item.courseId === this.value.courseId
-          ).courseName;
+          ).courseName
         } catch {}
-        this.$emit("input", this.value);
+        this.$emit('input', this.value)
       },
       deep: true
     }
   },
   methods: {
-    bindFocus(){
+    bindFocus () {
       this.$refs.selectCourse.focus()
     }
-  },
-};
+  }
+}
 </script>
 
 <style lang="less" scoped>

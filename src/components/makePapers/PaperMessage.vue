@@ -18,51 +18,50 @@
 import SelectCourse from '@/components/selectionBox/SelectCourse' // 组件
 import Api from '@/http/BMakePaper' // API接口
 export default {
-    data() {
-        var fromPaperFrom = (rule, value, callback) => {
-            if (!value) return callback(new Error('试卷名称不能为空'));
-            callback()
-        };
-        return {
-            paperCourse:{courseId:"0",courseName:""}, // v-model的传入值
-            fromPaperName:{
-                /** */
-                name:"",
-                selectCourse:""
-            },
-            fromPaperRules:{
-                name: [{ validator: fromPaperFrom,required: true, trigger: 'blur' }]
-            },
+  data () {
+    var fromPaperFrom = (rule, value, callback) => {
+      if (!value) return callback(new Error('试卷名称不能为空'))
+      callback()
+    }
+    return {
+      paperCourse: { courseId: '0', courseName: '' }, // v-model的传入值
+      fromPaperName: {
+        /** */
+        name: '',
+        selectCourse: ''
+      },
+      fromPaperRules: {
+        name: [{ validator: fromPaperFrom, required: true, trigger: 'blur' }]
+      }
+    }
+  },
+  watch: {
+    'paperCourse.courseId' (newV) { // 监听获取到的值
+      this.fromPaperName.selectCourse = this.paperCourse.courseId
+    }
+  },
+  methods: {
+    submitForm (formName) {
+      if (!this.fromPaperName.name) return this.$refs.name.focus()
+      if (this.paperCourse.courseId === '0') return this.$refs.selectCourse.$refs.selectCourse.focus()
+      const uid = this.$store.state.userData.userUid // 老师编号
+      Api.MakeTestPaper({
+        uid,
+        paper: { tpTitle: this.fromPaperName.name, tpCourseId: this.fromPaperName.selectCourse }
+      }).then(res => {
+        switch (res.data.code) {
+          case 1:
+            sessionStorage.setItem('testPaperId', res.data.data.testPaperId) // 保存试卷编号
+            this.$message({ message: '试卷添加成功', type: 'success' })
+            this.$emit('next', res.data.data.testPaperId) // 在父组件调用方法
+            break
+          default:
+            this.$message({ message: res.data.message, type: 'warning' })
         }
-    },
-    watch: {
-        'paperCourse.courseId'(newV){ // 监听获取到的值
-            this.fromPaperName.selectCourse = this.paperCourse.courseId
-        }
-    },
-    methods: {
-        submitForm(formName) {
-            if(!this.fromPaperName.name) return this.$refs['name'].focus()
-            if(this.paperCourse.courseId==="0") return this.$refs.selectCourse.$refs.selectCourse.focus()
-            let uid = JSON.parse(sessionStorage.getItem('userData')).userUid // 老师编号
-            Api.MakeTestPaper({
-                uid,
-                paper:{tpTitle:this.fromPaperName.name,tpCourseId:this.fromPaperName.selectCourse}
-            }).then(res=>{
-                switch (res.data.code){
-                    case 1:
-                        sessionStorage.setItem("testPaperId",res.data.data.testPaperId) // 保存试卷编号
-                        this.$message({message: '试卷添加成功',type: 'success'});
-                        this.$emit("next",res.data.data.testPaperId) // 在父组件调用方法
-                        break;
-                    default:
-                        this.$message({message: res.data.message ,type: 'warning'});
-                }
-
-            })
-        },
-    },
-    components:{SelectCourse}
+      })
+    }
+  },
+  components: { SelectCourse }
 }
 </script>
 

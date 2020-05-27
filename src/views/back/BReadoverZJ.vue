@@ -155,39 +155,39 @@
 </template>
 
 <script>
-import Api from "@/http/BReadover";
+import Api from '@/http/BReadover'
 
-import PaperAddTitle from "@/components/makePapers/PaperAddTitle";
-import PaperComplete from "@/components/makePapers/PaperComplete";
+import PaperAddTitle from '@/components/makePapers/PaperAddTitle'
+import PaperComplete from '@/components/makePapers/PaperComplete'
 export default {
-  data() {
+  data () {
     return {
       allStudentData: [], // 获取所有学生
       allStudentHasView: [], // 已阅卷的学生
       allStudentNoHasView: [], // 未阅卷的学生
-      testUid: "", // 学生id
+      testUid: '', // 学生id
       allPaperData: { questions: [] }, // 试卷所有数据
       tableData_1: [{}], // 分数表格
       hasView: false, // 是否显示学生试卷信息
       choice: [], // 选择题
       blank: [], // 填空题
       essay: [], // 问答题
-      usa: ["A", "B", "C", "D", "E", "F", "G"], // 选择题选项
-    };
+      usa: ['A', 'B', 'C', 'D', 'E', 'F', 'G'] // 选择题选项
+    }
   },
-  created() {
+  created () {
     Api.GetStudentTest({ taskId: this.$route.query.paperId }).then(res => {
-      this.allStudentData = res.data;
-      this.allStudentHasView = this.allStudentData.filter(item => item.hasView);
+      this.allStudentData = res.data
+      this.allStudentHasView = this.allStudentData.filter(item => item.hasView)
       this.allStudentNoHasView = this.allStudentData.filter(
         item => !item.hasView
-      );
-    });
+      )
+    })
   },
   watch: {
     /** 监听学生会改变的数据 计算分数 */
     allPaperData: {
-      handler(newObj) {
+      handler (newObj) {
         this.tableData_1 = [
           {
             stuName: newObj.stuName,
@@ -195,60 +195,60 @@ export default {
             testSubmitTime: newObj.testSubmitTime,
             testScore: newObj.testScore
           }
-        ];
+        ]
         this.tableData_1[0].choice = this.choice.reduce(
           (num, item) => num + item.score,
           0
-        );
+        )
         this.tableData_1[0].blank = this.blank.reduce(
           (num, item) => num + item.score,
           0
-        );
+        )
         this.tableData_1[0].essay = this.essay.reduce(
           (num, item) => num + item.score,
           0
-        );
+        )
         this.allPaperData.testScore =
           this.tableData_1[0].choice +
           this.tableData_1[0].blank +
-          this.tableData_1[0].essay;
-        this.tableData_1[0].testScore = this.allPaperData.testScore;
+          this.tableData_1[0].essay
+        this.tableData_1[0].testScore = this.allPaperData.testScore
       },
       deep: true
     }
   },
   computed: {
     /** 选择题总分 */
-    choiseScore() {
-      return this.choice.reduce((num, item) => num + item.testPaperScore, 0);
+    choiseScore () {
+      return this.choice.reduce((num, item) => num + item.testPaperScore, 0)
     },
     /** 选择题得分 */
-    haveChoiseScore() {
-      return this.choice.reduce((num, item) => num + item.score, 0);
+    haveChoiseScore () {
+      return this.choice.reduce((num, item) => num + item.score, 0)
     },
     /** 填空题总分 */
-    blankScore() {
-      return this.blank.reduce((num, item) => num + item.testPaperScore, 0);
+    blankScore () {
+      return this.blank.reduce((num, item) => num + item.testPaperScore, 0)
     },
     /** 填空题得分 */
-    haveBlankScore() {
-      return this.blank.reduce((num, item) => num + item.score, 0);
+    haveBlankScore () {
+      return this.blank.reduce((num, item) => num + item.score, 0)
     },
     /** 问答题总分 */
-    essayScore() {
-      return this.essay.reduce((num, item) => num + item.testPaperScore, 0);
+    essayScore () {
+      return this.essay.reduce((num, item) => num + item.testPaperScore, 0)
     },
     /** 问答题得分 */
-    haveEssayScore() {
-      return this.essay.reduce((num, item) => num + item.score, 0);
+    haveEssayScore () {
+      return this.essay.reduce((num, item) => num + item.score, 0)
     }
   },
   methods: {
     /** 点击学生获取对应试卷 */
-    lookStu(testUid) {
-      this.testUid = testUid;
+    lookStu (testUid) {
+      this.testUid = testUid
       Api.GetStudentTestPaper({ testUid }).then(res => {
-        this.allPaperData = res.data;
+        this.allPaperData = res.data
         this.tableData_1 = [
           {
             stuName: this.allPaperData.stuName,
@@ -256,85 +256,85 @@ export default {
             testSubmitTime: this.allPaperData.testSubmitTime,
             testScore: this.allPaperData.testScore
           }
-        ];
-        this.hasView = true;
+        ]
+        this.hasView = true
         // 选择题
         this.choice = this.allPaperData.questions.filter(
           item => item.questionTypeId === 1
-        );
+        )
         this.tableData_1[0].choice = this.choice.reduce(
           (num, item) => num + item.score,
           0
-        );
+        )
         // 填空题
         this.blank = this.allPaperData.questions.filter(
           item => item.questionTypeId === 2
-        );
+        )
         this.tableData_1[0].blank = this.blank.reduce(
           (num, item) => num + item.score,
           0
-        );
+        )
         // 问答题
         this.essay = this.allPaperData.questions.filter(
           item => item.questionTypeId === 3
-        );
+        )
         this.tableData_1[0].essay = this.essay.reduce(
           (num, item) => num + item.score,
           0
-        );
-      });
+        )
+      })
     },
     /** 计算填空题分数 */
-    handleChangeBlank(data) {
+    handleChangeBlank (data) {
       data.score = data.fillQuestion.myFill.reduce(
         (num, item) => num + item.fillScore,
         0
-      );
+      )
     },
     /** 保存分数 */
-    commitPaper() {
-      let userUid = this.$store.state.userData.userUid;
-      let data = {
+    commitPaper () {
+      const userUid = this.$store.state.userData.userUid
+      const data = {
         id: this.allPaperData.id,
         testScore: this.allPaperData.testScore,
         studentAnswer: []
-      };
+      }
       this.essay.forEach(item => {
-        data.studentAnswer.push({ id: item.id, score: item.score });
-      });
+        data.studentAnswer.push({ id: item.id, score: item.score })
+      })
       this.blank.forEach(item => {
-        let arrSCore = [];
+        const arrSCore = []
         item.fillQuestion.myFill.forEach(item_2 => {
-          arrSCore.push({ id: item_2.id, fillScore: item_2.fillScore });
-        });
+          arrSCore.push({ id: item_2.id, fillScore: item_2.fillScore })
+        })
         data.studentAnswer.push({
           id: item.id,
           score: item.score,
           fillOption: arrSCore
-        });
-      });
+        })
+      })
       Api.SetTestPaperScore(data, { userUid }).then(res => {
         switch (res.data.code) {
           case 1:
-            let isuseInd = this.allStudentNoHasView.findIndex(
+            const isuseInd = this.allStudentNoHasView.findIndex(
               item => item.testUid === this.testUid
-            );
+            )
             if (isuseInd !== -1) {
               this.allStudentHasView.push(
                 this.allStudentNoHasView.splice(isuseInd, 1)[0]
-              );
+              )
             }
             document.getElementsByClassName('main')[0].scrollTop = 0
-            this.$message({ type: "success", message: res.data.message });
-            break;
+            this.$message({ type: 'success', message: res.data.message })
+            break
           default:
-            this.$message({ type: "warning", message: res.data.message });
-            break;
+            this.$message({ type: 'warning', message: res.data.message })
+            break
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less">

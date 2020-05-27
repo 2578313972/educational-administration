@@ -69,130 +69,124 @@
       </span>
     </el-dialog>
 
-
   </div>
 </template>
 
 <script>
-import Api from "@/http/FRole";
-import Sortable from 'sortablejs';
+import Api from '@/http/FRole'
+import Sortable from 'sortablejs'
 export default {
-  data() {
+  data () {
     return {
-      checked:false, // 是否允许拖拽
+      checked: false, // 是否允许拖拽
       tableData: [], // 显示的用户数据
-      allData:[],
+      allData: [],
       selectWin: true, // 控制添加和修改
       centerDialogVisible: false, // 控制新增弹框
       ruleForm: {
-        userTypeTypeName: "", // 角色名称
+        userTypeTypeName: '' // 角色名称
       },
-      sortable:"",
+      sortable: '',
       rules: { // 弹框验证
         userTypeTypeName: [
-          { required: true, message: "输入角色名称", trigger: "blur" }
+          { required: true, message: '输入角色名称', trigger: 'blur' }
         ]
       },
       selectData: {}, // 修改时需要用到的所有数据
-      selectIndex: 0, // 修改时需要时用的下标
+      selectIndex: 0 // 修改时需要时用的下标
 
-
-    };
+    }
   },
-  created() {
-    Api.GetUserRoles().then(res=>{
+  created () {
+    Api.GetUserRoles().then(res => {
       this.tableData = res.data
       this.allData = JSON.parse(JSON.stringify(res.data))
     })
   },
   watch: {
-    checked(newVal,oldVla){
-      if(newVal){
+    checked (newVal, oldVla) {
+      if (newVal) {
         this.rowDrop()
-      }else{
+      } else {
         this.sortable.destroy()
       }
-
     }
   },
   methods: {
-    handleEdit(index, row) {
+    handleEdit (index, row) {
       // 编辑
-      this.selectWin = false; // 改为编辑框
-      this.centerDialogVisible = true; // 显示弹框
-      this.ruleForm.userTypeTypeName = row.userTypeTypeName;
-      this.selectData = row; // 将要编辑的所有数据传给 selectData 在修改时引用
-      this.selectIndex = index; // 将要编辑的下标传给 selectIndex 在修改时引用
+      this.selectWin = false // 改为编辑框
+      this.centerDialogVisible = true // 显示弹框
+      this.ruleForm.userTypeTypeName = row.userTypeTypeName
+      this.selectData = row // 将要编辑的所有数据传给 selectData 在修改时引用
+      this.selectIndex = index // 将要编辑的下标传给 selectIndex 在修改时引用
     },
-    handleDelete(index, row) {
+    handleDelete (index, row) {
       // 删除
-      this.$confirm("此操作将永久删除该班级, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+      this.$confirm('此操作将永久删除该班级, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
-        Api.RemoveUserRole(row.userTypeId).then(res=>{
-          this.tableData.splice(index,1)
+        Api.RemoveUserRole(row.userTypeId).then(res => {
+          this.tableData.splice(index, 1)
         })
       }).catch(() => {
         this.$message({
-          type: "info",
-          message: "已取消删除"
-        });
-      });
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
-    modification(formName) {
+    modification (formName) {
       // 修改
       /**
        * 后台修改
        */
       this.$refs[formName].validate(valid => {
         if (valid) {
-          let id = this.selectData.userTypeId
-          let userRoleName = this.ruleForm.userTypeTypeName
-          console.log(id,userRoleName);
-          Api.ModifyUserRole({id,userRoleName}).then(res=>{
+          const id = this.selectData.userTypeId
+          const userRoleName = this.ruleForm.userTypeTypeName
+          console.log(id, userRoleName)
+          Api.ModifyUserRole({ id, userRoleName }).then(res => {
             this.tableData[this.selectIndex].userTypeTypeName = userRoleName
-            this.$message({message: '修改成功',type: 'success'});
-
+            this.$message({ message: '修改成功', type: 'success' })
           })
-          this.centerDialogVisible = false;
+          this.centerDialogVisible = false
         }
-      });
+      })
     },
-    addData(formName) {
-      /**添加数据*/
+    addData (formName) {
+      /** 添加数据 */
       this.$refs[formName].validate(valid => {
         if (valid) {
-          let userRoleName = this.ruleForm.userTypeTypeName
-          Api.AddUserRole(userRoleName).then(res=>{
+          const userRoleName = this.ruleForm.userTypeTypeName
+          Api.AddUserRole(userRoleName).then(res => {
             this.tableData.unshift({
               disable: res.data.data.disable,
               userTypeId: res.data.data.userTypeId,
               userTypeTypeName: res.data.data.userTypeTypeName
             })
-            this.$message({message: '添加成功',type: 'success'});
+            this.$message({ message: '添加成功', type: 'success' })
           })
-          this.centerDialogVisible = false;
+          this.centerDialogVisible = false
         }
-      });
+      })
     },
-    close(formName) {
+    close (formName) {
       // 关闭弹出窗口回调
-      this.$refs[formName].resetFields();
+      this.$refs[formName].resetFields()
     },
 
-
-    //行拖拽
-    rowDrop() {
+    // 行拖拽
+    rowDrop () {
       const tbody = document.querySelector('.el-table__body-wrapper tbody')
       const that = this
       this.sortable = Sortable.create(tbody, {
-        animation:150,
-        onEnd({ newIndex, oldIndex }) {
-
-          let data = that.tableData.splice(oldIndex,1)[0]
-          that.tableData.splice(newIndex,0,data)
+        animation: 150,
+        onEnd ({ newIndex, oldIndex }) {
+          const data = that.tableData.splice(oldIndex, 1)[0]
+          that.tableData.splice(newIndex, 0, data)
           //    let allData = JSON.parse(JSON.stringify(that.tableData))
           //    let newData = that.allData[newIndex] // 新数据
           //    let oldData = that.allData[oldIndex] // 旧数据
@@ -207,20 +201,20 @@ export default {
 
           // console.log(1,that.allData.map(item=>item.userTypeTypeName))
 
-          let userTypes = [] // 创建一个数组用于接收改变顺序后的值
+          const userTypes = [] // 创建一个数组用于接收改变顺序后的值
           for (let i in that.tableData) { // 循环添加
-            userTypes.push({userTypeId:that.tableData[i].userTypeId,userTypeSortNo:++i})
+            userTypes.push({ userTypeId: that.tableData[i].userTypeId, userTypeSortNo: ++i })
           }
-          Api.OrderUserRoleNo(userTypes).then(res=>{ /**调用Api接口*/
+          Api.OrderUserRoleNo(userTypes).then(res => { /** 调用Api接口 */
             // that.tableData = JSON.parse(JSON.stringify(that.allData))
-            console.log(res);
+            console.log(res)
           })
           // that.tableData = allData
         }
       })
     }
   }
-};
+}
 </script>
 
 <style lang="less">
