@@ -47,7 +47,7 @@
 
 <script>
 import Api from '@/http/BTest'
-import SelectClass from '@/components/selectionBox/SelectClass'
+import SelectClass from 'select/SelectClass'
 import { export2Excel } from '@/common/js/util'
 
 import ECharts from 'vue-echarts'

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import SelectCourse from '@/components/selectionBox/SelectCourse' // 组件
+import SelectCourse from 'select/SelectCourse' // 组件
 import Api from '@/http/BMakePaper' // API接口
 export default {
   data () {

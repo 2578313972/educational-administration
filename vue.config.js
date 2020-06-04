@@ -24,8 +24,12 @@ module.exports = {
   chainWebpack: (config) => {
     console.log(config);
     config.resolve.alias
+      // resolve() 中 @不指向src
       .set('@', resolve('./src'))
       .set('paper', resolve('./src/components/makePapers')) // 试卷路径
+      .set('select', resolve('./src/components/selectionBox')) // 下拉框组件路径
+      // .set('select1', resolve('@/src/components/selectionBox')) // 下拉框组件路径
+      // .set('select2', resolve('src/components/selectionBox')) // 下拉框组件路径
     //set第一个参数：设置的别名，第二个参数：设置的路径
   },
 }

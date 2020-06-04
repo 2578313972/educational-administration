@@ -68,13 +68,12 @@ function Http (baseurl) {
               }
             })
             /** 重新获取token */
-            console.log(res)
-            if (res.data.token_type === 'Bearer') {
-              Cookie.setCookie('token', Base64.encode(res.data.token_type + ' ' + res.data.access_token))
+            // if (res.data.token_type === 'Bearer') {
+              // Cookie.setCookie('token', Base64.encode(res.data.token_type + ' ' + res.data.access_token))
               return http(error.config)
-            } else {
-              throw new Error()
-            }
+            // } else {
+            //   throw new Error()
+            // }
           } catch (err) {
             Cookie.removeCookie('userInfo')
             return router.replace({ path: '/login' })

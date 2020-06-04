@@ -104,7 +104,7 @@
 import Api from '@/http/FStudent'
 import TimeOut from '@/plug-in/TimeOut'
 
-import SelectClass from '@/components/selectionBox/SelectClass'
+import SelectClass from 'select/SelectClass'
 export default {
   data () {
     var checkAge = (rule, value, callback) => {

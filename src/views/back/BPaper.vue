@@ -67,7 +67,7 @@
 
 <script>
 import Api from '@/http/BPaper'
-import SelectCourse from '@/components/selectionBox/SelectCourse'
+import SelectCourse from 'select/SelectCourse'
 
 import TimeOut from '@/plug-in/TimeOut'
 export default {

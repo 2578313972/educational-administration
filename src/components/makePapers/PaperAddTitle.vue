@@ -86,7 +86,7 @@
 
 <script>
 import Api from '@/http/BMakePaper'
-import SelectQuestionType from '@/components/selectionBox/SelectQuestionType' // 题目类型组件
+import SelectQuestionType from 'select/SelectQuestionType' // 题目类型组件
 import PaperChoiceQuestion from 'paper/subject/PaperChoiceQuestion' // 选择题组件
 import PaperBlanksTest from 'paper/subject/PaperBlanksTest' // 填空题组件
 import PaperEssayQuestion from 'paper/subject/PaperEssayQuestion' // 问答题组件

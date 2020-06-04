@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Cookie from '@/plug-in/Cookie.js'
 Vue.use(VueRouter)
 
 const context = require.context('.', false, /[^index]\.js$/)

@@ -90,7 +90,7 @@
 
 <script>
 import Api from '@/http/FTeacher'
-import SelectUser from '@/components/selectionBox/SelectUser'
+import SelectUser from 'select/SelectUser'
 export default {
   data () {
     var checkAge = (rule, value, callback) => {

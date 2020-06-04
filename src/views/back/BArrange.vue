@@ -134,8 +134,8 @@ import Api from '@/http/BArrange'
 
 import TimeOut from '@/plug-in/TimeOut'
 
-import SelectClass from '@/components/selectionBox/SelectClass'
-import SelectPaper from '@/components/selectionBox/SelectPaper'
+import SelectClass from 'select/SelectClass'
+import SelectPaper from 'select/SelectPaper'
 export default {
   data () {
     return {

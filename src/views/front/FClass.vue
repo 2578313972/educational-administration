@@ -75,8 +75,8 @@
 
 <script>
 import Api from '@/http/FClass'
-import SelectCourse from '@/components/selectionBox/SelectCourse'
-import SelectTeacher from '@/components/selectionBox/SelectTeacher'
+import SelectCourse from 'select/SelectCourse'
+import SelectTeacher from 'select/SelectTeacher'
 export default {
   data () {
     return {

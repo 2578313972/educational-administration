@@ -5,10 +5,11 @@ Vue.directive('has', {
   inserted: function (el, val) {
     switch (val.value) {
       case 1:
-        break
+        break;
       default:
-        el.style.display = 'none'
-        break
+        // el.style.display = 'none'
+        el.remove();
+        break;
     }
   }
-})
+});
